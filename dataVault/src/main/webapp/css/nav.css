@@ -1,0 +1,234 @@
+.searchBefore::before{
+    content: "";
+    display: block;
+    width: 39px;
+    height: 37px;
+    border-radius: 2px;
+    margin-top: -5px;
+    background: url("../images/search.png") no-repeat;
+    margin-left: 8px;
+}
+i{
+    width: fit-content !important;
+}
+
+#AllSortDiv{
+    width:80%;
+    min-width: 400px;
+    height: 40vw;
+    border: #9eb6d8 solid 0.5px;
+    box-shadow: 0 -3px 6px rgb(0 0 0/18%);
+    transition: all 0.5s;
+    background-color: white;
+    position: absolute;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    z-index: 2147483647;
+    overflow-y: auto;
+
+}
+
+#AllSortDiv::before{
+    content: "";
+    border-bottom: 30px solid #fff;
+    border-right: 20px solid transparent;
+    border-left: 20px solid transparent;
+    position: absolute;
+    top: -20px;
+    left: 15%;
+
+}
+.sort{
+    width: fit-content;
+    height: auto;
+    min-height: 25px;
+    margin: 10px 1.5%;
+    cursor: pointer;
+    border-radius: 10px;
+    padding:5px 10px;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    justify-items: start
+
+}
+
+#all{
+    width: fit-content;
+    height: auto;
+    margin: 10px 1.5%;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 5px 10px;
+    display: grid;
+    place-items: center;
+    justify-items: start
+}
+
+.allSortBefore{
+    margin: auto;
+}
+
+#product{
+    cursor: pointer;
+}
+#product a{
+    color: white;
+    text-decoration: none;
+}
+#product2 a{
+    color: white;
+    text-decoration: none;
+}
+#product2{
+    cursor: pointer;
+}
+.productAfter{
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: 4px dashed;
+    border-top: 4px solid \9;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+/*#two::before{*/
+/*    content: "";*/
+/*    border-bottom: 16px solid #f0f0f0;*/
+/*    border-right: 10px solid transparent;*/
+/*    border-left: 10px solid transparent;*/
+/*    position: absolute;*/
+/*    top: -15px;*/
+/*    left: 0;*/
+
+
+/*}*/
+#two2::before{
+    content: "";
+    border-bottom: 16px solid #f0f0f0;
+    border-right: 10px solid transparent;
+    border-left: 10px solid transparent;
+    position: absolute;
+    top: -15px;
+    left:100px;
+
+
+}
+.sq img{
+    width: 100%;
+
+}
+#two{
+    z-index: 2147483640;
+    border:#e0e4e9 solid 0.5px;
+}
+#three{
+    z-index: 2147483640;
+    border:#e0e4e9 solid 1px;
+}
+#two2{
+    z-index: 2147483640;
+    border:#e0e4e9 solid 0.5px;
+}
+#three2{
+    z-index: 2147483640;
+    border:#e0e4e9 solid 1px;
+}
+.twoSortBefore::before{
+    content: url("../images/right.png");
+}
+
+.twoSort div{
+    width: 175px;
+    height: 20px;
+    padding-left: 40px;
+    cursor: pointer;
+}
+.twoSort{
+    display: flex;
+    margin: 10px auto;
+    color: #333333;
+    font-weight: normal;
+}
+.twoSort div:hover{
+    color: #0070bb;
+}
+.twoSort:hover .twoSortBefore::before{
+    content: url("../images/righthover.png");
+
+}
+.threeDiv{
+    width: 40%;
+    height: 25px;
+    margin: 10px ;
+    color: #333333;
+    font-weight: normal;
+}
+
+
+
+
+.twoSort2Before::before{
+    content: url("../images/right.png");
+}
+
+.twoSort2 div{
+    width: 175px;
+    height: 20px;
+    padding-left: 40px;
+    cursor: pointer;
+}
+.twoSort2{
+    display: flex;
+    margin: 10px auto;
+    color: #333333;
+    font-weight: normal;
+}
+.twoSort2 div:hover{
+    color: #0070bb;
+}
+.twoSort2:hover .twoSortBefore::before{
+    content: url("../images/righthover.png");
+
+}
+.threeDiv2{
+    width: 40%;
+    height: 25px;
+    margin: 10px ;
+    color: #333333;
+    font-weight: normal;
+}
+
+#two a{
+    color: #007bff;
+    text-decoration: none;
+}
+#two a:hover{
+    color: blue;
+}
+#threeSort a{
+    color: #007bff;
+    text-decoration: none;
+}
+#threeSort a:hover{
+    color: blue;
+}
+
+#two2 a{
+    color: #007bff;
+    text-decoration: none;
+}
+#two2 a:hover{
+    color: blue;
+}
+#threeSort2 a{
+    color: #007bff;
+    text-decoration: none;
+}
+#threeSort2 a:hover{
+    color: blue;
+}

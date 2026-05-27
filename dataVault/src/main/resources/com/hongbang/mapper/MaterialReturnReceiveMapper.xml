@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.MaterialReturnReceiveMapper">
+
+    <insert id="insert">
+        INSERT INTO material_return_receive
+        (
+            application_content_id,
+            application_id,
+            product_id,
+            vault,
+            handle_type,
+            return_qty,
+            continue_purchase,
+            handle_remark,
+         return_qtyed
+        ) VALUES (
+                     #{applicationContentId},
+                     #{applicationId},
+                     #{productId},
+                     #{vault},
+                     #{handleType},
+                     #{returnQty},
+                    3,
+                     #{handleRemark},
+                  0
+                 )
+    </insert>
+    <select id="selectProduct" resultType="com.hongbang.pojo.Product">
+
+            SELECT
+            id,
+            parentId,
+            name,
+            url,
+            material_number,
+            brand,
+            description,
+            number,
+            vault,
+            deleteSign,
+            unit,
+            priceUnit
+            FROM product
+            WHERE (id, vault) IN
+            <foreach collection="materialReturnReceives" item="materialReturnReceives" index="index" open="(" separator="," close=")">
+                (#{MaterialReturnReceives.productId}, #{MaterialReturnReceives.vault})
+            </foreach>
+
+            UNION ALL
+
+            SELECT
+            id AS id,
+            fin_sort_id AS parentId,
+            fin_product_name AS name,
+            url AS url,
+            fin_material_number AS material_number,
+            price AS brand,
+            fin_description AS description,
+            fin_number AS number,
+            vault AS vault,
+            deleteSign AS deleteSign,
+            unit AS unit,
+            priceUnit AS priceUnit
+            FROM fin_product
+            WHERE (id, vault) IN
+            <foreach collection="materialReturnReceives" item="materialReturnReceives" index="index" open="(" separator="," close=")">
+                (#{MaterialReturnReceives.productId}, #{MaterialReturnReceives.vault})
+            </foreach>
+        </select>
+    <select id="selectNoFp" resultType="java.util.Map">
+        SELECT
+            r.*,
+
+            COALESCE(p.parentId, f.fin_sort_id) AS parentId,
+            COALESCE(p.name, f.fin_product_name) AS name,
+            COALESCE(p.url, f.url) AS url,
+            COALESCE(p.material_number, f.fin_material_number) AS material_number,
+            COALESCE(p.brand, f.price) AS brand,
+            COALESCE(p.description, f.fin_description) AS description,
+            COALESCE(p.number, f.fin_number) AS number,
+
+            COALESCE(p.unit, f.unit) AS unit,
+            COALESCE(p.priceUnit, f.priceUnit) AS priceUnit
+
+        FROM material_return_receive r
+
+                 LEFT JOIN product p
+                           ON r.product_id = p.id AND r.vault = p.vault
+
+                 LEFT JOIN fin_product f
+                           ON r.product_id = f.id AND r.vault = f.vault
+
+        WHERE r.handle_type = 2 AND LENGTH(material_number) > 0
+
+        ORDER BY
+            CASE WHEN r.receive_user = 0 THEN 0 ELSE 1 END,
+            r.handle_time DESC
+
+            -- 分页：第 pageNum 页，每页 pageSize 条
+        LIMIT #{page}, #{pageSize}
+    </select>
+    <select id="selectNoFpCount" resultType="java.lang.Integer">
+select count(*) from (
+SELECT
+            r.*,
+
+            COALESCE(p.parentId, f.fin_sort_id) AS parentId,
+            COALESCE(p.name, f.fin_product_name) AS name,
+            COALESCE(p.url, f.url) AS url,
+            COALESCE(p.material_number, f.fin_material_number) AS material_number,
+            COALESCE(p.brand, f.price) AS brand,
+            COALESCE(p.description, f.fin_description) AS description,
+            COALESCE(p.number, f.fin_number) AS number,
+
+            COALESCE(p.unit, f.unit) AS unit,
+            COALESCE(p.priceUnit, f.priceUnit) AS priceUnit
+
+        FROM material_return_receive r
+
+                 LEFT JOIN product p
+                           ON r.product_id = p.id AND r.vault = p.vault
+
+                 LEFT JOIN fin_product f
+                           ON r.product_id = f.id AND r.vault = f.vault
+
+        WHERE r.handle_type = 2 AND LENGTH(material_number) > 0
+
+        ORDER BY
+            CASE WHEN r.receive_user = 0 THEN 0 ELSE 1 END,
+            r.handle_time DESC) as a
+    </select>
+    <select id="selectProductOne" resultType="com.hongbang.pojo.Product">
+        SELECT
+        id,
+        parentId,
+        name,
+        url,
+        material_number,
+        brand,
+        description,
+        number,
+        vault,
+        deleteSign,
+        unit,
+        priceUnit
+        FROM product
+        WHERE id=#{id} and vault = #{vault}
+
+
+        UNION ALL
+
+        SELECT
+        id AS id,
+        fin_sort_id AS parentId,
+        fin_product_name AS name,
+        url AS url,
+        fin_material_number AS material_number,
+        price AS brand,
+        fin_description AS description,
+        fin_number AS number,
+        vault AS vault,
+        deleteSign AS deleteSign,
+        unit AS unit,
+        priceUnit AS priceUnit
+        FROM fin_product
+        WHERE id=#{id} and vault = #{vault}
+    </select>
+    <select id="selectTh" resultType="java.util.Map">
+        SELECT
+            r.*,
+
+            COALESCE(p.parentId, f.fin_sort_id) AS parentId,
+            COALESCE(p.name, f.fin_product_name) AS name,
+            COALESCE(p.url, f.url) AS url,
+            COALESCE(p.material_number, f.fin_material_number) AS material_number,
+            COALESCE(p.brand, f.price) AS brand,
+            COALESCE(p.description, f.fin_description) AS description,
+            COALESCE(p.number, f.fin_number) AS number,
+
+            COALESCE(p.unit, f.unit) AS unit,
+            COALESCE(p.priceUnit, f.priceUnit) AS priceUnit
+
+        FROM material_return_receive r
+
+                 LEFT JOIN product p
+                           ON r.product_id = p.id AND r.vault = p.vault
+
+                 LEFT JOIN fin_product f
+                           ON r.product_id = f.id AND r.vault = f.vault
+
+        WHERE r.handle_type = 1 AND LENGTH(material_number) > 0
+
+        ORDER BY
+            CASE WHEN r.receive_user = 0 THEN 0 ELSE 1 END,
+            r.handle_time DESC
+
+            -- 分页：第 pageNum 页，每页 pageSize 条
+        LIMIT #{page}, #{pageSize}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.FinMappingMapper">
+
+    <!--    循环添加映射-->
+    <insert id="addMapExcel">
+        insert into fin_mapping (id, fin_att_name_id, fin_sort_id, begin_location, end_location, length) VALUES
+        <foreach collection="mappings" item="mappings" index="index" separator=",">
+            (
+            null,
+            #{mappings.finAttNameId,jdbcType=INTEGER},
+            #{mappings.finSortId,jdbcType=INTEGER},
+            #{mappings.beginLocation,jdbcType=INTEGER},
+            #{mappings.endLocation,jdbcType=INTEGER},
+            #{mappings.length,jdbcType=INTEGER}
+            )
+        </foreach>
+
+    </insert>
+    <delete id="deleteMapExcelNextAdd">
+        delete from  fin_mapping where fin_mapping.fin_sort_id in
+        <foreach collection="mappings" item="mappings" index="index" separator="," open="(" close=")">
+            #{mappings.finSortId,jdbcType=INTEGER}
+        </foreach>
+    </delete>
+</mapper>

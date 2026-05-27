@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.InspectionMapper">
+
+    <insert id="add">
+        insert into inspection(id, app_id, product_id, vault, pass_rate, notes,pass) VALUES
+            <foreach collection="inspections" item="inspections" index="index" separator=",">
+                (
+                 null,
+                 #{inspections.appId,jdbcType=INTEGER},
+                 #{inspections.productId,jdbcType=INTEGER},
+                 #{inspections.vault,jdbcType=INTEGER},
+                 #{inspections.passRate,jdbcType=DOUBLE},
+                 #{inspections.notes},
+                 0
+                )
+            </foreach>
+    </insert>
+    <insert id="batchInsertQCRequest">
+        INSERT INTO arrival_qc_record (content_id, qc_application_id, operator_id, qc_quantity, operation_time)
+        VALUES
+        <foreach collection='items' item='item' separator=','>
+        (#{item.content_id}, #{item.qc_application_id}, #{item.operator_id}, #{item.qc_quantity}, NOW())
+        </foreach>
+    </insert>
+
+
+    <update id="updateList">
+        INSERT INTO inspection
+        (id, app_id, product_id, vault, pass_rate, notes, pass)
+        VALUES
+        <foreach collection="inspections" item="inspections" index="index" separator=",">
+            (
+            #{inspections.id, jdbcType=INTEGER},
+            #{inspections.appId, jdbcType=INTEGER},
+            #{inspections.productId, jdbcType=INTEGER},
+            #{inspections.vault, jdbcType=INTEGER},
+            #{inspections.passRate, jdbcType=DOUBLE},
+            #{inspections.notes},
+            #{inspections.pass,jdbcType=INTEGER}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        pass_rate = VALUES(pass_rate),
+        notes = VALUES(notes),
+        pass = VALUES(pass)
+    </update>
+    <select id="selectQCRecords" resultType="java.util.Map">
+        SELECT qc.*, u.name as operator_name, u.department as operator_department,
+               c.product_id, c.vault, f.order_number as qc_order_number, f.notes as qc_notes, f.date as qc_date,
+               p.name as product_name, p.material_number
+        FROM arrival_qc_record qc
+        LEFT JOIN user u ON qc.operator_id = u.id
+        LEFT JOIN application_content c ON qc.content_id = c.id
+        LEFT JOIN application_form f ON qc.qc_application_id = f.id
+        LEFT JOIN product p ON c.product_id = p.id
+        WHERE 1=1
+        <if test='contentId != null'>AND qc.content_id = #{contentId}</if>
+        <if test='qcApplicationId != null'>AND qc.qc_application_id = #{qcApplicationId}</if>
+        <if test='operatorId != null'>AND qc.operator_id = #{operatorId}</if>
+        ORDER BY qc.operation_time DESC
+    </select>
+    <select id="batchSelectAvailableQCQuantity" resultType="java.util.Map">
+        SELECT ac.id as content_id, ac.actual_number,
+               ac.actual_number - COALESCE(SUM(qc.qc_quantity), 0) as available_quantity
+        FROM application_content ac
+        LEFT JOIN arrival_qc_record qc ON ac.id = qc.content_id
+        WHERE ac.id IN
+        <foreach collection='contentIds' item='id' open='(' separator=',' close=')'>
+        #{id}
+        </foreach>
+        GROUP BY ac.id
+    </select>
+
+
+</mapper>

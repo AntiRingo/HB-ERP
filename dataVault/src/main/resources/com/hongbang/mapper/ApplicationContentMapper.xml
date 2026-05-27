@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.ApplicationContentMapper">
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        insert into application_content (id, application_id, product_Id,app_number,actual_number,vault,app_price,fin_product_id,fin_product_number,last_level,bom_title_id)
+        VALUES
+        <foreach collection="applicationContent" item="applicationContent" index="index" separator=",">
+            (
+             null,
+            #{applicationContent.applicationId,jdbcType=INTEGER},
+            #{applicationContent.productId,jdbcType=INTEGER},
+            #{applicationContent.appNumber,jdbcType=DOUBLE},
+            #{applicationContent.actualNumber,jdbcType=DOUBLE},
+            #{applicationContent.vault,jdbcType=INTEGER},
+            #{applicationContent.appPrice,jdbcType=DOUBLE},
+            #{applicationContent.finProductId,jdbcType=INTEGER},
+            #{applicationContent.finProductNumber,jdbcType=INTEGER},
+            #{applicationContent.lastLevel,jdbcType=INTEGER},
+            #{applicationContent.bomTitleId,jdbcType=INTEGER}
+            )
+        </foreach>
+
+    </insert>
+
+<!--    插入日志-->
+    <insert id="addLog">
+        insert into log (id, date, manager, app_form_id, product_id, vault, log_number,url)
+        VALUES
+            <foreach collection="logs" item="logs" index="index" separator=",">
+                (
+                 null,
+                 #{logs.date},
+                 #{logs.manager,jdbcType=INTEGER},
+                 #{logs.appFormId,jdbcType=INTEGER},
+                 #{logs.productId,jdbcType=INTEGER},
+                 #{logs.vault,jdbcType=INTEGER},
+                 #{logs.logNumber,jdbcType=INTEGER},
+                 #{logs.url}
+                )
+
+            </foreach>
+
+    </insert>
+
+    <!--    更新申请单已出入库信息信息（一键入库/出库的时候）-->
+    <update id="updateActual">
+        update application_content
+            <set>
+                actual_number = case id
+                <foreach collection="applicationContents" item="applicationContents" index="index">
+                    when #{applicationContents.id,jdbcType=INTEGER} then #{applicationContents.actualNumber,jdbcType=INTEGER}
+
+                </foreach>
+                else actual_number
+                end
+<!--            ,-->
+<!--                app_number = CASE id-->
+<!--                <foreach collection="applicationContents" item="applicationContents" index="index">-->
+<!--                    when #{applicationContents.id,jdbcType=INTEGER} then #{applicationContents.appNumber,jdbcType=INTEGER}-->
+<!--                </foreach>-->
+<!--                ELSE app_number-->
+<!--                END-->
+            </set>
+        <!-- 仅更新传入的 id 对应的记录（关键优化：避免全表扫描） -->
+        WHERE id IN
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="("  separator="," close=")">
+            #{applicationContents.id,jdbcType=INTEGER}
+        </foreach>
+
+    </update>
+
+<!--    一键出库（电子仓库）-->
+    <update id="updatePtCk">
+    update product
+        <set>
+            number = case id
+            <foreach collection="products" item="products" index="index">
+                when  #{products.id,jdbcType=INTEGER} then product.number - #{products.number,jdbcType=INTEGER}
+            </foreach>
+             else number
+                end;
+        </set>
+
+    </update>
+
+<!--    一键出库（产品仓库）-->
+    <update id="updateFptCk">
+        update  fin_product
+        <set>
+            fin_number = case id
+            <foreach collection="finProducts" index="index" item="finProducts">
+                when #{finProducts.id,jdbcType=INTEGER}  then fin_number - #{finProducts.finNumber,jdbcType=INTEGER}
+            </foreach>
+             else fin_number
+                end;
+        </set>
+    </update>
+
+    <!--    一键入库（电子仓库）-->
+    <update id="updatePtRk">
+        update product
+        <set>
+            number = case id
+            <foreach collection="products" item="products" index="index">
+                when  #{products.id,jdbcType=INTEGER} then product.number + #{products.number,jdbcType=INTEGER}
+            </foreach>
+            else number
+            end;
+        </set>
+
+    </update>
+
+    <!--    一键入库（产品仓库）-->
+    <update id="updateFptRk">
+        update  fin_product
+        <set>
+            fin_number = case id
+            <foreach collection="finProducts" index="index" item="finProducts">
+                when #{finProducts.id,jdbcType=INTEGER}  then fin_number + #{finProducts.finNumber,jdbcType=INTEGER}
+            </foreach>
+            else fin_number
+            end;
+        </set>
+    </update>
+
+<!--    更新app_price和数量-->
+    <update id="updateAppPrice">
+        update application_content
+        <set>
+            app_price = CASE id
+            <foreach collection="applicationContents" item="applicationContents" index="index">
+                WHEN #{applicationContents.id,jdbcType=INTEGER} THEN #{applicationContents.appPrice}
+            </foreach>
+            ELSE app_price
+            END,
+            app_number = CASE id  <!-- 新增的数量更新 -->
+            <foreach collection="applicationContents" item="applicationContents" index="index">
+                WHEN #{applicationContents.id,jdbcType=INTEGER} THEN #{applicationContents.appNumber}  <!-- 使用数量字段 -->
+            </foreach>
+            ELSE app_number
+            END
+        </set>
+        WHERE id IN
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" separator="," close=")">
+            #{applicationContents.id}
+        </foreach>
+    </update>
+<!--只更新申请数量-->
+    <update id="updateAppNumber">
+        update application_content
+        <set>
+            fin_product_number = CASE id
+            <foreach collection="applicationContents" item="applicationContents" index="index">
+                WHEN #{applicationContents.id,jdbcType=INTEGER} THEN #{applicationContents.finProductNumber}
+            </foreach>
+            ELSE fin_product_number
+            END,
+            app_number = CASE id  <!-- 新增的数量更新 -->
+            <foreach collection="applicationContents" item="applicationContents" index="index">
+                WHEN #{applicationContents.id,jdbcType=INTEGER} THEN #{applicationContents.appNumber}  <!-- 使用数量字段 -->
+            </foreach>
+            ELSE app_number
+            END
+        </set>
+        WHERE id IN
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" separator="," close=")">
+            #{applicationContents.id}
+        </foreach>
+    </update>
+
+
+    <update id="updateAppDgNumber">
+        update application_content set actual_number = actual_number +
+        case id
+         <foreach collection="applicationContents" item="applicationContents" index="index">
+            when #{applicationContents.id,jdbcType=INTEGER} then #{applicationContents.appNumber,jdbcType=DOUBLE}
+         </foreach>
+
+        else 0
+            end
+            where id  in
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" separator="," close=")">
+            #{applicationContents.id,jdbcType=INTEGER}
+        </foreach>
+        <if test="applicationContents == null or applicationContents.isEmpty()">
+            AND 1=0  -- 防止空列表导致语法错误
+        </if>
+
+
+    </update>
+
+    <update id="updateAppZjNumber">
+        update application_content set actual_number = actual_number +
+        case id
+        <foreach collection="applicationContents" item="applicationContents" index="index">
+            when #{applicationContents.id,jdbcType=INTEGER} then #{applicationContents.appNumber,jdbcType=DOUBLE}
+        </foreach>
+
+        else 0
+        end
+        where id  in
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" separator="," close=")">
+            #{applicationContents.id,jdbcType=INTEGER}
+        </foreach>
+        <if test="applicationContents == null or applicationContents.isEmpty()">
+            AND 1=0  -- 防止空列表导致语法错误
+        </if>
+
+
+    </update>
+
+    <update id="updateBomTitleId">
+        update application_content set bom_title_id = 0 where id in
+        <foreach collection="applicationContents" index="index" item="applicationContents" separator="," open="(" close=")">
+            #{applicationContents.id,jdbcType=INTEGER}
+        </foreach>
+    </update>
+    <update id="updateApplicationId">
+        update application_content set application_id = #{applicationId,jdbcType=INTEGER} where id in
+        <foreach collection="applicationContents" index="index" item="applicationContents" separator="," open="(" close=")">
+            #{applicationContents.id,jdbcType=INTEGER}
+        </foreach>
+    </update>
+    <update id="updateActualNumberZero">
+        update application_content set actual_number = 0 where id in
+        <foreach collection="applicationContents" index="index" item="applicationContents" separator="," open="(" close=")">
+            #{applicationContents.id,jdbcType=INTEGER}
+        </foreach>
+    </update>
+
+
+    <!--    查看申请单数据-->
+    <select id="selectAppContentDz" resultType="java.util.Map">
+        select * from application_content left join product on application_content.product_id=product.id
+            where application_content.id in
+        <foreach collection="applicationContents" item="applicationContents" index="index" separator="," open="(" close=")">
+        #{applicationContents.id,jdbcType=INTEGER}
+        </foreach>
+    </select>
+
+
+
+    <!--    查看申请单数据-->
+    <select id="selectAppContentCp" resultType="java.util.Map">
+        select * from application_content left join fin_product on application_content.product_id=fin_product.id
+            where application_content.id in
+        <foreach collection="applicationContents" item="applicationContents" index="index" separator="," open="(" close=")">
+            #{applicationContents.id,jdbcType=INTEGER}
+        </foreach>
+    </select>
+
+<!--    查询存放位置，电子仓库-->
+    <select id="selectLocationDz" resultType="java.util.Map">
+        select a.content,productId from (select * from attribute_content where attribute_content.productId in
+        <foreach collection="applicationContents" item="applicationContents" index="index" separator="," open="(" close=")">
+            #{applicationContents.productId,jdbcType=INTEGER}
+        </foreach>
+            )as a LEFT JOIN attribute_name on attribute_name.id=a.parentId where attribute_name.`name` = '存放位置'
+    </select>
+
+
+<!--    根据id查询存放位置（产品仓库）-->
+    <select id="selectLocationCp" resultType="java.util.Map">
+        select a.fin_att_content,fin_product_id from (select * from fin_attribute_content where fin_attribute_content.fin_product_id in
+        <foreach collection="applicationContents" item="applicationContents" index="index" separator="," open="(" close=")">
+            #{applicationContents.productId,jdbcType=INTEGER}
+        </foreach>
+            )as a LEFT JOIN fin_attribute_name on fin_attribute_name.id=a.fin_att_name_id where fin_attribute_name.fin_att_name = '存放位置'
+    </select>
+<!--    //查询申请单中产品的属性信息(电子仓库)-->
+    <select id="selectAttDz" resultType="java.util.Map">
+        SELECT productId,attributeName,attributeNameUnit,content from product right JOIN
+        (SELECT * from (select * from (select attribute_content.productId,attribute_content.content,attribute_name.name as attributeName,attribute_name.unit as attributeNameUnit,attribute_content.parentId as attNameId from attribute_content left JOIN attribute_name on attribute_name.id = attribute_content.parentId ) as d LEFT JOIN attribute_function
+        on attribute_function.att_name_id =  d.attNameId where attribute_function.display_code = 1) as a)
+        as b on  b.productId = product.id where product.id in (select * from (select product.id from application_content left join product on application_content.product_id=product.id where application_content.application_id = #{applicationId}
+                                                                                                                                               ) as c)
+    </select>
+
+    <select id="selectAttCp" resultType="java.util.Map">
+        SELECT fin_product.id,attributeName,attributeNameUnit,fin_att_content as content  from fin_product LEFT JOIN
+        (SELECT * from (select * from (select fin_attribute_content.fin_product_id,fin_attribute_content.fin_att_content,fin_attribute_name.fin_att_name as attributeName,fin_attribute_name.fin_att_unit as attributeNameUnit,fin_attribute_content.fin_att_name_id as attNameId
+        from fin_attribute_content left JOIN fin_attribute_name on fin_attribute_name.id = fin_attribute_content.fin_att_name_id  ) as d LEFT JOIN fin_attribute_function
+        on fin_attribute_function.fin_att_name_id =  d.attNameId where fin_attribute_function.display_code = 1 ) as a)
+        as b on  b.fin_product_id = fin_product.id where fin_product.id in (select * from (select fin_product.id from application_content left join fin_product on application_content.product_id=fin_product.id where application_content.application_id =  #{applicationId}
+                                                                                                                                                                                     ) as c)
+
+    </select>
+
+
+<!--    查询申请单的所有物料信息单价-->
+    <select id="selectPrice" resultType="java.util.Map">
+
+        select brand as price from product where (id,vault) in
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" close=")" separator=",">
+            (#{applicationContents.productId,jdbcType=INTEGER} ,  #{applicationContents.vault,jdbcType=INTEGER})
+        </foreach>
+
+        union all
+        select  price from fin_product where (id,vault) in
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" close=")" separator=",">
+            ( #{applicationContents.productId,jdbcType=INTEGER} ,#{applicationContents.vault,jdbcType=INTEGER})
+        </foreach>
+
+    </select>
+
+<!-- 根据productID，vault查询产品信息-->
+    <select id="selectProductByIdVault" resultType="java.util.Map">
+        select fin_product_name as name,unit, fin_material_number as material_number,fin_number as number,price as brand,application_content.* from fin_product left join application_content on fin_product.id = application_content.product_id
+        where application_id = #{applicationId,jdbcType=INTEGER} and fin_product_id=0 and last_level=0 and application_content.vault = 1 and (product_id,application_content.vault) in
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" close=")" separator=",">
+            (#{applicationContents.productId,jdbcType=INTEGER},#{applicationContents.vault,jdbcType=INTEGER})
+        </foreach>
+
+        union all
+
+        select name,unit,material_number,number,brand,application_content.* from product left join application_content on product.id = application_content.product_id
+        where application_id = #{applicationId,jdbcType=INTEGER} and fin_product_id=0 and last_level=0 and application_content.vault = 0 and (product_id,application_content.vault) in
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" close=")" separator=",">
+        (#{applicationContents.productId,jdbcType=INTEGER},#{applicationContents.vault,jdbcType=INTEGER})
+        </foreach>
+    </select>
+
+
+
+    <select id="selectProductByIdVaultZk" resultType="java.util.Map">
+        select fin_product_name as name,unit,bom_title_id as bomTitleId, fin_material_number as material_number,fin_number as number,application_id,fin_product_id,fin_product_number,last_level from fin_product left join application_content on fin_product.id = application_content.fin_product_id
+        where application_id = #{applicationId,jdbcType=INTEGER} and fin_product_id!=0 and last_level=0 and fin_product_id in
+        <foreach collection="applicationContents" item="applicationContents" index="index" open="(" close=")" separator=",">
+           #{applicationContents.finProductId,jdbcType=INTEGER}
+        </foreach>
+                    group by name,material_number,number,bomTitleId,application_id,fin_product_id,fin_product_number,last_level
+    </select>
+
+
+    <select id="selectProductByIdZkContent" resultType="java.util.Map">
+        select fin_product_name as name,unit, fin_material_number as material_number,fin_number as number,price as brand, application_content.* from fin_product left join application_content on fin_product.id = application_content.product_id
+        where application_id = #{applicationId,jdbcType=INTEGER} and fin_product_id = #{finProductId,jdbcType=INTEGER} and last_level=#{lastLevel,jdbcType=INTEGER} and application_content.vault = 1 and (product_id,application_content.vault) in
+        (select product_id,application_content.vault from application_content where fin_product_id = #{finProductId,jdbcType=INTEGER} and application_id = #{applicationId,jdbcType=INTEGER})
+
+        union all
+
+        select name,unit,material_number,number,brand,application_content.* from product left join application_content on product.id = application_content.product_id
+        where application_id = #{applicationId,jdbcType=INTEGER} and fin_product_id = #{finProductId,jdbcType=INTEGER} and last_level=#{lastLevel,jdbcType=INTEGER} and application_content.vault = 0 and   (product_id,application_content.vault) in
+       (select product_id,application_content.vault from application_content where fin_product_id = #{finProductId,jdbcType=INTEGER} and  application_id = #{applicationId,jdbcType=INTEGER})
+    </select>
+
+<!--    可以展开的一定是产品-->
+    <select id="selectCanZk" resultType="java.util.Map">
+        select fin_product_name as name,unit,bom_title_id as bomTitleId, fin_material_number as material_number,fin_number as number,application_id,fin_product_id,fin_product_number,last_level from fin_product left join application_content on fin_product.id = application_content.fin_product_id
+        where application_id = #{applicationId,jdbcType=INTEGER}  and last_level=#{finProductId,jdbcType=INTEGER}
+
+        group by name,unit,material_number,number,bomTitleId,application_id,fin_product_id,fin_product_number,last_level
+    </select>
+
+
+
+    <select id="selectByAppIdAllVault" resultType="java.util.Map">
+        select * from (
+        select application_content.*,parentId,name,material_number,brand,number,deleteSign,unit,priceUnit from application_content left join product on application_content.product_id=product.id
+        where application_content.id in(select id from application_content where application_id = #{applicationId} and vault=0)
+union all
+select application_content.*, fin_sort_id as parentId,fin_product_name as name,fin_material_number as material_number,price as brand,fin_number as number,deleteSign,unit,priceUnit from application_content left join fin_product on application_content.product_id=fin_product.id
+        where application_content.id in(select id from application_content where application_id = #{applicationId} and vault=1)
+            ) as a order by id desc
+
+
+
+
+    </select>
+    <select id="selectNewPriceByAppId" resultType="java.util.Map">
+
+
+
+
+
+        SELECT
+        a.product_id,
+        a.vault,
+        a.date,
+        a.app_price
+        FROM (
+        SELECT
+        e1.*,
+        application_content.product_id,
+        application_content.vault,
+        application_content.app_price
+        FROM examine_log e1
+        INNER JOIN (
+        SELECT app_form_id, MAX(id) as max_id
+        FROM examine_log
+        GROUP BY app_form_id
+        ) e2 ON e1.id = e2.max_id
+        LEFT JOIN application_content ON e1.app_form_id = application_content.application_id
+        WHERE (application_content.product_id,application_content.vault) IN
+        <foreach collection="applicationContents" index="index" item="applicationContents" open="(" close=")" separator=",">
+            (#{applicationContents.productId,jdbcType=INTEGER},#{applicationContents.vault,jdbcType=INTEGER})
+        </foreach>
+        AND e1.examine_status = '通过'
+        ) a
+        INNER JOIN (
+        SELECT
+        product_id,
+        vault,
+        MAX(date) as max_date
+        FROM (
+        SELECT
+        e1.*,
+        application_content.product_id,
+        application_content.vault,
+        application_content.app_price
+        FROM examine_log e1
+        INNER JOIN (
+        SELECT app_form_id, MAX(id) as max_id
+        FROM examine_log
+        GROUP BY app_form_id
+        ) e2 ON e1.id = e2.max_id
+        LEFT JOIN application_content ON e1.app_form_id = application_content.application_id
+          WHERE (application_content.product_id,application_content.vault) IN
+        <foreach collection="applicationContents" index="index" item="applicationContents" open="(" close=")" separator=",">
+            (#{applicationContents.productId,jdbcType=INTEGER},#{applicationContents.vault,jdbcType=INTEGER})
+        </foreach>
+        AND e1.examine_status = '通过'
+        ) tmp
+        GROUP BY product_id, vault
+        ) b ON a.product_id = b.product_id
+        AND a.vault = b.vault
+        AND a.date = b.max_date
+        ORDER BY a.product_id, a.vault;
+    </select>
+    <select id="selectByIds" resultType="java.util.Map">
+        SELECT ac.*, p.name as product_name, p.material_number
+        FROM application_content ac
+        LEFT JOIN product p ON ac.product_id = p.id
+        WHERE ac.id IN
+        <foreach collection='ids' item='id' open='(' separator=',' close=')'>
+        #{id}
+        </foreach>
+    </select>
+
+
+
+
+
+    <!-- 主表映射 -->
+    <resultMap id="ContentResultMap" type="com.hongbang.pojo.ApplicationContent">
+        <id column="id" property="id"/>
+        <result column="application_id" property="applicationId"/>
+        <result column="product_id" property="productId"/>
+        <result column="app_number" property="appNumber"/>
+        <result column="actual_number" property="actualNumber"/>
+        <result column="vault" property="vault"/>
+        <result column="app_price" property="appPrice"/>
+        <result column="fin_product_id" property="finProductId"/>
+        <result column="fin_product_number" property="finProductNumber"/>
+        <result column="last_level" property="lastLevel"/>
+        <result column="bom_title_id" property="bomTitleId"/>
+    </resultMap>
+
+    <select id="selectByIdCg" resultMap="ContentResultMap">SELECT * FROM application_content WHERE id=#{id}</select>
+    <select id="selectList" resultMap="ContentResultMap">SELECT * FROM application_content</select>
+    <insert id="insert">
+INSERT INTO application_content(application_id,product_id,app_number,actual_number,vault,app_price,fin_product_id,fin_product_number,last_level,bom_title_id)
+ VALUES(#{applicationId},#{productId},#{appNumber},#{actualNumber},#{vault},#{appPrice},#{finProductId},#{finProductNumber},#{lastLevel},#{bomTitleId})
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+ </insert>
+    <update id="update">UPDATE application_content SET application_id=#{applicationId},product_id=#{productId},app_number=#{appNumber},actual_number=#{actualNumber},vault=#{vault},app_price=#{appPrice},fin_product_id=#{finProductId},fin_product_number=#{finProductNumber},last_level=#{lastLevel},bom_title_id=#{bomTitleId} WHERE id=#{id}</update>
+    <delete id="deleteById">DELETE FROM application_content WHERE id=#{id}</delete>
+    <update id="updateActualNum">UPDATE application_content SET actual_number=#{actualNumber} WHERE id=#{id}</update>
+
+    <select id="getAppAndDetail" resultType="java.util.Map">
+        SELECT
+            ac.*,
+            ad.*
+        FROM application_content ac
+                 LEFT JOIN application_detail ad
+                           ON ac.id = ad.application_content_id
+
+    </select>
+
+
+
+    <!-- 分页联表查询：application_content + application_detail + product + fin_product -->
+    <!-- 分页联表查询：采购主表+详情+物料+品牌+封装 全部一次搞定 -->
+    <!-- 分页联表查询：采购主表+详情+物料+品牌+封装 -->
+    <select id="selectAppAndDetailByPage" resultType="java.util.Map">
+        SELECT
+        ac.id,
+        ac.app_number,
+        ac.app_price,
+        ac.vault,
+        ac.application_id,
+
+        ad.tax_price,
+        ad.goods_amount,
+        ad.freight,
+        ad.pay_date,
+        ad.arrive_date,
+        ad.invoice_date,
+        ad.warranty_date,
+        ad.supplier_name,
+        ad.supplier_address,
+        ad.contact_person,
+        ad.contact_tel,
+        ad.fax,
+        ad.tax_no,
+        ad.email,
+        ad.order_no,
+        ad.expect_info,
+
+        COALESCE(p.name, fp.fin_product_name) AS productName,
+        COALESCE(p.description, fp.fin_description, '') AS model,
+        COALESCE(p.unit, fp.unit, '') AS unit,
+        COALESCE(p.material_number, fp.fin_material_number, '') AS materialNumber,
+        IFNULL(att.brand, '') AS brand,
+        IFNULL(att.package, '') AS package,
+
+        u.name AS applyUserName
+
+        FROM application_content ac
+
+        LEFT JOIN application_form af ON ac.application_id = af.id
+        LEFT JOIN user u ON af.user_id = u.id
+        LEFT JOIN application_detail ad ON ac.id = ad.application_content_id
+        LEFT JOIN product p ON ac.product_id = p.id
+        LEFT JOIN fin_product fp ON ac.fin_product_id = fp.id
+
+        LEFT JOIN (
+        SELECT
+        productId AS id, 0  AS vault,
+        MAX(CASE WHEN name='品牌' THEN content END) AS brand,
+        MAX(CASE WHEN name='封装' THEN content END) AS package
+        FROM attribute_content
+        LEFT JOIN attribute_name ON attribute_content.parentId = attribute_name.id
+        WHERE name IN ('品牌','封装')
+        GROUP BY productId, vault
+
+        UNION ALL
+
+        SELECT
+        fin_product_id AS id, 1 AS vault,
+        MAX(CASE WHEN fin_att_name='品牌' THEN fin_att_content END) AS brand,
+        MAX(CASE WHEN fin_att_name='封装' THEN fin_att_content END) AS package
+        FROM fin_attribute_content
+        LEFT JOIN fin_attribute_name ON fin_attribute_content.fin_att_name_id = fin_attribute_name.id
+        WHERE fin_att_name IN ('品牌','封装')
+        GROUP BY fin_product_id
+        ) att ON (
+        (ac.product_id = att.id AND ac.vault = att.vault)
+        OR
+        (ac.fin_product_id = att.id AND att.vault = 1)
+        )
+
+        <!-- 🔥 这里加条件：只查 采购单（sort=2） -->
+        WHERE af.sort = 2 and af.circulation_boss = 1
+
+        LIMIT #{start},#{pageSize}
+    </select>
+
+    <!-- 总条数 -->
+    <select id="selectTotalCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM application_content ac
+                 LEFT JOIN application_form af ON ac.application_id = af.id
+        WHERE af.sort = 2 and  af.circulation_boss = 1
+    </select>
+
+    <!-- 自动保存主表（改名后） -->
+    <update id="autoSaveApplicationContent">
+        UPDATE application_content
+        SET app_price = #{app_price}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新申请数量（改名后） -->
+    <update id="updateApplicationNumber">
+        UPDATE application_content SET app_number = #{appNumber} WHERE id = #{id}
+    </update>
+
+    <!-- 插入复制的主表数据（改名后） -->
+    <insert id="insertCopiedApplicationContent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO application_content
+            (application_id,product_id,fin_product_id,app_number,app_price,vault)
+        VALUES(#{form_id},#{product_id},#{fin_product_id},#{app_number},#{app_price},#{vault})
+    </insert>
+
+</mapper>

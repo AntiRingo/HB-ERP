@@ -1,0 +1,143 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+body {
+    padding: 20px;
+    background-color: #f5f7fa;
+}
+.container {
+    width: 90%;
+    max-width: 1400px;
+    margin: 20px auto;
+    border: 1px solid #9eb6d8;
+    border-radius: 8px;
+    overflow: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+.header-row {
+    display: flex;
+    background-color: #4a6fa5;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.header-col {
+    padding: 12px 8px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    cursor: move;
+    user-select: none;
+    transition: all 0.2s ease;
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+.header-col:last-child {
+    border-right: none;
+}
+.header-col.dragging {
+    background-color: rgba(255, 255, 255, 0.2);
+    opacity: 0.8;
+}
+.header-col.over {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+.data-row {
+    border-bottom: 1px solid #e1e5eb;
+    transition: background-color 0.2s;
+}
+.data-row:hover {
+    background-color: #f8f9fc;
+}
+.row-content {
+    display: flex;
+    min-height: 60px;
+    align-items: center;
+}
+.row-col {
+    padding: 10px 8px;
+    border-right: 1px solid #e1e5eb;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+.row-col:last-child {
+    border-right: none;
+}
+.attr-content {
+    padding: 10px 15px;
+    color: #5a6268;
+    font-size: 0.9em;
+    line-height: 1.6;
+    background-color: #f9fafc;
+    border-top: 1px solid #e1e5eb;
+}
+input[type="text"] {
+    width: 90%;
+    border: 1px solid #d1d5db;
+    padding: 6px 8px;
+    border-radius: 4px;
+    background: #f8f9fa;
+    font-size: 0.95em;
+}
+textarea {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    padding: 8px;
+    border-radius: 4px;
+    background: #f8f9fa;
+    resize: vertical;
+    min-height: 60px;
+    font-size: 0.95em;
+}
+textarea:focus, input:focus {
+    outline: none;
+    border-color: #4a6fa5;
+    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+}
+.delete-btn {
+    color: #e53e3e;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-size: 0.95em;
+}
+.delete-btn:hover {
+    background-color: #fef2f2;
+}
+.bom-content {
+    max-height: 70vh;
+    /*overflow-y: auto;*/
+}
+.drag-handle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: move;
+    color: #718096;
+}
+.drag-icon {
+    font-size: 18px;
+}
+.row-col.dragging {
+    background-color: rgba(74, 111, 165, 0.05);
+}
+
+/* 新增：列拖动占位符样式 */
+.placeholder-col {
+    background-color: #e0e0e0;
+    border: 2px dashed #999;
+    height: 100%;
+}
+
+
+
+
+

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.LogMapper">
+
+<!--    日志筛选-->
+    <select id="screen" resultType="com.hongbang.pojo.Log">
+        select * from log left join application_form on  log.app_form_id = application_form.id
+        <where>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+               log.date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+                #{maps.andDate} > log.date and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                log.date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                log.manager=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.vault != null and maps.vault != '' " >
+
+                log.vault=#{maps.vault,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                application_form.sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if test="maps.sort == 0">
+                sort=0 and complete_status!=2
+            </if>
+            <if test="maps.sort == 1">
+                sort=1  and complete_status!=2
+            </if>
+
+        </where>
+        ORDER BY log.date DESC limit #{begin},#{size}
+    </select>
+    <select id="screenCount" resultType="java.lang.Integer">
+        select count(*) from log left join application_form on  log.app_form_id = application_form.id
+        <where>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                log.date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+                #{maps.andDate} > log.date and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                log.date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                manager=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.vault != null and maps.vault != '' " >
+                log.vault=#{maps.vault,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                application_form.sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if test="maps.sort == 0">
+                sort=0 and complete_status!=2
+            </if>
+            <if test="maps.sort == 1">
+                sort=1  and complete_status!=2
+            </if>
+
+
+        </where>
+    </select>
+    <select id="screenInformation" resultType="java.util.Map">
+        select z.*,user.userName as appUserName from (
+        select b.*,application_form.order_number,application_form.user_id as appUser from (select a.*,userName from (
+        select log.*,product.name,material_number from log LEFT JOIN product on log.product_id = product.id where
+        log.vault = product.vault and log.id in
+        <foreach collection="logs" index="index" item="logs" open="(" close=")" separator=",">
+            #{logs.id,jdbcType=INTEGER}
+        </foreach>
+        ) as a LEFT JOIN user on user.id = a.manager)as b LEFT JOIN application_form on b.app_form_id =
+        application_form.id
+
+
+        union all select b.*,application_form.order_number,application_form.user_id as appUser from (select
+        a.*,userName from ( select log.*,fin_product.fin_product_name as name,fin_material_number as material_number
+        from log LEFT JOIN fin_product on log.product_id = fin_product.id where log.vault = fin_product.vault and log.id
+        in
+        <foreach collection="logs" index="index" item="logs" open="(" close=")" separator=",">
+            #{logs.id,jdbcType=INTEGER}
+
+        </foreach>
+        ) as a LEFT JOIN user on user.id = a.manager)as b LEFT JOIN application_form on b.app_form_id =
+        application_form.id
+        ) as z left join user on z.appUser = user.id
+
+    </select>
+<!--    搜索-->
+    <select id="search" resultType="java.util.Map">
+        select z.*,user.userName as appUserName from (
+        SELECT * from ((select
+        log_number,order_number,userName,date,product.material_number,product.`name`,product.vault,product.id,b.url,b.appUser
+        from
+        (SELECT product_id,vault,log_number,order_number,date,`user`.userName,url,appUser from
+        (select
+        log.manager,log.product_id,log.vault,log.log_number,log.date,application_form.order_number,url,application_form.user_id
+        as appUser from log
+        left join application_form on log.app_form_id=application_form.id where
+        <if test="sort == 0">
+            application_form.sort=0 and complete_status!=2
+        </if>
+        <if test="sort == 1">
+            application_form.sort=1 and complete_status!=2
+        </if>
+        ) as a
+        LEFT JOIN `user` on a.manager=user.id ) as b LEFT JOIN product ON b.product_id= product.id where
+        product.vault=b.vault) union all
+        (select
+        log_number,order_number,userName,date,fin_product.fin_material_number,fin_product.fin_product_name,fin_product.vault,fin_product.id,b.url,b.appUser
+        from
+        (SELECT product_id,vault,log_number,order_number,date,`user`.userName,url,appUser from
+        (select
+        log.manager,log.product_id,log.vault,log.log_number,log.date,application_form.order_number,url,application_form.user_id
+        as appUser from log
+        left join application_form on log.app_form_id=application_form.id where
+        <if test="sort == 0">
+            application_form.sort=0 and complete_status!=2
+        </if>
+        <if test="sort == 1">application_form.sort=1 and complete_status!=2
+        </if> ) as a
+                        LEFT JOIN `user` on a.manager=user.id ) as b
+                            LEFT JOIN fin_product ON b.product_id= fin_product.id where fin_product.vault=b.vault)  ) as a
+                where (order_number like CONCAT('%',#{str},'%') or material_number like CONCAT('%',#{str},'%') or name like CONCAT('%',#{str},'%')) order by date desc LIMIT #{begin},#{size}
+) as z left join user on user.id = z.appUser
+    </select>
+    <select id="searchCount" resultType="java.lang.Integer">
+        SELECT count(*) from ((select log_number,order_number,userName,date,product.material_number,product.`name`,product.vault,product.id from
+        (SELECT product_id,vault,log_number,order_number,date,`user`.userName from
+        (select log.manager,log.product_id,log.vault,log.log_number,log.date,application_form.order_number from log
+        left join application_form on log.app_form_id=application_form.id where
+        <if test="sort == 0">
+            application_form.sort=0 and complete_status!=2
+        </if>
+        <if test="sort == 1">
+           application_form.sort=1  and complete_status!=2
+        </if>
+        ) as a
+        LEFT JOIN `user` on a.manager=user.id ) as b LEFT JOIN product ON b.product_id= product.id where product.vault=0)  union all
+        (select log_number,order_number,userName,date,fin_product.fin_material_number,fin_product.fin_product_name,fin_product.vault,fin_product.id from
+        (SELECT product_id,vault,log_number,order_number,date,`user`.userName from
+        (select log.manager,log.product_id,log.vault,log.log_number,log.date,application_form.order_number from log
+        left join application_form on log.app_form_id=application_form.id where
+        <if test="sort == 0">
+            application_form.sort=0 and complete_status!=2
+        </if>
+        <if test="sort == 1">
+            application_form.sort=1  and complete_status!=2
+        </if> ) as a
+        LEFT JOIN `user` on a.manager=user.id ) as b
+        LEFT JOIN fin_product ON b.product_id= fin_product.id where fin_product.vault=1)  ) as a
+        where (order_number like CONCAT('%',#{str},'%') or material_number like CONCAT('%',#{str},'%') or name like CONCAT('%',#{str},'%'))
+    </select>
+
+<!--   在一段时间内统计已经存在的物料出库还是入库的总量-->
+    <select id="Statistics" resultType="java.util.Map">
+        SELECT SUM(log_number) as sum,e.product_id,e.vault,name,material_number from
+           (select * from (select b.product_id,b.name,b.material_number,log_number,b.vault,sort from
+           (SELECT log.*,a.name,a.material_number from log LEFT JOIN (select * from product where (id,vault) in (select  product_id,vault from log)
+            UNION all
+            select * from fin_product where (id,vault) in (select  product_id,vault from log)) as a
+               on log.product_id = a.id and log.vault = a.vault
+               <where>
+                   <if test="(maps.betweenDate.length>0) and (maps.andDate.length==0)   ">
+                       log.date > #{maps.betweenDate}
+                   </if>
+                   <if test="(maps.andDate.length>0) and (maps.betweenDate.length==0)  ">
+                       #{maps.andDate} > log.date
+                   </if>
+                   <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                       log.date between #{maps.betweenDate} and #{maps.andDate}
+
+                   </if>
+                   <if test="maps.str !=null and maps.str !='' and ((maps.betweenDate !=null and maps.andDate !=null) or (maps.betweenDate !='' and maps.andDate !=''))">
+                       and (name like CONCAT('%',#{maps.str},'%') or material_number like CONCAT('%',#{maps.str},'%'))
+                   </if>
+                   <if test="maps.str !=null and maps.str !='' and maps.betweenDate ==null and maps.andDate ==null and maps.betweenDate =='' and maps.andDate ==''">
+                       (name like CONCAT('%',#{maps.str},'%') or material_number like CONCAT('%',#{maps.str},'%'))
+                   </if>
+
+               </where>
+
+
+               ) as b
+               LEFT JOIN application_form on b.app_form_id = application_form.id
+               <where>
+                   <if test="maps.sort == 0">
+                       application_form.sort=0 and complete_status!=2
+                   </if>
+                   <if test="maps.sort == 1">
+                       application_form.sort=1 and complete_status!=2
+                   </if>
+               </where>
+                 ) as c) as e
+        GROUP BY product_id,vault,name,material_number
+        limit #{begin},#{size}
+
+    </select>
+    <select id="StatisticsCount" resultType="java.lang.Integer">
+        select count(*) from (
+        SELECT count(*) from
+        (select * from (select b.product_id,b.name,b.material_number,log_number,b.vault,sort from
+        (SELECT log.*,a.name,a.material_number from log LEFT JOIN (select * from product where (id,vault) in (select
+        product_id,vault from log)
+        UNION all
+        select * from fin_product where (id,vault) in (select product_id,vault from log)) as a
+        on log.product_id = a.id and log.vault = a.vault
+        <where>
+
+            <if test="(maps.betweenDate.length>0) and (maps.andDate.length==0)   ">
+                log.date > #{maps.betweenDate}
+            </if>
+            <if test="(maps.andDate.length>0) and (maps.betweenDate.length==0)  ">
+                #{maps.andDate} > log.date
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                log.date between #{maps.betweenDate} and #{maps.andDate}
+
+            </if>
+            <if test="maps.str !=null and maps.str !='' and ((maps.betweenDate !=null and maps.andDate !=null) or (maps.betweenDate !='' and maps.andDate !=''))">
+                and (name like CONCAT('%',#{maps.str},'%') or material_number like CONCAT('%',#{maps.str},'%'))
+            </if>
+            <if test="maps.str !=null and maps.str !='' and maps.betweenDate ==null and maps.andDate ==null and maps.betweenDate =='' and maps.andDate ==''">
+                (name like CONCAT('%',#{maps.str},'%') or material_number like CONCAT('%',#{maps.str},'%'))
+            </if>
+
+        </where>
+
+
+        ) as b
+        LEFT JOIN application_form on b.app_form_id = application_form.id
+        <where>
+            <if test="maps.sort == 0">
+                application_form.sort=0
+            </if>
+            <if test="maps.sort == 1">
+                application_form.sort=1
+            </if>
+        </where>
+        ) as c) as e
+        GROUP BY product_id,vault,name,material_number
+        ) as d
+
+
+    </select>
+
+    <select id="selectQzProduct" resultType="java.util.Map">
+
+        select * from
+        (
+          select log.*,name,material_number from log LEFT JOIN product on log.product_id = product.id and log.vault = product.vault where app_form_id = #{appFormId,jdbcType=INTEGER}  and (length(log.url)=0 or log.url is null)
+            UNION all
+            select log.*,fin_product_name as name,fin_material_number as material_number from log LEFT JOIN fin_product on log.product_id = fin_product.id and log.vault = fin_product.vault where app_form_id = #{appFormId,jdbcType=INTEGER}  and (length(log.url)=0 or log.url is null)
+        ) as a where length(name)>0
+    </select>
+
+
+</mapper>

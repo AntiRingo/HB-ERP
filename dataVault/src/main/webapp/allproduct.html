@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="utf-8">
+  <title>所有产品页面</title>
+<link href="css/nav.css" rel="stylesheet">
+    <link href="css/model.css" rel="stylesheet">
+    <link href="css/searchInput.css" rel="stylesheet">
+
+</head>
+<style>
+    html{
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding:0;
+        font-family: 宋体,serif;
+    }
+    body{
+        margin: 0;
+        padding:0;
+    }
+
+
+h3{
+    margin: 0 ;
+}
+
+.sortTitle2{
+  width: 90%;
+    height: 50px;
+    background:#e0e4e9;
+    border-radius: 10px;
+    margin: 20px auto;
+    padding-left: 20px;
+    color: #007bff;
+    line-height: 50px
+}
+    .sortTitle2 a{
+        color: #007bff;
+        text-decoration: none;
+    }
+    .sortTitle3{
+        width: 88%;
+        height: 20px;
+        margin: auto auto auto 6%;
+        border-bottom: #d9d9d9 solid 2px;
+        line-height: 20px;
+    }
+.sortTitle3 a{
+    text-decoration: none;
+    color: #333333;
+}
+    #levelOne a{
+        text-decoration: none;
+        color: #333333;
+    }
+
+
+    h2 a{
+        color: black;
+        text-decoration: none;
+    }
+
+
+
+
+
+
+
+
+</style>
+<body>
+<div class="sq" style="width: 100%;height: auto;text-align: center;">
+    <div id="sw" style="display: flex;margin: auto;width: 90%;">
+        <div style="height: auto;display: flex;width: 35%;min-width: 295px;margin: auto">
+            <div style="margin: auto"><img style="min-width: 38px" src="images/HBlogo.png" alt=""></div>
+            <div><img style="min-width: 256px" src="images/logo2.png" alt=""></div>
+        </div>
+        <div style="width: 100%;height: auto;position: relative">
+            <div style="width:100%;min-width: 400px; margin: 8px auto;height: auto;display: flex;">
+                <button id="allSort" value="0"><span id="sortName">全部</span><span id="sortVault" style="display:none"></span><i class="allSortBefore">﹀</i></button>
+                <label for="searchContent"></label><input id="searchContent" type="search" style="width: 45%;min-width: 200px; height: 39px;font-size:16px;padding: 0 10px " oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
+                <button id="search" value="搜索"><i class="searchBefore"></i></button>
+
+            </div>
+            <div id="AllSortDiv" style="opacity: 0;pointer-events: none;">
+                <div style="width: 100%;text-align: left;margin-top: 20px">
+                    <span style="padding: 2px 10px;color: #333;font-weight: bold;font-size: 15px;width: 100%;"><b>过滤搜索</b></span>
+                </div>
+                <div class="search-container">
+                    <div class="keyword-input-container">
+                        <div class="search-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <input type="text"
+                               id="keywordInput"
+                               class="keyword-input"
+                               title="失去焦点后显示查询结果"
+                               placeholder="请输入分类关键字（如：IC、电阻、电容）">
+                        <div class="wave-effect"></div>
+                    </div>
+                </div>
+                <div id="allSortContent"  style="display:flex;flex-wrap:wrap">
+
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+
+</div>
+<div style="width: 100%;height: 50px;background-color: #0070bb;margin-top: 15px;">
+    <div style="width: 90%;height: 50px;margin: auto;display: flex;position: relative">
+        <div id="product" style="width: fit-content;height: 50px;line-height: 50px;color: white"><b><a href="allproduct.html">零件库</a></b><span class="productAfter"></span></div>
+        <div id="product2" style="width: fit-content;height: 50px;line-height: 50px;color: white;margin-left: 50px"><b><a href="allfinproduct.html">产品库</a></b><span class="productAfter"></span></div>
+            <button id="fontModeToggle" type="button" aria-pressed="false">放大字体</button>
+        <button id="login" >登录</button>
+    </div>
+    <div id="one" style="width: fit-content;height: auto;margin:auto auto auto 5%;display: flex;position: absolute;">
+        <div id="two" style="width: 250px;height: auto;background-color: #f0f0f0;padding-bottom: 15px;display:none">
+
+
+
+        </div>
+        <div id="three" style="width: 550px;height:auto;background-color: #f0f0f0;padding-bottom: 20px;display: none">
+            <div style="width: 100%;height: auto;padding-left: 20px;margin: 15px auto;font-weight: bolder;color: #333333"><span id="twoName"></span><span>类型</span></div>
+            <div id="threeSort" style="display: flex;flex-wrap:wrap">
+
+
+            </div>
+        </div>
+    </div>
+    <div id="one2" style="width: fit-content;height: auto;margin:auto auto auto 5%;display: flex;position: absolute;">
+        <div id="two2" style="width: 250px;height: auto;background-color: #f0f0f0;padding-bottom: 15px;display:none">
+
+
+
+        </div>
+        <div id="three2" style="width: 550px;height:auto;background-color: #f0f0f0;padding-bottom: 20px;display: none">
+            <div style="width: 100%;height: auto;padding-left: 20px;margin: 15px auto;font-weight: bolder;color: #333333"><span id="twoName2"></span><span>类型</span></div>
+            <div id="threeSort2" style="display: flex;flex-wrap:wrap">
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<!--<div class="application" style="color: white;margin-top: 20px;" >-->
+<!--    <li style="padding: 0 10px">申请单( <span id="applicationNumber">0</span> )</li>-->
+
+<!--</div>-->
+<!--导航栏-->
+
+
+<!--<div style="width: 90%;height: 50px;border-bottom: #d9d9d9 solid 2px;margin: auto;color: #007bff;line-height: 50px;">-->
+<!--    所有产品/-->
+<!--</div>-->
+
+<marquee id="pickUpMessige" direction="up" style="color: #ff6a00; align-self: center;width: 15px;height: 30%;position: fixed;top: 150px;right: 5px"></marquee>
+<div id="allall" style="width: 100%;height: auto;margin: auto;border-bottom: #d9d9d9 solid 2px;padding-bottom: 20px">
+<!--    <div id="levelOne" style="width: 90%;height: auto;margin: auto">-->
+<!--    </div>-->
+<!--    <div style="height: auto;display: flex;width: 90%;margin: auto"><h3>结果总数：</h3><h3 id="number"></h3></div>-->
+<!--    <div style="width: 100%;height: auto;margin: auto" id="allsortName">-->
+
+<!--       -->
+
+
+<!--    </div>-->
+</div>
+
+
+<form>
+    <!-- 弹窗 -->
+    <div id="myModal" class="modal" >
+
+        <!-- 弹窗内容 -->
+        <div class="modal-content">
+            <div class="close">&times;</div>
+            <div class="wrapper">
+
+                <div class="loginBox">
+                    <div class="loginBoxCenter">
+                        <p style="text-align: center;font-weight: bolder;font-size: larger">用户登录</p>
+                        <p><label for="username">用户名：</label></p>
+                        <!--autofocus 规定当页面加载时按钮应当自动地获得焦点。 -->
+                        <!-- placeholder提供可描述输入字段预期值的提示信息-->
+                        <p><input id="username" type="text" id="text" name="text" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入用户名" value="" /></p>
+                        <!-- required 规定必需在提交之前填写输入字段-->
+                        <p><label for="password">密码：</label></p>
+                        <p>
+                        <div class="passwordDiv ">
+                            <input type="password" id="password" name="password" class="passwordInput" required="required" placeholder="请输入密码" value="" />
+                            <img id="eye" style="position: absolute;width: 34px;height: 34px;" src="./images/close.png">
+                        </div>
+                        </p>
+                        <p><label style="display: none" for="checkCode">验证码：</label></p>
+                        <p>
+                        <div style="width: 344px;height: 25px;line-height: 22px;display: none;">
+                            <input class="loginInput" name="checkCode"type="text" value="" id="checkCode" style="width:158px;height: 15px" >
+                        &nbsp;<img style="padding-top: 2px" id="checkCodeImg" src="checkCodeServlet">
+                            <a style="margin-top: 3px" class="code" href="javascript:void(0)" id="changeImg">看不清？</a>
+                        </div>
+
+                        </p>
+
+
+
+
+                    </div>
+                    <div class="loginBoxButtons">
+
+                        <input type="button" class="loginBtn" id="loginBtn" value="登录">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</form>
+
+</body>
+<script type="text/javascript" src="js/axios-0.18.0.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/model.js"></script>
+<script>
+
+
+    function height(){
+
+        let iframe = window.parent.document.getElementById("iframepage");
+        if (iframe){
+            // let offsetHeight = document.body.clientHeight;
+
+            iframe.style.height=96+"vh";
+
+            // let num= window.parent.innerHeight;
+            // if (Number(num)>Number(60)){
+            //     let s = Number(num)-Number(60)
+            //     iframe.style.height=s+"px";
+            // }
+
+        }
+
+
+    }
+
+
+    //查询所有一级分类
+    axios({
+        method:"post",
+        url:"sort/selectOne"
+    }).then(async function (resp){
+        let datas=resp.data;
+        let ss1="";
+        for (let i = 0; i < datas.length; i++) {
+            ss1+= '    <div id="levelOne'+datas[i].id+'" style="width: 90%;height: auto;margin: auto">\n' +
+                '        <h2><a href="productResult.html?id='+datas[i].id+'&level='+datas[i].level+'">'+datas[i].name+'</a></h2>\n' +
+                '    </div>\n' +
+                '    <div style="height: auto;display: flex;width: 90%;margin: auto"><h3>结果总数：</h3><h3 id="number'+datas[i].id+'"></h3></div>\n' +
+                '    <div style="width: 100%;height: auto;margin: auto" id="allsortName'+datas[i].id+'">\n' +
+                '\n' +
+                '       \n' +
+                '\n' +
+                '\n' +
+                '    </div>'
+
+        }
+        document.getElementById("allall").innerHTML=ss1;
+        //查询二级分类
+        for (let i = 0; i < datas.length; i++) {
+          await  axios({
+                method:"post",
+                url:"sort/selectOtherLevel",
+                data:datas[i].id
+            }).then(async function (resp){
+                let datasTwo = resp.data;
+                let ss="";
+              for (let j = 0; j < datasTwo.length; j++) {
+                  ss+=' <div class="sortTitle2">\n' +
+                      '        <h3><a href="productResult.html?id='+datasTwo[j].id+'&level='+datasTwo[j].level+'">'+datasTwo[j].name+'</a></h3>\n' +
+                      '    </div>\n' +
+                      '    <div id="parentIdTwo'+datasTwo[j].id+'" style="width: 100%;height: auto;margin: auto">\n' +
+
+                      '    </div>'
+              }
+              document.getElementById("allsortName"+datas[i].id+"").innerHTML=ss;
+
+              //查询三级分类
+              for (let j = 0; j < datasTwo.length; j++) {
+                  await axios({
+                      method:"post",
+                      url:"sort/selectOtherLevel",
+                      data:datasTwo[j].id
+                  }).then(async function (resp){
+                      let dataThree=resp.data;
+                      let three="";
+                      for (let k = 0; k < dataThree.length; k++) {
+                          three+=' <div class="sortTitle3" ><a href="productResult.html?id='+dataThree[k].id+'&level='+dataThree[k].level+'">'+dataThree[k].name+'</a></div>\n' +
+                              '        <div style="width: 86%;height: auto;margin: auto auto auto 7%;display: flex;flex-wrap:wrap" id="parentIdThree'+dataThree[k].id+'" >\n' +
+
+                              '        </div>'
+                      }
+                      document.getElementById("parentIdTwo"+datasTwo[j].id+"").innerHTML=three;
+                      //查询四级分类
+                      for (let k = 0; k < dataThree.length; k++) {
+                          await axios({
+                              method:"post",
+                              url:"sort/selectOtherLevel",
+                              data:dataThree[k].id
+                          }).then(async function (resp){
+                              let dataFour=resp.data;
+                              let four="";
+                              for (let l = 0; l < dataFour.length; l++) {
+                                  four+='<div class="four"><a href="productResult.html?id='+dataFour[l].id+'&level='+dataFour[l].level+'">'+dataFour[l].name+'</a></div>'
+                              }
+                              document.getElementById("parentIdThree"+dataThree[k].id+"").innerHTML=four;
+
+
+
+                          })
+                      }
+
+                  })
+              }
+          })
+
+            //查询总数
+            axios({
+                method:"post",
+                url:"sort/selectAllDown",
+                data:datas[i].id
+            }).then( async function (resp){
+                if (resp.data.length>0){
+                    let n=0;
+                    for (let j = 0; j < resp.data.length; j++) {
+                        await   axios({
+                            method:"post",
+                            url:"sort/selectNumber",
+                            data:resp.data[j].id_list
+                        }).then(function (resp){
+                            let m=resp.data;
+                            n=Number(m)+Number(n);
+                        })
+                    }
+                    await   axios({
+                        method:"post",
+                        url:"sort/selectNumber",
+                        data:datas[i].id
+                    }).then(function (resp){
+                        let m=resp.data;
+                        n=Number(m)+Number(n);
+                    })
+                    document.getElementById("number"+datas[i].id +"").innerHTML=n;
+
+
+
+                }else {
+                    axios({
+                        method:"post",
+                        url:"sort/selectNumber",
+                        data:datas[i].id
+                    }).then(function (resp){
+                        document.getElementById("number"+datas[i].id +"").innerHTML=resp.data;
+                    })
+                }
+            })
+        }
+        height();
+    })
+
+
+
+    //搜索功能
+    document.getElementById("search").onclick=function (){
+        //检查搜索条件是否为空
+        //获取搜索框中的条件
+        let value = document.getElementById("searchContent").value;
+        const encodedValue = encodeURIComponent(value); // 输出 "abc%25",输出对应的编码
+        //获取分类筛选条件
+        let value1 = document.getElementById("allSort").value;
+        let sortVault = document.getElementById("sortVault").innerHTML;
+        if (value.length>0){
+            location.href="productResult.html?str="+encodedValue+"&sortId="+value1+"&level="+4+"&sortVault="+sortVault+"";
+        }else {
+            alert("请输入查询关键字！")
+        }
+
+
+    }
+</script>
+<script src="js/searchSort.js"></script>
+</html>

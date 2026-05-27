@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.PublicFileMapper">
+
+    <insert id="addPubicFile">
+        insert into public_file (id, p_id, name, size, type, url) VALUES
+            <foreach collection="publicFiles" item="publicFiles" index="index"  separator=",">
+                (
+                null,
+                #{publicFiles.pId,jdbcType=INTEGER},
+                #{publicFiles.name},
+                #{publicFiles.size,jdbcType=DOUBLE},
+                #{publicFiles.type},
+                #{publicFiles.url}
+                )
+
+            </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.InvoiceMapper">
+
+
+
+
+    <insert id="insertAllInvoice">
+    insert into invoice (id, app_id, invoice_str,status) VALUES
+    <foreach collection="invoices" item="invoices" index="index" separator=",">
+        (
+         null,
+         #{invoices.appId,jdbcType=INTEGER},
+         #{invoices.invoiceStr},
+         #{invoices.status,jdbcType=INTEGER}
+         )
+    </foreach>
+    </insert>
+    <select id="selectWsFp" resultType="java.util.Map">
+        select * from application_form
+        <where>
+            id in (select DISTINCT app_id from invoice where status=0)  and complete_status !=2 and sort_two=9
+            <if test="(maps.betweenDate.length>0) and (maps.andDate.length==0)   ">
+                and date > #{maps.betweenDate}
+            </if>
+            <if test="(maps.andDate.length>0) and (maps.betweenDate.length==0)  ">
+                and #{maps.andDate} > date
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                and date between #{maps.betweenDate} and #{maps.andDate}
+
+            </if>
+            <if test="maps.str !=null and maps.str !='' and ((maps.betweenDate !=null and maps.andDate !=null) or (maps.betweenDate !='' and maps.andDate !=''))">
+                and (order_number like CONCAT('%',#{maps.str},'%'))
+            </if>
+            <if test="maps.str !=null and maps.str !='' and maps.betweenDate ==null and maps.andDate ==null and maps.betweenDate =='' and maps.andDate ==''">
+                and (order_number like CONCAT('%',#{maps.str},'%'))
+            </if>
+        </where>
+            order by date desc
+
+    </select>
+
+</mapper>

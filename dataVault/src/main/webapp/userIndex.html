@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>宏邦电子</title>
+</head>
+<style>
+/*#iframepage{*/
+/*    overflow-y: hidden;*/
+/*}*/
+/*body{*/
+/*    overflow-y:auto;*/
+/*}*/
+</style>
+<body>
+<iframe width="100%"  id="iframepage" frameborder="0" name="iframe" scrolling="yes" ></iframe>
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+    document.getElementById("iframepage").src='allproduct.html';
+
+
+    //新信息桌面右下角提示
+    function  messageNotice(s,tag){
+
+            if (window.Notification && Notification.permission !==  "denied" ) {
+                Notification.requestPermission( function (status) {
+                    var  notice_ =  new  Notification( '新的消息' , {
+                        body:  s,
+                        icon: '/dataVault/images/HBlogo.png', // 自定义图标路径
+                        image: '/dataVault/images/logo2.png', // 可选图片展示
+                        badge: '/dataVault/images/HBlogo.png', // 应用于小尺寸的通知标记图标的URL
+                        requireInteraction: true, // 不自动关闭通知
+                        tag:tag,
+                        renotify:true,
+                    });
+                    notice_.onclick =  function () { //单击消息提示框，进入浏览器页面
+                        window.focus();
+                    }
+                });
+            }
+
+
+    }
+
+
+    //立即执行，查询自己是否存在已出库的申请单
+    let dcz=[];
+    axios({
+        method:"post",
+        url:"user/selectLoginId"
+    }).then(async function (resp)
+    {
+        let datas = resp.data;
+        if (datas !== "fail") {
+            //得到了登录的id，根据id查询自己申请的申请单是否存在已出库的数据
+            await axios({
+                method: "post",
+                url: "applicationForm/selectPickUpAppId",
+                data: datas
+            }).then(function (resp) {
+                if (resp.data.length > 0) {
+                    dcz.push(resp.data)
+                    let s = "您有申请单需要操作,请及时处理!";
+                    messageNotice(s, 'user');
+                }
+
+            })
+
+            //根据id查询该id下的申请单（已完成和已撤销的除外）
+            await axios({
+                method: "post",
+                url: "applicationForm/selectAppFormNotCompleteAndDelete",
+                data: datas
+            }).then(async function (resp) {
+                let appForms = resp.data;
+                if (appForms.length > 0) {
+                    let s = false;
+                    for (let i = 0; i < appForms.length; i++) {
+                        await axios({
+                            method: "post",
+                            url: "log/selectWqz",
+                            data: appForms[i].id
+                        }).then(function (resp) {
+                            if (resp.data === true) {
+                                s = true;
+                                dcz.push(appForms[i].id);
+
+                            }
+                        })
+                        // if (s===true){
+                        //     break;
+                        // }
+
+                    }
+                    if (s === true) {
+                        let ss = "您有申请单需要操作,请及时处理!";
+                        messageNotice(ss, 'user');
+                        s = true;
+                    }
+                }
+            })
+
+
+        }
+
+    })
+    //十秒一次
+
+    var timer= setInterval(function (){
+        let listAppId=[];
+        axios({
+            method:"post",
+            url:"user/selectLoginId"
+        }).then(async function (resp) {
+            let datas = resp.data;
+            if (datas !== "fail") {
+                //得到了登录的id，根据id查询自己申请的申请单是否存在已出库的数据
+                await axios({
+                    method: "post",
+                    url: "applicationForm/selectPickUpAppId",
+                    data: datas
+                }).then(function (resp) {
+                    // if (resp.data===true){
+                    //     let ss="您有申请单需要操作,请及时处理!";
+                    //     messageNotice(ss,'user');
+                    // }
+
+                    if (resp.data.length > 0) {
+                        listAppId.push(resp.data);
+                    }
+
+                })
+
+                //根据id查询该id下的申请单（已完成和已撤销的除外）
+                await  axios({
+                    method: "post",
+                    url: "applicationForm/selectAppFormNotCompleteAndDelete",
+                    data: datas
+                }).then(async function (resp) {
+                    let appForms = resp.data;
+                    if (appForms.length > 0) {
+
+                        let s = false;
+                        for (let i = 0; i < appForms.length; i++) {
+                            await axios({
+                                method: "post",
+                                url: "log/selectWqz",
+                                data: appForms[i].id
+                            }).then(function (resp) {
+                                if (resp.data === true) {
+                                    // let ss="您有申请单需要操作,请及时处理!";
+                                    // messageNotice(ss,'user');
+                                    // s=true;
+                                    listAppId.push(appForms[i].id)
+
+                                }
+                            })
+                            // if (s===true){
+                            //     break;
+                            // }
+
+                        }
+                    }
+                })
+
+
+
+
+                for (let i = 0; i < listAppId.length; i++) {
+                    let boo = false;
+                    for (let j = 0; j < dcz.length; j++) {
+                        if (Number(listAppId[i]) === Number(dcz[j])){
+                            boo=true;
+                            break;
+                        }
+                    }
+
+                    if (boo===false){
+                        let ss = "您有新的申请单需要操作,请及时处理!";
+                        messageNotice(ss, 'user');
+                        break;
+                    }
+                }
+
+            }
+            else {
+              let innerHTML = document.getElementById("iframepage").contentWindow.document.getElementById("login").innerHTML;
+                if (innerHTML!=="登录"){
+                    let ss = "您已退出登录!";
+                    messageNotice(ss, 'user');
+                    document.getElementById("iframepage").contentWindow.document.getElementById("login").innerHTML = "登录";
+                }
+                // window.close();
+            }
+
+        })
+    },10000)
+
+
+    // 监听页面卸载前事件（包含刷新/关闭/跳转等行为）
+    window.addEventListener('beforeunload', function(e) {
+        // 执行自定义逻辑（如数据保存）
+        console.log('执行自定义刷新逻辑');
+        let iframe = document.getElementById("iframepage");
+        iframe.contentWindow.location.reload(true);
+        // 可选：弹出二次确认（需用户交互后才能生效）
+        e.preventDefault();
+        e.returnValue = '刷新请点击取消！';
+
+
+
+    });
+</script>
+
+
+</html>

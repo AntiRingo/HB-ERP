@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.TakeOrderMapper">
+
+    <select id="selectAllTakeOrder" resultType="java.util.Map">
+        select DISTINCT a.*,userName,name,sort_two as sortTwo,user_id as userId,if(take_order_status=0,'未接单','已接单')  as jd
+        from (select application_form.*,take_order.take_order_status,user
+              from application_form left join take_order on app_form_id = application_form.id where take_order.id>0  and  circulation_boss = 1
+             ) as a LEFT JOIN `user` on `user`.id = a.`user` where
+
+        <if test="!rk || !ck || !cg|| !zj|| !dg">
+          sort in
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="ck">1,</if>
+                <if test="rk">0,</if>
+<!--                <if test="cg">2,</if>-->
+                <if test="dg">3,</if>
+                <if test="zj">4,</if>
+            </trim>
+        </if>
+<!--        <if test="isCg ==true">sort =2</if>-->
+<!--        <if test="isCg ==false">sort !=2</if>-->
+
+        ORDER BY date desc limit #{begin},#{size}
+    </select>
+    <select id="selectAllTakeOrderCount" resultType="java.lang.Integer">
+select count(*) from ( select DISTINCT a.*,userName,name,sort_two as sortTwo,user_id as userId,if(take_order_status=0,'未接单','已接单')  as jd
+        from (select application_form.*,take_order.take_order_status,user
+        from application_form left join take_order on app_form_id = application_form.id where take_order.id>0  and  circulation_boss = 1
+        ) as a LEFT JOIN `user` on `user`.id = a.`user` where
+        <!--         <if test="isCg ==true">sort =2</if>-->
+        <!--        <if test="isCg ==false">sort !=2</if>-->
+        <if test="!rk || !ck || !cg|| !zj|| !dg">
+            sort in
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="ck">1,</if>
+                <if test="rk">0,</if>
+<!--                <if test="cg">2,</if>-->
+                <if test="dg">3,</if>
+                <if test="zj">4,</if>
+            </trim>
+        </if>) as au
+
+    </select>
+</mapper>

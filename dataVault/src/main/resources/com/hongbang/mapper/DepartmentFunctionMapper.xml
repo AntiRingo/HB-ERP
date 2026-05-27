@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.DepartmentFunctionMapper">
+
+
+    <select id="selectModule" resultType="com.hongbang.pojo.Module">
+
+
+            select * from module where id in (
+            SELECT module_id from department_function  LEFT JOIN `function` on department_function.function_id = `function`.id where `level`>=#{level}
+            <if test="level==1 or level==2">
+               or department_function.depart_id = 14
+            </if>
+
+            <if  test="level==3 or level==4">
+                and (department_function.depart_id = 14 or department_function.depart_id = #{departId})
+            </if>
+
+            )
+
+    </select>
+    <select id="selectFunction" resultType="com.hongbang.pojo.Function">
+        SELECT `function`.* from department_function  LEFT JOIN `function` on department_function.function_id = `function`.id where `level`>=#{level}
+        <if test="level==2 or level==1">
+            or department_function.depart_id = 14
+        </if>
+
+        <if  test="level==3 or level==4">
+            and (department_function.depart_id = 14 or department_function.depart_id = #{departId})
+        </if>
+
+    </select>
+    <select id="selectFunctionTwo" resultType="com.hongbang.pojo.FunctionTwo">
+        select *from function_two where function_id in (
+        select function_two.function_id from department_function LEFT JOIN function_two on
+        department_function.function_id = function_two.function_id where `level`>=#{level}
+        <if test="level==1 or level==2">
+           or department_function.depart_id = 14
+        </if>
+
+        <if test="level==3 or level==4">
+          and  (department_function.depart_id = 14 or department_function.depart_id = #{departId})
+        </if>
+            )
+    </select>
+</mapper>

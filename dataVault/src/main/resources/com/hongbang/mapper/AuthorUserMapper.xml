@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.AuthorUserMapper">
+
+    <insert id="addAuthorUser">
+        insert into author_user (id, author_id, user_id, delete_sign, review_app_id, type,can_edit) VALUES
+        <foreach collection="authorUsers" item="authorUsers" index="index" separator=",">
+            (
+            0,
+             #{authorUsers.authorId,jdbcType=INTEGER},
+             #{authorUsers.userId,jdbcType=INTEGER},
+             2,
+             #{authorUsers.reviewAppId,jdbcType=INTEGER},
+             #{authorUsers.type,jdbcType=INTEGER},
+             #{authorUsers.canEdit,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+</mapper>

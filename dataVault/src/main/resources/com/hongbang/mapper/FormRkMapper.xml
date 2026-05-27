@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.FormRkMapper">
+
+    <insert id="add">
+        insert into form_rk(id, app_form_id, actual_price, price_sort, product_id, vault, rk_time, rk_sort) VALUES
+        <foreach collection="formRks" separator="," index="index" item="formRks">
+            (null,#{formRks.appFormId,jdbcType=INTEGER},#{formRks.actualPrice,jdbcType=DOUBLE},#{formRks.priceSort,jdbcType=INTEGER},#{formRks.productId,jdbcType=INTEGER},#{formRks.vault,jdbcType=INTEGER},#{formRks.rkTime,jdbcType=VARCHAR},#{formRks.rkSort,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+    <select id="selectRkFormListBy" resultType="java.util.Map">
+        select * from (select a.*,application_form.sort_two from ( select form_rk.*,product.name,material_number from form_rk left join product on form_rk.product_id = product.id  and form_rk.vault=product.vault ) as a
+        left join application_form on a.app_form_id =application_form.id
+        union all
+        select b.*,application_form.sort_two from ( select form_rk.*,fin_product.fin_product_name as name ,fin_material_number as material_number  from form_rk left join fin_product on form_rk.product_id = fin_product.id  and form_rk.vault=fin_product.vault ) as b
+        left join application_form on b.app_form_id =application_form.id) as c
+        <where>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                c.rk_time > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+                #{maps.andDate} >  c.rk_time and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                c.rk_time between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+
+            <if  test=" maps.vault != null and maps.vault != '' " >
+                c.vault=#{maps.vault,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                c.sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            c.sort = 1
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.PdfExcelMapper">
+
+    <insert id="addPdfExcel">
+        insert into pdf_excel (id,bom_title_id, name, type, time, user, url, scale, originCanvasX, originCanvasY,pdfScale,rotation,flippedX,flippedY) VALUES
+        <foreach collection="pdfExcels" item="pdfExcels" index="index"  separator=",">
+            (
+            null,
+            #{pdfExcels.bomTitleId,jdbcType=INTEGER},
+            #{pdfExcels.name},
+            #{pdfExcels.type},
+            #{pdfExcels.time},
+            #{pdfExcels.user,jdbcType=INTEGER},
+             #{pdfExcels.url},
+             1.0,
+             0,
+             0,
+             1.5,
+            0,
+             false,
+             false
+            )
+
+        </foreach>
+
+    </insert>
+</mapper>

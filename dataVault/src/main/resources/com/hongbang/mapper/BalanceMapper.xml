@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.BalanceMapper">
+
+    <insert id="addBalance">
+        insert into balance (id, product_id, vault, today_in, today_out, today, time, today_in_number, today_out_number,today_number) VALUES
+            <foreach collection="balanceList" item="balanceList" index="index" separator=",">
+                (
+                 null,
+                 #{balanceList.productId,jdbcType=INTEGER},
+                 #{balanceList.vault,jdbcType=INTEGER},
+                 #{balanceList.todayIn,jdbcType=VARCHAR},
+                 #{balanceList.todayOut,jdbcType=VARCHAR},
+                 #{balanceList.today,jdbcType=VARCHAR},
+                 #{balanceList.time,jdbcType=VARCHAR},
+                 #{balanceList.todayInNumber,jdbcType=VARCHAR},
+                #{balanceList.todayOutNumber,jdbcType=VARCHAR},
+                #{balanceList.todayNumber,jdbcType=VARCHAR}
+                )
+            </foreach>
+    </insert>
+
+</mapper>

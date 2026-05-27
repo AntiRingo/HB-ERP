@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.ExamineConditionContentMapper">
+
+    <insert id="addAll">
+        insert into examine_condition_content (id, examine_step_id, examine_condition_id, content) VALUES
+        <foreach collection="examineConditionContents" separator="," index="index" item="examineConditionContents">
+            (
+            null,
+            #{examineConditionContents.examineStepId,jdbcType=INTEGER},
+            #{examineConditionContents.examineConditionId,jdbcType=INTEGER},
+            #{examineConditionContents.content}
+            )
+        </foreach>
+
+    </insert>
+</mapper>

@@ -1,0 +1,1148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.ApplicationFormMapper">
+
+    <insert id="add" parameterType="applicationForm">
+        insert into application_form (id, order_number, date, sort, user_id,complete_status,sort_two,reason,circulation,circulation_boss,refuse,notes,robot,invoice_sign) VALUES (#{id},#{orderNumber},#{date},#{sort},#{userId},#{completeStatus},#{sortTwo},#{reason},#{circulation},#{circulationBoss},#{refuse},#{notes},#{robot},#{invoiceSign})
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+<!--    申请单筛选-->
+     <select id="screen" resultType="java.util.Map" >
+         select DISTINCT * from ( select application_form.*,user.department,user.userName,department.departmentName,outbound_type.type,
+         <if test="maps.sort == 0 || maps.sort == 1">
+             log.manager,
+         </if>
+
+        take_order.`user` from application_form
+         INNER JOIN user on application_form.user_id = user.id
+         INNER JOIN department on user.department = department.id
+         INNER JOIN outbound_type on application_form.sort_two = outbound_type.id
+             <if test="maps.sort == 0 || maps.sort == 1">
+                 inner join log on log.app_form_id = application_form.id
+             </if>
+
+         INNER JOIN take_order on take_order.app_form_id = application_form.id
+         ) as  a
+         <where>
+             <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">a.date > #{maps.betweenDate} and
+             </if>
+             <if test="maps.andDate !=null and maps.andDate !='' ">#{maps.andDate} > a.date and
+             </if>
+             <if test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' ">
+                 a.date between #{maps.betweenDate} and #{maps.andDate} and
+
+             </if>
+             <if test=" maps.completeStatus !=null and maps.completeStatus !='' ">a.complete_status =
+                 #{maps.completeStatus,jdbcType=INTEGER} and
+             </if>
+
+             <if  test=" maps.userId != null and maps.userId != '' " >
+
+                 user_id=#{maps.userId,jdbcType=INTEGER} and
+             </if>
+             <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                 sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+             </if>
+
+             <if test="maps.sort == 0">
+                 a.sort=0 and complete_status!=2
+             </if>
+             <if test="maps.sort == 1">
+                 a.sort=1  and complete_status!=2
+             </if>
+             <if test="maps.sort == 2">
+                 a.sort=2  and complete_status!=2
+             </if>
+             <if test="maps.sort == 3">
+                 a.sort=3  and complete_status!=2
+             </if>
+             <if test="maps.sort == 4">
+                 a.sort=4  and complete_status!=2
+             </if>
+             and circulation_boss = 1
+
+
+
+             <if test="level==true and (maps.sort == 0 or maps.sort==1)">
+                 and manager = #{ckId}
+             </if>
+
+
+
+         </where>
+         ORDER BY date DESC limit #{begin},#{size}
+
+
+
+<!--select DISTINCT c.*,manager from (-->
+<!--         select b.*,user from-->
+<!--         (select a.*,departmentName from(-->
+<!--         SELECT-->
+<!--         application_form.id,application_form.robot,order_number,date,sort,user_id,complete_status,user.name,sort_two,reason,department,circulation_boss-->
+<!--         from application_form LEFT JOIN `user` on application_form.user_id = `user`.id-->
+<!--         ) as a LEFT JOIN department on a.department = department.id-->
+<!--         <where>-->
+<!--             <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">a.date > #{maps.betweenDate} and-->
+<!--             </if>-->
+<!--             <if test="maps.andDate !=null and maps.andDate !='' ">#{maps.andDate} > a.date and-->
+<!--             </if>-->
+<!--            <if test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' ">-->
+<!--                a.date between #{maps.betweenDate} and #{maps.andDate} and-->
+
+<!--            </if>-->
+<!--             <if test-->
+
+<!--                         ="-->
+<!--              maps.completeStatus !=null and maps.completeStatus !='' ">a.complete_status =-->
+<!--                 #{maps.completeStatus,jdbcType=INTEGER} and-->
+<!--             </if>-->
+
+<!--            <if  test=" maps.userId != null and maps.userId != '' " >-->
+
+<!--                 user_id=#{maps.userId,jdbcType=INTEGER} and-->
+<!--            </if>-->
+<!--            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >-->
+
+<!--                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and-->
+<!--            </if>-->
+
+<!--            <if test="maps.sort == 0">-->
+<!--                sort=0 and complete_status!=2-->
+<!--            </if>-->
+<!--            <if test="maps.sort == 1">-->
+<!--                sort=1  and complete_status!=2-->
+<!--            </if>-->
+<!--             <if test="maps.sort == 2">-->
+<!--                 sort=2  and complete_status!=2-->
+<!--             </if>-->
+<!--            and circulation_boss = 1-->
+
+
+
+
+<!--        </where>-->
+<!--         ) as b left join take_order on take_order.app_form_id = b.id-->
+<!--         ) as c left join log on c.id = log.app_form_id-->
+<!--         where manager = #{ckId}-->
+
+<!--         <if test="level==true ">-->
+<!--             or user = #{ckId}-->
+<!--         </if>-->
+<!--        ORDER BY date DESC limit #{begin},#{size}-->
+
+
+
+    </select>
+
+
+    <select id="screenCount" resultType="integer">
+select count(*) from (
+        select DISTINCT * from ( select application_form.*,user.department,user.userName,department.departmentName,outbound_type.type,
+        <if test="maps.sort == 0 || maps.sort == 1">
+            log.manager,
+        </if>
+               take_order.`user` from application_form
+        INNER JOIN user on application_form.user_id = user.id
+        INNER JOIN department on user.department = department.id
+        INNER JOIN outbound_type on application_form.sort_two = outbound_type.id
+        <if test="maps.sort == 0 || maps.sort == 1">
+            inner join log on log.app_form_id = application_form.id
+        </if>
+        INNER JOIN take_order on take_order.app_form_id = application_form.id
+        ) as  a
+        <where>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">a.date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">#{maps.andDate} > a.date and
+            </if>
+            <if test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' ">
+                a.date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if test=" maps.completeStatus !=null and maps.completeStatus !='' ">a.complete_status =
+                #{maps.completeStatus,jdbcType=INTEGER} and
+            </if>
+
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+
+            <if test="maps.sort == 0">
+                a.sort=0 and complete_status!=2
+            </if>
+            <if test="maps.sort == 1">
+                a.sort=1  and complete_status!=2
+            </if>
+            <if test="maps.sort == 2">
+                a.sort=2  and complete_status!=2
+            </if>
+            <if test="maps.sort == 3">
+                a.sort=3  and complete_status!=2
+            </if>
+            <if test="maps.sort == 4">
+                a.sort=4  and complete_status!=2
+            </if>
+            and circulation_boss = 1
+
+            <if test="level==true and (maps.sort == 0 or maps.sort==1)">
+                and manager = #{ckId}
+            </if>
+
+        </where>
+) as b
+
+    </select>
+<!--    //根据筛选结果获取筛选人名-->
+    <select id="screenUserName" resultType="java.util.Map">
+
+        select a.*,departmentName from(
+        SELECT  application_form.id,order_number,date,sort,user_id,complete_status,name,sort_two,reason,department,circulation_boss,robot from application_form  LEFT JOIN `user`  on application_form.user_id = `user`.id
+        ) as a LEFT JOIN department on a.department = department.id
+            where a.id in
+            <foreach collection="applicationForms" index="index" item="applicationForms" open="(" close=")" separator=",">
+                #{applicationForms.id,jdbcType=INTEGER}
+            </foreach>
+            order by date desc
+
+    </select>
+
+<!--    查询申请单包括申请人信息-->
+    <select id="selectAllApplication" resultType="java.util.Map">
+
+        select c.*,departmentName from (select b.*,name,department from (
+        select application_form.* from(
+        select app_form_id from take_order where user =  #{ckId}
+        <if test="level==true ">
+            union
+            select app_form_id from log where manager =  #{ckId}
+        </if>
+
+            ) as a LEFT JOIN application_form on application_form.id = app_form_id) as b LEFT JOIN user on b.user_id = user.id) as c
+        LEFT JOIN department on department.id = c.department
+        where complete_status !=2
+          <if test="sort!=null ">
+              and sort = #{sort}
+          </if>
+        <if test="sort==null and sort==''">
+            <if test="!rk || !ck || !cg|| !zj || !dg">
+                and sort in
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="ck">1,</if>
+                    <if test="rk">0,</if>
+                    <if test="cg">2,</if>
+                    <if test="dg">3,</if>
+                    <if test="zj">4,</if>
+                </trim>
+            </if>
+        </if>
+
+        and circulation_boss = 1
+        ORDER BY  FIELD(complete_status,3,5,0,6,1,7,2,4), SUBSTRING_INDEX(order_number, '_', -1)desc  limit #{begin},#{size}
+
+
+<!--select c.*,manager from (-->
+<!--        select b.*,user from (-->
+<!--        select a.*,departmentName from(-->
+<!--        SELECT-->
+<!--        application_form.id,order_number,date,sort,user_id,complete_status,name,sort_two,reason,notes,department,circulation_boss,robot-->
+<!--        from application_form LEFT JOIN `user` on application_form.user_id = `user`.id-->
+<!--        ) as a LEFT JOIN department on a.department = department.id-->
+<!--        where-->
+<!--        <if test="sort == 1">-->
+<!--            sort = 1 and complete_status !=2-->
+<!--        </if>-->
+<!--        <if test="sort == 0">-->
+<!--            sort = 0 and complete_status !=2-->
+<!--        </if>-->
+<!--        <if test="sort == 2">-->
+<!--            sort = 2 and complete_status !=2-->
+<!--        </if>-->
+<!--        and circulation_boss = 1-->
+<!--        ) as b left join take_order on take_order.app_form_id = b.id-->
+<!--        ) as c left join log on c.id = log.app_form_id-->
+<!--        where manager = #{ckId}-->
+
+
+<!--         ORDER BY  SUBSTRING_INDEX(order_number, '_', -1)desc  limit #{begin},#{size}-->
+    </select>
+    <select id="count" resultType="java.lang.Integer">
+<!--select count(*) from (-->
+<!--        select DISTINCT c.*,manager from (-->
+<!--        select b.*,user from (-->
+<!--        select a.*,departmentName from(-->
+<!--        SELECT-->
+<!--        application_form.id,order_number,date,sort,user_id,complete_status,name,sort_two,reason,notes,department,circulation_boss,robot-->
+<!--        from application_form LEFT JOIN `user` on application_form.user_id = `user`.id-->
+<!--        ) as a LEFT JOIN department on a.department = department.id-->
+<!--        where-->
+<!--        <if test="sort == 1">-->
+<!--            sort = 1 and complete_status !=2-->
+<!--        </if>-->
+<!--        <if test="sort == 0">-->
+<!--            sort = 0 and complete_status !=2-->
+<!--        </if>-->
+<!--        <if test="sort == 2">-->
+<!--            sort = 2 and complete_status !=2-->
+<!--        </if>-->
+<!--        and circulation_boss = 1-->
+<!--        ) as b left join take_order on take_order.app_form_id = b.id-->
+<!--        ) as c left join log on c.id = log.app_form_id-->
+<!--        where manager = #{ckId}-->
+
+<!--        <if test="level==true ">-->
+<!--            or user = #{ckId}-->
+<!--        </if>-->
+<!--    ) as d-->
+
+        select count(*) from (select b.*,name,department from (
+        select application_form.* from(
+        select app_form_id from take_order where user =  #{ckId}
+        <if test="level==true ">
+            union
+            select app_form_id from log where manager =  #{ckId}
+        </if>
+
+        ) as a LEFT JOIN application_form on application_form.id = app_form_id) as b LEFT JOIN user on b.user_id = user.id) as c
+        LEFT JOIN department on department.id = c.department
+        where
+        complete_status !=2
+        <if test="sort!=null ">
+            and sort = #{sort}
+        </if>
+        <if test="sort==null and sort==''">
+            <if test="!rk || !ck || !cg|| !zj || !dg">
+                and sort in
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="ck">1,</if>
+                    <if test="rk">0,</if>
+                    <if test="cg">2,</if>
+                    <if test="dg">3,</if>
+                    <if test="zj">4,</if>
+                </trim>
+            </if>
+        </if>
+        and circulation_boss = 1
+
+    </select>
+    <select id="searchOrderNumber" resultType="java.util.Map">
+        select c.*,departmentName from (select b.*,name,department from (
+        select application_form.* from(
+        select app_form_id from take_order where user =  #{ckId}
+        <if test="level==true ">
+            union
+            select app_form_id from log where manager =  #{ckId}
+        </if>
+
+        ) as a LEFT JOIN application_form on application_form.id = app_form_id) as b LEFT JOIN user on b.user_id = user.id) as c
+        LEFT JOIN department on department.id = c.department
+        where
+        <if test="sort == 1">
+            sort = 1 and complete_status !=2
+        </if>
+        <if test="sort == 0">
+            sort = 0 and complete_status !=2
+        </if>
+        <if test="sort == 2">
+            sort = 2 and complete_status !=2
+        </if>
+        <if test="sort == 4">
+            sort = 4 and complete_status !=2
+        </if>
+        and circulation_boss = 1 and order_number like CONCAT('%',#{str},'%')
+        ORDER BY FIELD(complete_status,3,5,0,6,1,7,2,4), SUBSTRING_INDEX(order_number, '_', -1)desc  limit #{begin},#{size}
+
+        <!--select  DISTINCT c.*,manager from (-->
+<!--        select b.*,user from (-->
+<!--        select application_form.id,order_number,date,sort,user_id,complete_status,name,sort_two,reason,robot from-->
+<!--        application_form-->
+<!--        LEFT JOIN `user` on application_form.user_id = `user`.id where-->
+<!--        <if test="sort == 1">-->
+<!--            sort = 1 and complete_status !=2-->
+<!--        </if>-->
+<!--        <if test="sort == 0">-->
+<!--            sort = 0 and complete_status !=2-->
+<!--        </if>-->
+<!--        <if test="sort == 2">-->
+<!--            sort = 2 and complete_status !=2-->
+<!--        </if>and circulation_boss = 1-->
+<!--        and order_number like CONCAT('%',#{str},'%')-->
+<!--        )as b left join take_order on take_order.app_form_id = b.id-->
+<!--        ) as c  left join log on c.id = log.app_form_id-->
+<!--        where manager = #{ckId}-->
+
+<!--        <if test="level==true ">-->
+<!--            or user = #{ckId}-->
+<!--        </if>-->
+
+<!--        ORDER BY SUBSTRING_INDEX(order_number, '_', -1) desc limit #{begin},#{size}-->
+
+    </select>
+    <select id="searchOrderNumberCount" resultType="java.lang.Integer">
+        select count(*) from (select b.*,name,department from (
+        select application_form.* from(
+        select app_form_id from take_order where user =  #{ckId}
+        <if test="level==true ">
+            union
+            select app_form_id from log where manager =  #{ckId}
+        </if>
+
+        ) as a LEFT JOIN application_form on application_form.id = app_form_id) as b LEFT JOIN user on b.user_id = user.id) as c
+        LEFT JOIN department on department.id = c.department
+        where
+        <if test="sort == 1">
+            sort = 1 and complete_status !=2
+        </if>
+        <if test="sort == 0">
+            sort = 0 and complete_status !=2
+        </if>
+        <if test="sort == 2">
+            sort = 2 and complete_status !=2
+        </if>
+        <if test="sort == 4">
+            sort = 4 and complete_status !=2
+        </if>
+        and circulation_boss = 1 and order_number like CONCAT('%',#{str},'%')
+<!--        select count(*) from (-->
+<!--        select DISTINCT c.*,manager from (-->
+<!--        select b.*,user from (-->
+<!--        select application_form.id,order_number,date,sort,user_id,complete_status,name,sort_two,reason,robot from-->
+<!--        application_form-->
+<!--        LEFT JOIN `user` on application_form.user_id = `user`.id where-->
+<!--        <if test="sort == 1">-->
+<!--            sort = 1 and complete_status !=2-->
+<!--        </if>-->
+<!--        <if test="sort == 0">-->
+<!--            sort = 0 and complete_status !=2-->
+<!--        </if>-->
+<!--        <if test="sort == 2">-->
+<!--            sort = 2 and complete_status !=2-->
+<!--        </if>and circulation_boss = 1-->
+<!--        and order_number like CONCAT('%',#{str},'%')-->
+<!--        )as b left join take_order on take_order.app_form_id = b.id-->
+<!--        ) as c left join log on c.id = log.app_form_id-->
+<!--        where manager = #{ckId}-->
+
+<!--        <if test="level==true ">-->
+<!--            or user = #{ckId}-->
+<!--        </if>) as d-->
+    </select>
+
+<!--    //查看是否有新增的申请信息(出库申请)-->
+    <select id="selectIfNewApplicationCk" resultType="java.lang.Integer">
+    select id from application_form where complete_status = 3 and sort= 1
+        and circulation_boss = 1;
+
+    </select>
+<!--         //查看是否有新增的申请信息(入库申请) -->
+    <select id="selectIfNewApplicationRk" resultType="java.lang.Integer">
+
+    select id from application_form where complete_status = 3 and sort= 0
+     and circulation_boss = 1;
+    </select>
+
+<!--    部长查看申请单，签字的或者是未签字的-->
+    <select id="ministerExamine" resultType="com.hongbang.pojo.ApplicationForm">
+        select a.* from (select * from application_form where user_id in (select id from user where department = #{department} ) and complete_status !=2 and sort = 1)as a LEFT JOIN examine  on app_form_id = a.id where minister = #{minister} ORDER BY  SUBSTRING_INDEX(order_number, '_', -1)desc limit #{begin},#{size}
+    </select>
+    <select id="ministerExamineCount" resultType="java.lang.Integer">
+        select count(*) from (select * from application_form where user_id in (select id from user where department = #{department} ) and complete_status !=2 and sort = 1)as a LEFT JOIN examine  on app_form_id = a.id where minister = #{minister}
+    </select>
+
+<!--    部长筛选-->
+<!--    <select id="ministerScreen" resultType="com.hongbang.pojo.ApplicationForm">-->
+<!--        select a.* from (select * from application_form where user_id in (select id from user where department = #{department} ) and complete_status !=2 and sort = 1)as a LEFT JOIN examine  on app_form_id = a.id-->
+<!--        <where>-->
+
+<!--            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">-->
+<!--               date > #{maps.betweenDate} and-->
+<!--            </if>-->
+<!--            <if test="maps.andDate !=null and maps.andDate !='' ">-->
+<!--                #{maps.andDate} > date and-->
+<!--            </if>-->
+<!--            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >-->
+
+<!--               date between #{maps.betweenDate} and #{maps.andDate} and-->
+
+<!--            </if>-->
+
+
+<!--            <if  test=" maps.userId != null and maps.userId != '' " >-->
+
+<!--                user_id=#{maps.userId,jdbcType=INTEGER} and-->
+<!--            </if>-->
+
+<!--            <if  test=" maps.minister != null and maps.minister != '' " >-->
+
+<!--                minister = #{maps.minister,jdbcType=INTEGER} and-->
+<!--            </if>-->
+<!--         a.id>0-->
+<!--        </where>-->
+
+<!--       order by date desc limit #{begin},#{size}-->
+<!--    </select>-->
+<!--    <select id="ministerScreenCount" resultType="java.lang.Integer">-->
+<!--        select count(*) from (select * from application_form where user_id in (select id from user where department = #{department} ) and complete_status !=2 and sort = 1)as a LEFT JOIN examine  on app_form_id = a.id-->
+<!--        <where>-->
+<!--            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">-->
+<!--                date > #{maps.betweenDate} and-->
+<!--            </if>-->
+<!--            <if test="maps.andDate !=null and maps.andDate !='' ">-->
+<!--                #{maps.andDate} > date and-->
+<!--            </if>-->
+<!--            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >-->
+
+<!--                date between #{maps.betweenDate} and #{maps.andDate} and-->
+
+<!--            </if>-->
+<!--            &lt;!&ndash;            <if  test=" maps.completeStatus !=null and maps.completeStatus !='' " >&ndash;&gt;-->
+
+<!--            &lt;!&ndash;                application_form.complete_status = #{maps.completeStatus,jdbcType=INTEGER} and&ndash;&gt;-->
+<!--            &lt;!&ndash;            </if>&ndash;&gt;-->
+
+<!--            <if  test=" maps.userId != null and maps.userId != '' " >-->
+
+<!--                user_id=#{maps.userId,jdbcType=INTEGER} and-->
+<!--            </if>-->
+<!--            &lt;!&ndash;            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >&ndash;&gt;-->
+
+<!--            &lt;!&ndash;                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and&ndash;&gt;-->
+<!--            &lt;!&ndash;            </if>&ndash;&gt;-->
+
+<!--            &lt;!&ndash;            <if test="maps.sort == 0">&ndash;&gt;-->
+<!--            &lt;!&ndash;                sort=0 and complete_status!=2&ndash;&gt;-->
+<!--            &lt;!&ndash;            </if>&ndash;&gt;-->
+<!--            &lt;!&ndash;            <if test="maps.sort == 1">&ndash;&gt;-->
+<!--            &lt;!&ndash;                sort=1  and complete_status!=2&ndash;&gt;-->
+<!--            &lt;!&ndash;            </if>&ndash;&gt;-->
+<!--            <if  test=" maps.minister != null and maps.minister != '' " >-->
+
+<!--                minister = #{maps.minister,jdbcType=INTEGER} and-->
+<!--            </if>-->
+<!--            a.id>0-->
+<!--        </where>-->
+<!--    </select>-->
+
+
+
+
+
+
+<!--       //根据申请单id查询是否总价钱-->
+    <select id="selectPriceAndCount" resultType="java.util.Map">
+        select c.*,minister from (
+         select id,SUM(price*app_number) as totalPrice,count(id) as count from (
+         select a.*,product.brand as price from (select  application_form.id,product_id,vault,app_number from application_form LEFT JOIN application_content on application_form.id = application_content.application_id) as a LEFT JOIN product on a.product_id = product.id and a.vault = product.vault where LENGTH(product.id)>0
+         UNION ALL
+         select a.*,price from (select  application_form.id,product_id,vault,app_number from application_form LEFT JOIN application_content on application_form.id = application_content.application_id) as a LEFT JOIN fin_product on a.product_id = fin_product.id and a.vault = fin_product.vault where LENGTH(fin_product.id)>0) as b
+         where id in
+             <foreach collection="applicationForms" item="applicationForms" index="index" separator="," open="(" close=")" >
+                 #{applicationForms.id,jdbcType=INTEGER}
+             </foreach>
+         GROUP BY id) as c LEFT JOIN examine on c.id = examine.app_form_id order by field (c.id,
+        <foreach collection="applicationForms" item="applicationForms" index="index" separator=","  >
+            #{applicationForms.id,jdbcType=INTEGER}
+        </foreach>
+             )
+    </select>
+    <select id="ministerScreen" resultType="com.hongbang.pojo.ApplicationForm">
+        select * from application_form where id in (
+        select c.id
+        from (
+        select b.*,department_id,step from (
+        SELECT a.*,examine_step_id,result,examine_step_content.id as ids from (
+        select application_form.*,minister from application_form LEFT JOIN examine on examine.app_form_id =
+        application_form.id
+        )
+        as a LEFT JOIN examine_step_content on examine_step_content.app_form_id = a.id
+        )as b LEFT JOIN examine_all_type on examine_all_type.id = b.examine_step_id
+        ) as c LEFT JOIN user on `user`.id = c.user_id
+        <where>
+
+                <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                date > #{maps.betweenDate} and
+                </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+            #{maps.andDate} > date and
+            </if>
+                <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                    date between #{maps.betweenDate} and #{maps.andDate} and
+
+                </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sort != null and maps.sort != '' " >
+
+                sort=#{maps.sort,jdbcType=INTEGER} and
+            </if>
+                <if  test=" maps.userId != null and maps.userId != '' " >
+
+                    user_id=#{maps.userId,jdbcType=INTEGER} and
+                </if>
+            <if  test=" maps.department != null and maps.department != '' " >
+
+                user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+            </if>
+                <if  test=" maps.minister == 0 and  maps.minister != null and maps.minister != '' " >
+#                 未审核
+                   (( circulation = #{department}  and minister = 0)  or (circulation = #{department} and department_id = #{department} and result = 0)) and
+                </if>
+                <if  test=" maps.minister == 1 " >
+                    #                 审核通过
+
+                    ((minister = 1 and department = #{department})  or (department_id = #{department} and result = 1))  and
+                </if>
+
+                <if  test=" maps.minister == 2 " >
+                    #                 审核未通过
+
+                    ((minister = 2 and department = #{department}) or (department_id = #{department} and result = 2))  and
+                </if>
+            <if  test=" maps.minister == null or maps.minister=='' " >
+                #                全部
+                (circulation = #{department} or  ((minister = 1 and department = #{department}) or (department_id = #{department} and result = 1))
+                or     (   (minister = 2 and department = #{department}) or (department_id = #{department} and result = 2))) and
+            </if>
+
+            complete_status != 2
+            </where>
+        )
+
+        ORDER BY  SUBSTRING_INDEX(order_number, '_', -1) desc limit #{begin},#{size}
+        </select>
+    <select id="ministerScreenCount" resultType="java.lang.Integer">
+        select count(*) from application_form where id in (
+        select c.id
+        from (
+        select b.*,department_id,step from (
+        SELECT a.*,examine_step_id,result,examine_step_content.id as ids from (
+        select application_form.*,minister from application_form LEFT JOIN examine on examine.app_form_id =
+        application_form.id
+        )
+        as a LEFT JOIN examine_step_content on examine_step_content.app_form_id = a.id
+        )as b LEFT JOIN examine_all_type on examine_all_type.id = b.examine_step_id
+        ) as c LEFT JOIN user on `user`.id = c.user_id
+        <where>
+
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">date > #{maps.betweenDate} and
+            </if>
+            <if test="
+            maps.andDate !=null and maps.andDate !='' ">#{maps.andDate} > date and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.department != null and maps.department != '' " >
+
+                user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sort != null and maps.sort != '' " >
+
+                sort=#{maps.sort,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.minister == 0 and  maps.minister != null and maps.minister != '' " >
+                #                 未审核
+
+                (( circulation = #{department}  and minister = 0)  or (circulation = #{department} and department_id = #{department} and result = 0)) and
+            </if>
+            <if  test=" maps.minister == 1 " >
+                #                 审核通过
+
+                ((minister = 1 and department = #{department}) or (department_id = #{department} and result = 1))  and
+            </if>
+
+            <if  test=" maps.minister == 2 " >
+                #                 审核未通过
+
+               ((minister = 2 and department = #{department}) or (department_id = #{department} and result = 2))  and
+            </if>
+            <if  test=" maps.minister == null or maps.minister=='' " >
+                #                全部
+               (circulation = #{department} or  ((minister = 1 and department = #{department}) or (department_id = #{department} and result = 1))
+                or     (   (minister = 2 and department = #{department}) or (department_id = #{department} and result = 2))) and
+            </if>
+
+
+           complete_status != 2
+        </where>
+        )
+
+
+    </select>
+<!--    查询是否有新的申请单桌面右下角显示使用-->
+    <select id="selectIfExamine" resultType="java.lang.Integer">
+        select distinct c.id
+        from (
+        select b.*,department_id,step from (
+        SELECT a.*,examine_step_id,result,examine_step_content.id as ids from (
+        select application_form.*,minister from application_form LEFT JOIN examine on examine.app_form_id =
+        application_form.id
+        )
+        as a LEFT JOIN examine_step_content on examine_step_content.app_form_id = a.id
+        )as b LEFT JOIN examine_all_type on examine_all_type.id = b.examine_step_id
+        ) as c LEFT JOIN user on `user`.id = c.user_id
+       where
+                #  未审核
+            sort=#{sort,jdbcType=INTEGER} and
+                (( circulation = #{department}  and minister = 0)  or (circulation = #{department} and department_id = #{department} and result = 0)) and
+          complete_status != 2
+
+    </select>
+
+
+    <select id="ministerScreenUser" resultType="java.util.Map">
+        select * from (
+            select distinct user_id,userName,department,name from application_form left join user on user_id = user.id where application_form.id in (
+        select c.id
+        from (
+        select b.*,department_id,step from (
+        SELECT a.*,examine_step_id,result,examine_step_content.id as ids from (
+        select application_form.*,minister from application_form LEFT JOIN examine on examine.app_form_id =
+        application_form.id
+        )
+        as a LEFT JOIN examine_step_content on examine_step_content.app_form_id = a.id
+        )as b LEFT JOIN examine_all_type on examine_all_type.id = b.examine_step_id
+        ) as c LEFT JOIN user on `user`.id = c.user_id
+        <where>
+
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+                #{maps.andDate} > date and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sort != null and maps.sort != '' " >
+
+                sort=#{maps.sort,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.department != null and maps.department != '' " >
+
+                user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+            </if>
+            <if  test=" maps.minister == 0 and  maps.minister != null and maps.minister != '' " >
+                #                 未审核
+                (( circulation = #{department}  and minister = 0)  or (circulation = #{department} and department_id = #{department} and result = 0)) and
+            </if>
+            <if  test=" maps.minister == 1 " >
+                #                 审核通过
+
+                ((minister = 1 and department = #{department})  or (department_id = #{department} and result = 1))  and
+            </if>
+
+            <if  test=" maps.minister == 2 " >
+                #                 审核未通过
+
+                ((minister = 2 and department = #{department}) or (department_id = #{department} and result = 2))  and
+            </if>
+            <if  test=" maps.minister == null or maps.minister=='' " >
+                #                全部
+                (circulation = #{department} or  ((minister = 1 and department = #{department}) or (department_id = #{department} and result = 1))
+                or     (   (minister = 2 and department = #{department}) or (department_id = #{department} and result = 2))) and
+            </if>
+
+            complete_status != 2
+        </where>
+        )
+) as a LEFT JOIN department on department.id = a.department
+
+    </select>
+    <select id="ministerScreenDepartment" resultType="java.util.Map">
+
+        select  distinct department.id,departmentName from (
+        select distinct user_id,userName,department,name from application_form left join user on user_id = user.id where application_form.id in (
+        select c.id
+        from (
+        select b.*,department_id,step from (
+        SELECT a.*,examine_step_id,result,examine_step_content.id as ids from (
+        select application_form.*,minister from application_form LEFT JOIN examine on examine.app_form_id =
+        application_form.id
+        )
+        as a LEFT JOIN examine_step_content on examine_step_content.app_form_id = a.id
+        )as b LEFT JOIN examine_all_type on examine_all_type.id = b.examine_step_id
+        ) as c LEFT JOIN user on `user`.id = c.user_id
+        <where>
+
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+                #{maps.andDate} > date and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sort != null and maps.sort != '' " >
+
+                sort=#{maps.sort,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.department != null and maps.department != '' " >
+
+                user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+            </if>
+            <if  test=" maps.department != null and maps.department != '' " >
+
+                user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+            </if>
+            <if  test=" maps.minister == 0 and  maps.minister != null and maps.minister != '' " >
+                #                 未审核
+                (( circulation = #{department}  and minister = 0)  or (circulation = #{department} and department_id = #{department} and result = 0)) and
+            </if>
+            <if  test=" maps.minister == 1 " >
+                #                 审核通过
+
+                ((minister = 1 and department = #{department})  or (department_id = #{department} and result = 1))  and
+            </if>
+
+            <if  test=" maps.minister == 2 " >
+                #                 审核未通过
+
+                ((minister = 2 and department = #{department}) or (department_id = #{department} and result = 2))  and
+            </if>
+            <if  test=" maps.minister == null or maps.minister=='' " >
+                #                全部
+                (circulation = #{department} or  ((minister = 1 and department = #{department}) or (department_id = #{department} and result = 1))
+                or     (   (minister = 2 and department = #{department}) or (department_id = #{department} and result = 2))) and
+            </if>
+
+            complete_status != 2
+        </where>
+        )
+        ) as a LEFT JOIN department on department.id = a.department
+
+    </select>
+    <select id="selectPriceAndCountLj" resultType="java.util.Map">
+        select c.*,minister from (
+        select id,SUM(price*app_number) as totalPrice,count(id) as count from (
+        select a.*,product.brand as price from (select  application_form.id,product_id,vault,app_number from application_form LEFT JOIN application_content on application_form.id = application_content.application_id) as a LEFT JOIN product on a.product_id = product.id and a.vault = product.vault where LENGTH(product.id)>0
+        UNION ALL
+        select a.*,0 as price from (select  application_form.id,product_id,vault,app_number from application_form LEFT JOIN application_content on application_form.id = application_content.application_id) as a LEFT JOIN fin_product on a.product_id = fin_product.id and a.vault = fin_product.vault where LENGTH(fin_product.id)>0) as b
+        where id in
+        <foreach collection="applicationForms" item="applicationForms" index="index" separator="," open="(" close=")" >
+            #{applicationForms.id,jdbcType=INTEGER}
+        </foreach>
+        GROUP BY id) as c LEFT JOIN examine on c.id = examine.app_form_id order by field (c.id,
+        <foreach collection="applicationForms" item="applicationForms" index="index" separator=","  >
+            #{applicationForms.id,jdbcType=INTEGER}
+        </foreach>
+        )
+    </select>
+    <select id="screenUserId" resultType="java.util.Map">
+select distinct user_id, userName, department, name,departmentName from (
+        select * from (select  user_id,userName,department,name,application_form.id as appId,circulation_boss from application_form left join user on user_id = user.id where complete_status !=2 and application_form.sort=#{sort} and circulation_boss =1) as a
+            LEFT JOIN department on department.id = a.department
+) as b left join take_order on take_order.app_form_id = b.appId
+        <if test="level==true">
+            where take_order.user = #{ckId}
+        </if>
+    </select>
+    <select id="selectByUserId" resultType="com.hongbang.pojo.ApplicationForm">
+        select * from application_form where user_id = #{maps.userId}
+        <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+             and date > #{maps.betweenDate}
+        </if>
+        <if test="maps.andDate !=null and maps.andDate !='' ">
+             and #{maps.andDate} > date
+        </if>
+        <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+             and date between #{maps.betweenDate} and #{maps.andDate}
+
+        </if>
+        ORDER BY  SUBSTRING_INDEX(order_number, '_', -1)desc limit #{begin},#{size}
+    </select>
+    <select id="selectByUserIdCount" resultType="java.lang.Integer">
+        select count(*) from application_form where user_id = #{maps.userId}
+        <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+             and date > #{maps.betweenDate}
+        </if>
+        <if test="maps.andDate !=null and maps.andDate !='' ">
+            and #{maps.andDate} > date
+        </if>
+        <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+            and date between #{maps.betweenDate} and #{maps.andDate}
+
+        </if>
+    </select>
+    <select id="selectTakeOrder" resultType="com.hongbang.pojo.ApplicationForm">
+        select * from application_form left join take_order on application_form.id = take_order.app_form_id
+        where complete_status =3 and  circulation_boss = 1 and take_order_status = 0
+        <if test="!rk || !ck || !cg|| !zj || !dg">
+            and application_form.sort in
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="ck">1,</if>
+                <if test="rk">0,</if>
+<!-- 采购暂时不接单               <if test="cg">2,</if>-->
+                <if test="dg">3,</if>
+                <if test="zj">4,</if>
+            </trim>
+        </if>
+ ORDER BY date desc
+
+<!--        <if test="ck==true and rk ==false and cg==false">-->
+<!--            and application_form.sort = 1-->
+<!--        </if>-->
+<!--        <if test="rk==true and ck==false and cg==false">-->
+<!--            and application_form.sort = 0-->
+<!--        </if>-->
+<!--        <if test="cg==true and ck==false and rk==false">-->
+<!--            and application_form.sort = 2-->
+<!--        </if>-->
+<!--        <if test="ck==true and rk ==true and cg==false">-->
+<!--            and (application_form.sort = 1 or application_form.sort = 0)-->
+<!--        </if>-->
+<!--        <if test="ck==false and rk ==true and cg==true">-->
+<!--            and (application_form.sort = 0 or application_form.sort = 2)-->
+<!--        </if>-->
+<!--        <if test="ck==false and rk ==true and cg==true">-->
+<!--            and (application_form.sort = 1 or application_form.sort = 2)-->
+<!--        </if>-->
+
+
+<!--        <if test="rk==true and ck==true and cg==true">-->
+<!--            and 1>0-->
+<!--        </if>-->
+    </select>
+    <select id="selectAllCgApplication" resultType="java.util.Map">
+        select c.*,departmentName from (select b.*,name,department from (
+
+       select * from application_form
+        ) as b LEFT JOIN user on b.user_id = user.id) as c
+        LEFT JOIN department on department.id = c.department
+
+
+        <where>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">#{maps.andDate} > date and
+            </if>
+            <if test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' ">
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if test=" maps.completeStatus !=null and maps.completeStatus !='' ">
+            complete_status = #{maps.completeStatus,jdbcType=INTEGER} and
+            </if>
+
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.orderNumber != null and  maps.orderNumber  != '' " >
+
+                order_number LIKE CONCAT('%', #{maps.orderNumber,jdbcType=VARCHAR}, '%') and
+            </if>
+
+            <if test="!rk || !ck || !cg|| !zj">
+               sort in
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="ck">1,</if>
+                    <if test="rk">0,</if>
+                    <if test="cg">2,</if>
+                    <if test="zj">4,</if>
+                </trim>
+            and complete_status !=2
+            </if>
+
+
+
+
+
+
+
+
+        </where>
+
+        and circulation_boss = 1
+        ORDER BY  FIELD(complete_status,3,5,0,6,1,7,2,4), SUBSTRING_INDEX(order_number, '_', -1)desc  limit #{begin},#{size}
+    </select>
+    <select id="selectAllCgApplicationCount" resultType="java.lang.Integer">
+        select count(*) from (select b.*,name,department from (
+
+        select * from application_form
+        ) as b LEFT JOIN user on b.user_id = user.id) as c
+        LEFT JOIN department on department.id = c.department
+
+        <where>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">#{maps.andDate} >date and
+            </if>
+            <if test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' ">
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if test=" maps.completeStatus !=null and maps.completeStatus !='' ">
+            complete_status = #{maps.completeStatus,jdbcType=INTEGER} and
+            </if>
+
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.orderNumber != null and  maps.orderNumber  != '' " >
+
+                order_number LIKE CONCAT('%', #{maps.orderNumber,jdbcType=VARCHAR}, '%') and
+            </if>
+
+
+
+            <if test="!rk || !ck || !cg|| !zj">
+               sort in
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="ck">1,</if>
+                    <if test="rk">0,</if>
+                    <if test="cg">2,</if>
+                    <if test="zj">4,</if>
+                </trim>
+                and complete_status !=2
+            </if>
+
+        </where>
+        and circulation_boss = 1
+    </select>
+    <select id="selectAllDgApplication" resultType="java.util.Map">
+
+        select a.*,user from (select c.*,departmentName from (select b.*,name,department from (
+
+        select * from application_form
+        ) as b LEFT JOIN user on b.user_id = user.id) as c
+        LEFT JOIN department on department.id = c.department) as a LEFT JOIN take_order on a.id = take_order.app_form_id
+
+
+        <where>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">#{maps.andDate} > date and
+            </if>
+            <if test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' ">
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if test=" maps.completeStatus !=null and maps.completeStatus !='' ">
+                complete_status = #{maps.completeStatus,jdbcType=INTEGER} and
+            </if>
+
+
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.orderNumber != null and  maps.orderNumber  != '' " >
+
+                order_number LIKE CONCAT('%', #{maps.orderNumber,jdbcType=VARCHAR}, '%') and
+            </if>
+
+
+                sort = 3 and length(user)>0
+
+
+                and complete_status !=2
+
+
+
+        </where>
+
+        and circulation_boss = 1
+        ORDER BY  FIELD(complete_status,3,5,0,9,6,1,7,2,4), SUBSTRING_INDEX(order_number, '_', -1)desc  limit #{begin},#{size}
+    </select>
+    <select id="selectAllDgApplicationCount" resultType="java.lang.Integer">
+
+        select count(*) from (select c.*,departmentName from (select b.*,name,department from (
+
+        select * from application_form
+        ) as b LEFT JOIN user on b.user_id = user.id) as c
+        LEFT JOIN department on department.id = c.department) as a LEFT JOIN take_order on a.id = take_order.app_form_id
+
+        <where>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">#{maps.andDate} >date and
+            </if>
+            <if test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' ">
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if test=" maps.completeStatus !=null and maps.completeStatus !='' ">
+                complete_status = #{maps.completeStatus,jdbcType=INTEGER} and
+            </if>
+
+
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+
+            </if>
+            <if  test=" maps.orderNumber != null and  maps.orderNumber  != '' " >
+
+                order_number LIKE CONCAT('%', #{maps.orderNumber,jdbcType=VARCHAR}, '%') and
+            </if>
+
+
+                sort =3  and length(user)>0
+
+
+                and complete_status !=2
+
+
+        </where>
+        and circulation_boss = 1
+    </select>
+
+
+</mapper>

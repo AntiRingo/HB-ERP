@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.FinBomMapper">
+
+
+
+    <insert id="add">
+        insert into fin_bom (id, bom_title_id, status, productId, vault,number,part_number,notes) VALUES
+        <foreach collection="finBoms" item="finBoms" index="index" separator="," >
+            (
+                null,
+             #{finBoms.bomTitleId,jdbcType=INTEGER},
+             #{finBoms.status,jdbcType=INTEGER},
+             #{finBoms.productId,jdbcType=INTEGER},
+             #{finBoms.vault,jdbcType=INTEGER},
+             #{finBoms.number,jdbcType=INTEGER},
+            #{finBoms.partNumber,jdbcType=VARCHAR},
+            #{finBoms.notes,jdbcType=VARCHAR}
+            )
+
+        </foreach>
+    </insert>
+    <select id="selectProduct" resultType="com.hongbang.pojo.Product">
+
+    select * from product where (id,vault) in
+    <foreach collection="finBoms" separator="," open="(" close=")" index="index" item="finBoms">
+        (#{finBoms.productId,jdbcType=INTEGER},#{finBoms.vault,jdbcType=INTEGER})
+    </foreach>
+    union all
+        select * from fin_product where (id,vault) in
+        <foreach collection="finBoms" separator="," open="(" close=")" index="index" item="finBoms">
+            (#{finBoms.productId,jdbcType=INTEGER},#{finBoms.vault,jdbcType=INTEGER})
+        </foreach>
+
+    </select>
+
+</mapper>

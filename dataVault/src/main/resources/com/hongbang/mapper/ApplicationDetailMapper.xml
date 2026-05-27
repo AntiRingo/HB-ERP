@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.ApplicationDetailMapper">
+    <resultMap id="DetailResultMap" type="com.hongbang.pojo.ApplicationDetail">
+        <id column="id" property="id"/>
+        <result column="application_content_id" property="applicationContentId"/>
+        <result column="tax_price" property="taxPrice"/>
+        <result column="goods_amount" property="goodsAmount"/>
+        <result column="freight" property="freight"/>
+        <result column="use_purpose" property="usePurpose"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="expect_info" property="expectInfo"/>
+        <result column="pay_date" property="payDate"/>
+        <result column="arrive_date" property="arriveDate"/>
+        <result column="invoice_date" property="invoiceDate"/>
+        <result column="warranty_date" property="warrantyDate"/>
+        <result column="supplier_name" property="supplierName"/>
+        <result column="supplier_address" property="supplierAddress"/>
+        <result column="contact_person" property="contactPerson"/>
+        <result column="contact_tel" property="contactTel"/>
+        <result column="fax" property="fax"/>
+        <result column="tax_no" property="taxNo"/>
+        <result column="email" property="email"/>
+    </resultMap>
+
+    <select id="selectByContentId" resultMap="DetailResultMap">SELECT * FROM application_detail WHERE application_content_id=#{applicationContentId}</select>
+    <insert id="insert">INSERT INTO application_detail(application_content_id,tax_price,goods_amount,freight,use_purpose,order_no,expect_info,pay_date,arrive_date,invoice_date,warranty_date,supplier_name,supplier_address,contact_person,contact_tel,fax,tax_no,email) VALUES(#{applicationContentId},#{taxPrice},#{goodsAmount},#{freight},#{usePurpose},#{orderNo},#{expectInfo},#{payDate},#{arriveDate},#{invoiceDate},#{warrantyDate},#{supplierName},#{supplierAddress},#{contactPerson},#{contactTel},#{fax},#{taxNo},#{email})</insert>
+    <update id="update">UPDATE application_detail SET tax_price=#{taxPrice},goods_amount=#{goodsAmount},freight=#{freight},use_purpose=#{usePurpose},order_no=#{orderNo},expect_info=#{expectInfo},pay_date=#{payDate},arrive_date=#{arriveDate},invoice_date=#{invoiceDate},warranty_date=#{warrantyDate},supplier_name=#{supplierName},supplier_address=#{supplierAddress},contact_person=#{contactPerson},contact_tel=#{contactTel},fax=#{fax},tax_no=#{taxNo},email=#{email} WHERE id=#{id}</update>
+
+    <!-- 自动保存修改明细表 -->
+    <update id="updateDetail">
+        UPDATE application_detail
+        SET tax_price=#{tax_price},goods_amount=#{goods_amount},freight=#{freight},
+            pay_date=#{pay_date},arrive_date=#{arrive_date},invoice_date=#{invoice_date},
+            warranty_date=#{warranty_date},supplier_name=#{supplier_name},
+            supplier_address=#{supplier_address},contact_person=#{contact_person},
+            contact_tel=#{contact_tel},tax_no=#{tax_no},email=#{email},order_no=#{order_no}
+        WHERE application_content_id = #{id}
+    </update>
+
+    <!-- 复制明细数据 -->
+    <insert id="insertCopyDetail">
+        INSERT INTO application_detail
+        (application_content_id,tax_price,goods_amount,freight,pay_date,
+         arrive_date,invoice_date,warranty_date,supplier_name,
+         supplier_address,contact_person,contact_tel,tax_no,email,order_no)
+        SELECT #{newId},tax_price,goods_amount,freight,pay_date,
+               arrive_date,invoice_date,warranty_date,supplier_name,
+               supplier_address,contact_person,contact_tel,tax_no,email,order_no
+        FROM application_detail WHERE application_content_id = #{oldId}
+    </insert>
+
+
+    <!-- 查询是否存在 -->
+    <select id="checkExistByContentId" resultType="int">
+        SELECT COUNT(*) FROM application_detail WHERE application_content_id = #{contentId}
+    </select>
+
+    <!-- 新增明细（自动保存时如果没有就新建） -->
+    <insert id="insertDetail" parameterType="map">
+        INSERT INTO application_detail (
+            application_content_id,
+            tax_price,
+            goods_amount,
+            freight,
+            pay_date,
+            arrive_date,
+            invoice_date,
+            warranty_date,
+            supplier_name,
+            supplier_address,
+            contact_person,
+            contact_tel,
+            tax_no,
+            email,
+            order_no
+        ) VALUES (
+                     #{application_content_id},
+                     #{tax_price},
+                     #{goods_amount},
+                     #{freight},
+                     #{pay_date},
+                     #{arrive_date},
+                     #{invoice_date},
+                     #{warranty_date},
+                     #{supplier_name},
+                     #{supplier_address},
+                     #{contact_person},
+                     #{contact_tel},
+                     #{tax_no},
+                     #{email},
+                     #{order_no}
+                 )
+    </insert>
+</mapper>

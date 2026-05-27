@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.AttributeFunctionMapper">
+
+    <insert id="addExcel">
+        insert into attribute_function (id, att_name_id, `range`, auto_code, serial_code, unique_code,display_code)
+        VALUES
+            <foreach collection="attributeFunctions" item="attributeFunctions" index="index" separator=",">
+                (
+                 null,
+                 #{attributeFunctions.attNameId,jdbcType=INTEGER},
+                 #{attributeFunctions.range,jdbcType=INTEGER},
+                 #{attributeFunctions.autoCode,jdbcType=INTEGER},
+                #{attributeFunctions.serialCode,jdbcType=INTEGER},
+                #{attributeFunctions.uniqueCode,jdbcType=INTEGER},
+                #{attributeFunctions.displayCode,jdbcType=INTEGER}
+                )
+            </foreach>
+    </insert>
+    <update id="updateExcel">
+       replace into attribute_function
+        (att_name_id, `range`, auto_code) VALUES
+        <foreach collection="attributeFunctions" item="attributeFunctions" index="index" separator=",">
+            (
+            #{attributeFunctions.attNameId,jdbcType=INTEGER},
+            #{attributeFunctions.range,jdbcType=INTEGER},
+            #{attributeFunctions.autoCode,jdbcType=INTEGER}
+            )
+        </foreach>
+
+    </update>
+
+</mapper>

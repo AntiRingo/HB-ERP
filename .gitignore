@@ -1,0 +1,37 @@
+# ========== Java / Maven 编译产物（重点！）==========
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.exe
+
+# ========== IDE 配置 ==========
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# ========== 日志 / 临时文件 ==========
+*.log
+logs/
+log/
+*.tmp
+*.cache
+
+# ========== 系统文件 ==========
+.DS_Store
+Thumbs.db
+
+# ========== 本地配置 / 敏感信息 ==========
+.env
+local.properties
+config/local.properties
+
+
+data_vault.sql

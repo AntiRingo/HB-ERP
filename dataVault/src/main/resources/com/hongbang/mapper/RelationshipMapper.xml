@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.RelationshipMapper">
+
+    <insert id="addRelationshipList">
+        insert into relationship (id, old_app_form_id, new_app_form_id, app_content_id,new_app_content_id,number) VALUES
+        <foreach collection="relationships" item="relationships" index="index" separator=",">
+        (null,#{relationships.oldAppFormId,jdbcType=INTEGER},#{relationships.newAppFormId,jdbcType=INTEGER},#{relationships.appContentId,jdbcType=INTEGER},#{relationships.newAppContentId},#{relationships.number})
+
+        </foreach>
+    </insert>
+    <select id="selectFirstLevelAppForm" resultType="com.hongbang.pojo.Relationship">
+        -- 方法1：通过反向链找到第一级
+        SELECT distinct r_first.*
+        FROM (
+                 -- 构建反向链
+                 SELECT
+                     r4.id as level4_id,
+                     r3.id as level3_id,
+                     r2.id as level2_id,
+                     r1.id as level1_id
+                 FROM relationship r_last
+                          LEFT JOIN relationship r1 ON r_last.old_app_form_id = r1.new_app_form_id
+                          LEFT JOIN relationship r2 ON r1.old_app_form_id = r2.new_app_form_id
+                          LEFT JOIN relationship r3 ON r2.old_app_form_id = r3.new_app_form_id
+                          LEFT JOIN relationship r4 ON r3.old_app_form_id = r4.new_app_form_id
+                 WHERE r_last.new_app_form_id =#{lastAppFormId}
+             ) chain
+                 JOIN relationship r_first ON r_first.id = COALESCE(
+                chain.level4_id,
+                chain.level3_id,
+                chain.level2_id,
+                chain.level1_id
+            )
+-- 确保找到的是第一级（没有上级）
+        WHERE NOT EXISTS (
+                SELECT 1 FROM relationship r_prev
+                WHERE r_prev.new_app_form_id = r_first.old_app_form_id
+            );
+    </select>
+    <select id="selectFirstLevelAppContent" resultType="com.hongbang.pojo.ApplicationContent">
+        select * from application_content where application_id in (
+            -- 方法1：通过反向链找到第一级
+            SELECT distinct old_app_form_id
+            FROM (
+                     -- 构建反向链
+                     SELECT
+                         r4.id as level4_id,
+                         r3.id as level3_id,
+                         r2.id as level2_id,
+                         r1.id as level1_id
+                     FROM relationship r_last
+                              LEFT JOIN relationship r1 ON r_last.old_app_form_id = r1.new_app_form_id
+                              LEFT JOIN relationship r2 ON r1.old_app_form_id = r2.new_app_form_id
+                              LEFT JOIN relationship r3 ON r2.old_app_form_id = r3.new_app_form_id
+                              LEFT JOIN relationship r4 ON r3.old_app_form_id = r4.new_app_form_id
+                     WHERE r_last.new_app_form_id =#{lastAppFormId}
+                 ) chain
+                     JOIN relationship r_first ON r_first.id = COALESCE(
+                    chain.level4_id,
+                    chain.level3_id,
+                    chain.level2_id,
+                    chain.level1_id
+                )
+-- 确保找到的是第一级（没有上级）
+            WHERE NOT EXISTS (
+                    SELECT 1 FROM relationship r_prev
+                    WHERE r_prev.new_app_form_id = r_first.old_app_form_id
+                )
+            )
+    </select>
+<!--    <select id="selectFirstIfCompleteByLast" resultType="java.util.Map">-->
+<!--        SELECT-->
+<!--            af.id AS application_id,-->
+<!--            af.order_number,-->
+<!--            CASE-->
+<!--                WHEN req.total_required = conv.total_converted-->
+<!--                    AND last_status.all_complete_status_valid = 1-->
+<!--                    AND last_status.all_sort_two_9 = 1-->
+<!--                    THEN '已完成'-->
+<!--                WHEN conv.total_converted IS NULL OR conv.total_converted = 0 THEN '未开始'-->
+<!--                WHEN req.total_required > conv.total_converted THEN '进行中'-->
+<!--                ELSE '超额完成'-->
+<!--                END AS 完成状态,-->
+<!--            req.total_required AS 需求总数,-->
+<!--            COALESCE(conv.total_converted, 0) AS 已转换数-->
+<!--        FROM application_form af-->
+<!--                 JOIN (-->
+<!--            SELECT DISTINCT-->
+<!--                CASE-->
+<!--                    WHEN r4.old_app_form_id IS NOT NULL THEN r4.old_app_form_id-->
+<!--                    WHEN r3.old_app_form_id IS NOT NULL THEN r3.old_app_form_id-->
+<!--                    WHEN r2.old_app_form_id IS NOT NULL THEN r2.old_app_form_id-->
+<!--                    ELSE r1.old_app_form_id-->
+<!--                    END AS first_level_id-->
+<!--            FROM relationship r_last-->
+<!--                     LEFT JOIN relationship r1 ON r_last.old_app_form_id = r1.new_app_form_id-->
+<!--                     LEFT JOIN relationship r2 ON r1.old_app_form_id = r2.new_app_form_id-->
+<!--                     LEFT JOIN relationship r3 ON r2.old_app_form_id = r3.new_app_form_id-->
+<!--                     LEFT JOIN relationship r4 ON r3.old_app_form_id = r4.new_app_form_id-->
+<!--            WHERE r_last.new_app_form_id = #{lastAppFormId}-->
+<!--        ) fl ON af.id = fl.first_level_id-->
+<!--                 LEFT JOIN (-->
+<!--            SELECT application_id, SUM(app_number) AS total_required-->
+<!--            FROM application_content-->
+<!--            GROUP BY application_id-->
+<!--        ) req ON af.id = req.application_id-->
+<!--                 LEFT JOIN (-->
+<!--            SELECT old_app_form_id, SUM(number) AS total_converted-->
+<!--            FROM relationship-->
+<!--            WHERE old_app_form_id IN (-->
+<!--                SELECT DISTINCT-->
+<!--                    CASE-->
+<!--                        WHEN r4.old_app_form_id IS NOT NULL THEN r4.old_app_form_id-->
+<!--                        WHEN r3.old_app_form_id IS NOT NULL THEN r3.old_app_form_id-->
+<!--                        WHEN r2.old_app_form_id IS NOT NULL THEN r2.old_app_form_id-->
+<!--                        ELSE r1.old_app_form_id-->
+<!--                        END AS first_level_id-->
+<!--                FROM relationship r_last-->
+<!--                         LEFT JOIN relationship r1 ON r_last.old_app_form_id = r1.new_app_form_id-->
+<!--                         LEFT JOIN relationship r2 ON r1.old_app_form_id = r2.new_app_form_id-->
+<!--                         LEFT JOIN relationship r3 ON r2.old_app_form_id = r3.new_app_form_id-->
+<!--                         LEFT JOIN relationship r4 ON r3.old_app_form_id = r4.new_app_form_id-->
+<!--                WHERE r_last.new_app_form_id = #{lastAppFormId}-->
+<!--            )-->
+<!--              AND number > 0-->
+<!--            GROUP BY old_app_form_id-->
+<!--        ) conv ON af.id = conv.old_app_form_id-->
+<!--                 LEFT JOIN (-->
+<!--            SELECT-->
+<!--                r_start.old_app_form_id AS first_level_id,-->
+<!--                CASE-->
+<!--                    WHEN COUNT(DISTINCT last_af.id) = 0 THEN 0-->
+<!--                    WHEN COUNT(DISTINCT CASE WHEN last_af.complete_status IN (1, 6) THEN last_af.id END) = COUNT(DISTINCT last_af.id) THEN 1-->
+<!--                    ELSE 0-->
+<!--                    END AS all_complete_status_valid,-->
+<!--                CASE-->
+<!--                    WHEN COUNT(DISTINCT last_af.id) = 0 THEN 0-->
+<!--                    WHEN COUNT(DISTINCT CASE WHEN last_af.sort_two = 9 THEN last_af.id END) = COUNT(DISTINCT last_af.id) THEN 1-->
+<!--                    ELSE 0-->
+<!--                    END AS all_sort_two_9-->
+<!--            FROM (-->
+<!--                     SELECT DISTINCT-->
+<!--                         CASE-->
+<!--                             WHEN r4.old_app_form_id IS NOT NULL THEN r4.old_app_form_id-->
+<!--                             WHEN r3.old_app_form_id IS NOT NULL THEN r3.old_app_form_id-->
+<!--                             WHEN r2.old_app_form_id IS NOT NULL THEN r2.old_app_form_id-->
+<!--                             ELSE r1.old_app_form_id-->
+<!--                             END AS first_level_id-->
+<!--                     FROM relationship r_last-->
+<!--                              LEFT JOIN relationship r1 ON r_last.old_app_form_id = r1.new_app_form_id-->
+<!--                              LEFT JOIN relationship r2 ON r1.old_app_form_id = r2.new_app_form_id-->
+<!--                              LEFT JOIN relationship r3 ON r2.old_app_form_id = r3.new_app_form_id-->
+<!--                              LEFT JOIN relationship r4 ON r3.old_app_form_id = r4.new_app_form_id-->
+<!--                     WHERE r_last.new_app_form_id = #{lastAppFormId}-->
+<!--                 ) fl-->
+<!--                     JOIN relationship r_start ON fl.first_level_id = r_start.old_app_form_id-->
+<!--                     LEFT JOIN relationship r1 ON r_start.new_app_form_id = r1.old_app_form_id-->
+<!--                     LEFT JOIN relationship r2 ON r1.new_app_form_id = r2.old_app_form_id-->
+<!--                     LEFT JOIN relationship r3 ON r2.new_app_form_id = r3.old_app_form_id-->
+<!--                     LEFT JOIN relationship r4 ON r3.new_app_form_id = r4.old_app_form_id-->
+<!--                     LEFT JOIN application_form last_af ON-->
+<!--                    COALESCE(r4.new_app_form_id, r3.new_app_form_id, r2.new_app_form_id, r1.new_app_form_id, r_start.new_app_form_id) = last_af.id-->
+<!--            GROUP BY r_start.old_app_form_id-->
+<!--        ) last_status ON af.id = last_status.first_level_id-->
+<!--        ORDER BY af.id;-->
+<!--    </select>-->
+    <select id="selectFirstIfCompleteByLast" resultType="java.util.Map">
+        SELECT
+            paf.id AS purchase_id,
+            paf.order_number AS purchase_order_number,
+
+            req.real_required AS 需求总数,
+
+            COALESCE(in_cnt.in_qty, 0) AS 入库数量,
+            COALESCE(mrr.concession_qty, 0) AS 让步接收数量,
+            COALESCE(mrr.return_continue_qty, 0) AS 退货继续采购数量,
+            COALESCE(mrr.return_no_continue_qty, 0) AS 退货不继续采购数量,
+
+            (
+                    COALESCE(in_cnt.in_qty, 0)
+                    + COALESCE(mrr.concession_qty, 0)
+                    + COALESCE(mrr.return_no_continue_qty, 0)
+                ) AS 已转换数,
+
+            CASE
+                WHEN req.real_required =
+                     COALESCE(in_cnt.in_qty, 0)
+                         + COALESCE(mrr.concession_qty, 0)
+                         + COALESCE(mrr.return_no_continue_qty, 0)
+                    THEN '已完成'
+                WHEN COALESCE(in_cnt.in_qty, 0)
+                         + COALESCE(mrr.concession_qty, 0)
+                         + COALESCE(mrr.return_no_continue_qty, 0) = 0
+                    THEN '未开始'
+                WHEN req.real_required >
+                     COALESCE(in_cnt.in_qty, 0)
+                         + COALESCE(mrr.concession_qty, 0)
+                         + COALESCE(mrr.return_no_continue_qty, 0)
+                    THEN '进行中'
+                ELSE '超额完成'
+                END AS complete_status
+
+        FROM application_form paf
+
+/* ===== 1. 采购需求 ===== */
+                 JOIN (
+            SELECT application_id, SUM(app_number) AS real_required
+            FROM application_content
+            WHERE application_id = #{lastAppFormId}
+            GROUP BY application_id
+        ) req ON paf.id = req.application_id
+
+/* ===== 2. ✅ 入库数量（最终转换结果）===== */
+                 LEFT JOIN (
+            SELECT SUM(ac.app_number) AS in_qty
+            FROM application_content ac
+            WHERE ac.application_id IN (
+                SELECT r.new_app_form_id
+                FROM relationship r
+                WHERE r.old_app_form_id IN (
+                    SELECT DISTINCT r2.new_app_form_id
+                    FROM relationship r2
+                    WHERE r2.old_app_form_id = #{lastAppFormId}
+                )
+                  AND r.new_app_form_id IN (
+                    SELECT id FROM application_form WHERE sort = 5
+                )
+            )
+        ) in_cnt ON 1 = 1
+
+/* ===== 3. 异常数量（质检单）===== */
+                 LEFT JOIN (
+            SELECT
+                7734 AS purchase_id,
+                SUM(CASE WHEN handle_type = 2 THEN return_qty ELSE 0 END) AS concession_qty,
+                SUM(CASE WHEN handle_type = 1 AND continue_purchase = 1 THEN return_qty ELSE 0 END) AS return_continue_qty,
+                SUM(CASE WHEN handle_type = 1 AND continue_purchase = 0 THEN return_qty ELSE 0 END) AS return_no_continue_qty
+            FROM material_return_receive mrr
+            WHERE mrr.application_id IN (
+                SELECT DISTINCT r.new_app_form_id
+                FROM relationship r
+                WHERE r.old_app_form_id IN (
+                    SELECT DISTINCT r2.new_app_form_id
+                    FROM relationship r2
+                    WHERE r2.old_app_form_id = #{lastAppFormId}
+                )
+            )
+        ) mrr ON 1 = 1
+
+        WHERE paf.id = #{lastAppFormId};
+    </select>
+    <select id="selectFirst" resultType="java.lang.Integer">
+        -- 方法1：通过反向链找到第一级
+        SELECT distinct old_app_form_id
+        FROM (
+                 -- 构建反向链
+                 SELECT
+                     r4.id as level4_id,
+                     r3.id as level3_id,
+                     r2.id as level2_id,
+                     r1.id as level1_id
+                 FROM relationship r_last
+                          LEFT JOIN relationship r1 ON r_last.old_app_form_id = r1.new_app_form_id
+                          LEFT JOIN relationship r2 ON r1.old_app_form_id = r2.new_app_form_id
+                          LEFT JOIN relationship r3 ON r2.old_app_form_id = r3.new_app_form_id
+                          LEFT JOIN relationship r4 ON r3.old_app_form_id = r4.new_app_form_id
+                 WHERE r_last.new_app_form_id =#{lastAppFormId}
+             ) chain
+                 JOIN relationship r_first ON r_first.id = COALESCE(
+                chain.level4_id,
+                chain.level3_id,
+                chain.level2_id,
+                chain.level1_id
+            )
+-- 确保找到的是第一级（没有上级）
+        WHERE NOT EXISTS (
+                SELECT 1 FROM relationship r_prev
+                WHERE r_prev.new_app_form_id = r_first.old_app_form_id
+            );
+    </select>
+    <select id="selectAllAppNumberByRk" resultType="applicationContent">
+        select * from application_content where application_id in (        -- 方法1：通过反向链找到第一级
+            SELECT distinct old_app_form_id
+            FROM (
+                     -- 构建反向链
+                     SELECT
+                         r4.id as level4_id,
+                         r3.id as level3_id,
+                         r2.id as level2_id,
+                         r1.id as level1_id
+                     FROM relationship r_last
+                              LEFT JOIN relationship r1 ON r_last.old_app_form_id = r1.new_app_form_id
+                              LEFT JOIN relationship r2 ON r1.old_app_form_id = r2.new_app_form_id
+                              LEFT JOIN relationship r3 ON r2.old_app_form_id = r3.new_app_form_id
+                              LEFT JOIN relationship r4 ON r3.old_app_form_id = r4.new_app_form_id
+                     WHERE r_last.new_app_form_id =#{rkId}
+                 ) chain
+                     JOIN relationship r_first ON r_first.id = COALESCE(
+                    chain.level4_id,
+                    chain.level3_id,
+                    chain.level2_id,
+                    chain.level1_id
+                )
+-- 确保找到的是第一级（没有上级）
+            WHERE NOT EXISTS (
+                    SELECT 1 FROM relationship r_prev
+                    WHERE r_prev.new_app_form_id = r_first.old_app_form_id
+                ))
+
+    </select>
+</mapper>

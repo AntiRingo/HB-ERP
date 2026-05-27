@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.ProductExamineMapper">
+
+    <insert id="addProductExamine">
+        insert into product_examine (id, user_id, product_id, vault, status, note, app_time,examine_id) VALUES
+        (null,#{userId},#{productId},#{vault},#{status},#{note},#{appTime},#{examineId})
+    </insert>
+    <select id="selectAllData" resultType="java.util.Map">
+select * from (
+        select b.*,userName as examineName from ( select a.*,userName as appName from (select product_examine.*,product.name,material_number,description,product.parentId from product_examine left join product on product_examine.product_id = product.id and product_examine.vault = product.vault)  as a left join user on a.user_id = user.id) as b  left join user on user.id=b.examine_id
+        union all
+        select b.*,userName as examineName from ( select a.*,userName as appName from (select product_examine.*,fin_product.fin_product_name as name,fin_material_number as material_number,fin_description as description,fin_product.fin_sort_id as parentId from product_examine left join fin_product on product_examine.product_id = fin_product.id and product_examine.vault = fin_product.vault)  as a left join user on a.user_id = user.id) as b  left join user on user.id=b.examine_id
+        ) as d where length(d.material_number) >0  ORDER BY  FIELD(status,0,1,2), app_time desc
+
+    </select>
+    <select id="selectAttribute" resultType="java.util.Map">
+        select a.*,attribute_name.name,unit from (  select attribute_content.* from (select id from product where id =#{productId} and vault = #{vault}) as c left join attribute_content on attribute_content.productId = c.id ) as a LEFT JOIN attribute_name on a.parentId = attribute_name.id
+        union all
+        select a.*,fin_attribute_name.fin_att_name as  name,fin_att_unit as unit from (  select fin_attribute_content.* from (select id from fin_product where id =#{productId} and vault = #{vault}) as c left join fin_attribute_content on fin_attribute_content.fin_product_id = c.id ) as a LEFT JOIN fin_attribute_name on a.fin_att_name_id = fin_attribute_name.id
+    </select>
+    <select id="selectMyApplications" resultType="java.util.Map">
+        select * from (
+                          select b.*,userName as examineName from ( select a.*,userName as appName from (select product_examine.*,product.name,material_number,description,parentId from product_examine left join product on product_examine.product_id = product.id and product_examine.vault = product.vault where user_id = #{userId})  as a left join user on a.user_id = user.id) as b  left join user on user.id=b.examine_id
+                          union all
+                          select b.*,userName as examineName from ( select a.*,userName as appName from (select product_examine.*,fin_product.fin_product_name as name,fin_material_number as material_number,fin_description as description,fin_sort_id as parentId from product_examine left join fin_product on product_examine.product_id = fin_product.id and product_examine.vault = fin_product.vault where user_id = #{userId})  as a left join user on a.user_id = user.id) as b  left join user on user.id=b.examine_id
+                      ) as d where length(d.material_number) >0 ORDER BY  FIELD(status,0,1,2), app_time desc
+    </select>
+</mapper>

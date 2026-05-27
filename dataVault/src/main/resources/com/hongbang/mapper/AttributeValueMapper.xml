@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.AttributeValueMapper">
+    <insert id="addAttributeContent">
+        insert into attribute_content (id, parentId, productId, content)
+        VALUES
+        <foreach collection="attributeContents" item="attributeContents" index="index" separator="," >
+
+            (
+            null,
+            #{attributeContents.parentId,jdbcType=INTEGER},
+            #{attributeContents.productId,jdbcType=INTEGER},
+            #{attributeContents.content}
+            )
+        </foreach>
+
+    </insert>
+    <insert id="addCodeAuto">
+        insert into attribute_value (id, att_name_id, code, att_value)
+        VALUES
+        <foreach collection="attributeValues" item="attributeValues" index="index" separator="," >
+
+            (
+            null,
+            #{attributeValues.attNameId,jdbcType=INTEGER},
+            #{attributeValues.code},
+            #{attributeValues.attValue}
+            )
+        </foreach>
+
+    </insert>
+
+<!--    excel导入所用-->
+<!--    循环添加编码-->
+    <insert id="addCodeExcel">
+        insert into attribute_value (id, att_name_id, code, att_value)
+        VALUES
+        <foreach collection="attributeValues" item="attributeValues" index="index" separator="," >
+            (
+            null,
+            #{attributeValues.attNameId,jdbcType=INTEGER},
+            #{attributeValues.code},
+            #{attributeValues.attValue}
+            )
+        </foreach>
+    </insert>
+</mapper>

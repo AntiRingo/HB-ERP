@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.AttributeMapper">
+
+    <insert id="addAttributeContent">
+        insert into attribute_content (id, parentId, productId, content)
+        VALUES
+        <foreach collection="attributeContents" item="attributeContents" index="index" separator="," >
+
+            (
+            null,
+            #{attributeContents.parentId,jdbcType=INTEGER},
+            #{attributeContents.productId,jdbcType=INTEGER},
+            <if test="attributeContents.content == null or attributeContents.content == '' ">''</if>
+            <if test="attributeContents.content != null and attributeContents.content != '' ">#{attributeContents.content}</if>
+            )
+        </foreach>
+
+    </insert>
+
+    <insert id="add" parameterType="attributeName">
+        insert into attribute_name (id, parentId, name,unit,public_application) VALUES (null,#{parentId},#{name},#{unit},#{publicApplication});
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+
+<!--    得到的id其实是parentId，所以要换一下-->
+    <insert id="addContentAfterName">
+        insert into attribute_content (id, parentId, productId, content)
+        VALUES
+        <foreach collection="attributeContents" item="attributeContents" index="index" separator="," >
+
+            (
+            null,
+            #{attributeContents.parentId,jdbcType=INTEGER},
+            #{attributeContents.productId,jdbcType=INTEGER},
+            <if test="attributeContents.content == null or attributeContents.content == '' ">''</if>
+            <if test="attributeContents.content != null and attributeContents.content != '' ">#{attributeContents.content}</if>
+
+            )
+        </foreach>
+    </insert>
+
+
+
+    <update id="updateAttributeContent" parameterType="java.util.List">
+
+        <foreach collection="attributeContents" item="attributeContents" index="index" separator=";" >
+           update attribute_content
+            <set>
+                attribute_content.content=#{attributeContents.content,jdbcType=VARCHAR},
+            </set>
+            where attribute_content.id=#{attributeContents.id,jdbcType=INTEGER}
+
+        </foreach>
+
+    </update>
+
+
+
+    <!--    excel中循环添加属性名信息-->
+    <insert id="addAttNameExcel">
+        insert into attribute_name (id, parentId, name, unit, length, public_application) VALUES
+        <foreach collection="attributeNames" item="attributeNames" index="index" separator=",">
+            (
+             null,
+             #{attributeNames.parentId,jdbcType=INTEGER},
+             #{attributeNames.name},
+             #{attributeNames.unit},
+             #{attributeNames.length,jdbcType=INTEGER},
+             #{attributeNames.publicApplication,jdbcType=INTEGER}
+            )
+
+        </foreach>
+
+    </insert>
+
+<!--    添加完属性名信息后获取刚添加的id-->
+    <insert id="addAttNameExcelAndId"  parameterType="attributeName">
+        insert into attribute_name (id, parentId, name, unit, length, public_application) VALUES (null,#{parentId},#{name},#{unit},#{length},#{publicApplication});
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+<!--   添加属性信息后，如果有物料，添加空的属性值-->
+    <insert id="addAttributeContentExcel">
+        insert into attribute_content (id, parentId, productId, content)
+        VALUES
+        <foreach collection="attributeContents" item="attributeContents" index="index" separator="," >
+
+            (
+            null,
+            #{attributeContents.parentId,jdbcType=INTEGER},
+            #{attributeContents.productId,jdbcType=INTEGER},
+            <if test="attributeContents.content == null or attributeContents.content == '' ">''</if>
+            <if test="attributeContents.content != null and attributeContents.content != '' ">#{attributeContents.content}</if>
+            )
+        </foreach>
+    </insert>
+<!--    添加公共属性-->
+    <insert id="addPublic">
+        insert into attribute_name (id, parentId, name,unit,public_application) VALUES (null,#{parentId},#{name},#{unit},#{publicApplication});
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+<!--    添加完公共属性后，如果有物料就给所有的物料添加空的值-->
+    <insert id="afterAddPublicIfProductExist">
+        insert into attribute_content (id, parentId, productId, content) VALUES
+            <foreach collection="products" item="products" index="index" separator=",">
+            (
+                null,
+                #{parentId,jdbcType=INTEGER},
+                #{products.id,jdbcType=INTEGER},
+                ''
+                )
+            </foreach>
+
+    </insert>
+
+
+    <!--    <select id="selectAnd" resultType="com.hongbang.pojo.Product">-->
+<!--      select * from product where id in  (select productId from attribute_content-->
+<!--        where -->
+<!--        <foreach collection="attributeContents" item="attributeContents" index="index" open="" close="" separator="and">-->
+<!--            (attribute_content.parentId = #{attributeContents.parentId,jdbcType=INTEGER} or attribute_content.content= #{attributeContents.content})-->
+<!--        </foreach>-->
+<!--        )-->
+<!--    </select>-->
+
+    <select id="selectAnd" resultType="com.hongbang.pojo.Product">
+        select * from product where id in  (select productId from attribute_content
+        where attribute_content.parentId in
+            <foreach collection="attributeContents" item="attributeContents" index="index" open="(" close=")" separator=",">
+                 #{attributeContents.parentId,jdbcType=INTEGER}
+            </foreach>
+
+            and attribute_content.content in
+        <foreach collection="attributeContents" item="attributeContents" index="index" open="(" close=")" separator=",">
+             #{attributeContents.content}
+        </foreach>
+
+        )
+    </select>
+
+
+<!--    select prductId from table where parentId in ( 2390,2391,...,2395 )  and content in ( 'ABM','参考电压',...,'1' );-->
+
+    <!--    一个一个条件的筛选-->
+    <select id="selectOneByOne" resultType="java.lang.Integer">
+        select distinct productId from attribute_content where
+            <foreach collection="attributeContents" item="attributeContents" index="index" open="" close="" separator="or">
+                (attribute_content.parentId = #{attributeContents.parentId,jdbcType=INTEGER} and attribute_content.content= #{attributeContents.content})
+            </foreach>
+
+
+    </select>
+
+<!--    智能筛选-->
+    <select id="IntelligentFiltering" resultType="com.hongbang.pojo.AttributeContent">
+        select * from attribute_content where productId in (
+        select distinct productId from attribute_content where
+        <foreach collection="attributeContents" item="attributeContents" index="index" open="" close="" separator="or">
+            (attribute_content.parentId = #{attributeContents.parentId,jdbcType=INTEGER} and attribute_content.content= #{attributeContents.content})
+        </foreach>
+            )
+    </select>
+
+
+<!--    查询功能不带单位-->
+    <select id="searchContent" resultType="java.lang.Integer">
+        SELECT productId from attribute_content where concat(attribute_content.content) LIKE CONCAT('%',#{str},'%')
+            <if test="parentId != 0">
+              and  parentId in(select id from attribute_name where parentId = #{parentId})
+            </if>
+    </select>
+
+
+
+
+
+    <!--    查询功能带单位-->
+    <select id="searchContentUnit1" resultType="java.lang.Integer">
+        SELECT productId from attribute_content where concat(attribute_content.content) LIKE CONCAT('%',#{str})
+        <if test="parentId != 0">
+            and  parentId in(select id from attribute_name where parentId = #{parentId})
+        </if>
+       <if test="parentId == 0 ">
+           and  parentId in(select id from attribute_name where unit = #{unit})
+       </if>
+    </select>
+
+<!--  从搜索结果中搜索，不带单位  -->
+    <select id="selectInSelect" resultType="java.lang.Integer">
+        select productId from(select * from attribute_content where productId in
+        <foreach collection="products" index="index" item="products" open="(" close=")" separator=",">
+            #{products.id,jdbcType=INTEGER}
+        </foreach>
+            ) as `ac*` where concat(content) LIKE CONCAT('%',#{str},'%')
+
+    </select>
+
+<!--    从搜索结果中搜索，带单位-->
+    <select id="selectInSelectUnit" resultType="java.lang.Integer">
+        select productId from(select * from attribute_content where productId in
+        <foreach collection="products" index="index" item="products" separator="," open="(" close=")">
+            #{products.id,jdbcType=INTEGER}
+        </foreach>
+        and  parentId in(select id from attribute_name where unit = #{unit})
+        ) as `ac*` where concat(content) LIKE CONCAT('%',#{str})
+
+
+
+    </select>
+
+<!--    根据数据查询所有的后添加的属性-->
+    <select id="selectByListProduct" resultType="com.hongbang.pojo.AttributeContent">
+        select * from attribute_content where productId in
+    <foreach collection="products" index="index" item="products" separator="," open="(" close=")">
+        #{products.id,jdbcType=INTEGER}
+
+    </foreach>
+        order by field (productId,
+          <foreach collection="products" index="index" item="products" separator=",">
+              #{products.id,jdbcType=INTEGER}
+          </foreach>
+          )
+
+    </select>
+
+<!--    //查询当前分类的上级属性和公共属性-->
+    <select id="selectLastAndPublic" resultType="com.hongbang.pojo.AttributeName">
+        select * from attribute_name where attribute_name.parentId in
+        <foreach collection="sorts" index="index" item="sorts" separator="," open="(" close=")">
+            #{sorts.id,jdbcType=INTEGER}
+        </foreach>
+        or attribute_name.parentId=0 order by parentId desc
+    </select>
+<!--显示页面使用====================================================================================================================-->
+
+    <!--    查询功能不带单位-->
+    <select id="searchFinContent" resultType="java.lang.Integer">
+        SELECT fin_product_id as productId from fin_attribute_content where concat(fin_attribute_content.fin_att_content) LIKE CONCAT('%',#{str},'%')
+        <if test="parentId != 0">
+            and  fin_att_name_id in(select id from fin_attribute_name where fin_sort_id = #{parentId})
+        </if>
+    </select>
+
+
+
+
+
+    <!--    查询功能带单位-->
+    <select id="searchFinContentUnit1" resultType="java.lang.Integer">
+        SELECT fin_product_id as productId from fin_attribute_content where concat(fin_attribute_content.fin_att_content) LIKE CONCAT('%',#{str})
+        <if test="parentId != 0">
+            and  fin_att_name_id in(select id from fin_attribute_name where fin_sort_id = #{parentId})
+        </if>
+        <if test="parentId == 0 ">
+            and  fin_att_name_id in(select id from fin_attribute_name where fin_att_unit = #{unit})
+        </if>
+    </select>
+
+
+    <!--    根据数据查询所有的后添加的属性-->
+    <select id="selectByListFinProduct" resultType="com.hongbang.pojo.AttributeContent">
+        select id, fin_att_name_id, fin_product_id, fin_att_content from fin_attribute_content where fin_attribute_content.fin_product_id in
+        <foreach collection="products" index="index" item="products" separator="," open="(" close=")">
+            #{products.id,jdbcType=INTEGER}
+
+        </foreach>
+        order by field (fin_product_id,
+        <foreach collection="products" index="index" item="products" separator=",">
+            #{products.id,jdbcType=INTEGER}
+        </foreach>
+        )
+
+    </select>
+
+
+    <!--  从搜索结果中搜索，不带单位  -->
+    <select id="selectInFinSelect" resultType="java.lang.Integer">
+        select fin_product_id as productId from(select * from fin_attribute_content where fin_attribute_content.fin_product_id in
+        <foreach collection="products" index="index" item="products" open="(" close=")" separator=",">
+            #{products.id,jdbcType=INTEGER}
+        </foreach>
+        ) as `ac*` where concat(fin_att_content) LIKE CONCAT('%',#{str},'%')
+
+    </select>
+
+    <!--    从搜索结果中搜索，带单位-->
+    <select id="selectInFinSelectUnit" resultType="java.lang.Integer">
+        select fin_product_id as productId from(select * from fin_attribute_content where fin_product_id in
+        <foreach collection="products" index="index" item="products" separator="," open="(" close=")">
+            #{products.id,jdbcType=INTEGER}
+        </foreach>
+        and  fin_att_name_id in(select id from fin_attribute_name where fin_att_unit = #{unit})
+        ) as `ac*` where concat(fin_att_content) LIKE CONCAT('%',#{str})
+
+
+
+    </select>
+
+    <select id="selectAllUsedByList" resultType="java.util.Map">
+        select DISTINCT content from attribute_content where attribute_content.productId in
+            (select id from product where id in (select distinct productId from attribute_content where parentId = #{parentId} and content !='') and deleteSign = 0
+            and product.parentId in
+                <foreach collection="maps" item="maps" index="index" separator="," open="(" close=")">
+                    #{maps.id_list,jdbcType=INTEGER}
+                </foreach>
+                ) and parentId = #{parentId}
+    </select>
+
+
+<!--    第二段查询，第一段查询该属性对应的productID，第二段加入条件productID-->
+    <select id="selectPidByContentPid" resultType="java.lang.Integer">
+        select productId from attribute_content where parentId = #{parentId} and content = #{content}
+        <if test="productsId.size>0">
+          and productId in
+            <foreach collection="productsId" separator="," item="productsId" index="index" open="(" close=")">
+                #{integers,jdbcType=INTEGER}
+            </foreach>
+        </if>
+
+    </select>
+
+
+<!--    //在已有的物料id中查询最大的并且开启了映射中流水码功能的流水码-->
+    <select id="selectContentByLsAndPid" resultType="com.hongbang.pojo.AttributeContent">
+        select * from attribute_content where id in
+        (
+        select max(id) from attribute_content where attribute_content.parentId = #{attNameId} and attribute_content.productId in
+        <foreach collection="productsId" item="productsId" index="index" separator="," open="(" close=")">
+            #{productsId,jdbcType=INTEGER}
+        </foreach>
+        )
+
+    </select>
+    <select id="selectIfUseBySort" resultType="java.util.Map">
+        select count(*),parentId ,content from attribute_content where (parentId,binary content) in
+        <foreach collection="attributeValues" item="attributeValues" index="index" separator="," open="(" close=")">
+            (#{attributeValues.attNameId,jdbcType=INTEGER},#{attributeValues.attValue,jdbcType=VARCHAR})
+        </foreach>
+        group by parentId,content
+
+    </select>
+    <select id="selectByAppProductIdAndVault" resultType="java.util.Map">
+
+        select a.*,attribute_name.name,unit from ( select attribute_content.*,0 as vault from attribute_content where (productId,0) in
+        <foreach collection="applicationContents" item="applicationContents" index="index" separator="," open="("
+                 close=")">
+            (#{applicationContents.productId,jdbcType=INTEGER},#{applicationContents.vault,jdbcType=INTEGER})
+        </foreach>) as a left join attribute_name on a.parentId = attribute_name.id
+
+        union all
+        select b.*,fin_attribute_name.fin_att_name as name,fin_att_unit as unit from (
+        select id, fin_att_name_id as parentId,fin_product_id as productId,fin_att_content as content,1 as vault from
+        fin_attribute_content where (fin_product_id,1) in
+        <foreach collection="applicationContents" item="applicationContents" index="index" separator="," open="("
+                 close=")">
+            (#{applicationContents.productId,jdbcType=INTEGER},#{applicationContents.vault,jdbcType=INTEGER})
+        </foreach>) as b left join fin_attribute_name on b.parentId = fin_attribute_name.id
+    </select>
+    <select id="selectBrandFz" resultType="java.util.Map">
+        select attribute_content.*,name from attribute_content LEFT JOIN attribute_name on attribute_content.parentId = attribute_name.id  where productId = #{id} and 0=#{vault} and (name='品牌' or name='封装')
+        union all
+        select fin_attribute_content.*,fin_att_name as name from fin_attribute_content LEFT JOIN fin_attribute_name on fin_attribute_content.fin_att_name_id = fin_attribute_name.id  where fin_product_id = #{id} and 1=#{vault} and (fin_att_name='品牌' or fin_att_name='封装')
+    </select>
+    <select id="selectAllAttribute" resultType="java.util.Map">
+        select attribute_content.*,name from attribute_content LEFT JOIN attribute_name on attribute_content.parentId = attribute_name.id  where productId = #{id} and 0=#{vault} and name!='存放位置'
+        union all
+        select fin_attribute_content.*,fin_att_name as name from fin_attribute_content LEFT JOIN fin_attribute_name on fin_attribute_content.fin_att_name_id = fin_attribute_name.id  where fin_product_id = #{id} and 1=#{vault} and fin_attribute_name.fin_att_name !='存放位置'
+    </select>
+
+</mapper>

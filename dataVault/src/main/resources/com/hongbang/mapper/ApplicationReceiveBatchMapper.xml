@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.ApplicationReceiveBatchMapper">
+    <resultMap id="BatchResultMap" type="com.hongbang.pojo.ApplicationReceiveBatch">
+        <id column="id" property="id"/>
+        <result column="content_id" property="contentId"/>
+        <result column="batch_code" property="batchCode"/>
+        <result column="receive_num" property="receiveNum"/>
+        <result column="receive_type" property="receiveType"/>
+        <result column="vault" property="vault"/>
+        <result column="operate_user" property="operateUser"/>
+        <result column="operate_time" property="operateTime"/>
+        <result column="batch_remark" property="batchRemark"/>
+    </resultMap>
+
+    <insert id="insert">INSERT INTO application_receive_batch(content_id,batch_code,receive_num,receive_type,vault,operate_user,operate_time,batch_remark) VALUES(#{contentId},#{batchCode},#{receiveNum},#{receiveType},#{vault},#{operateUser},#{operateTime},#{batchRemark})</insert>
+    <select id="selectBatchByContentId" resultMap="BatchResultMap">SELECT * FROM application_receive_batch WHERE content_id=#{contentId} ORDER BY operate_time DESC</select>
+    <select id="sumReceiveNum" resultType="java.math.BigDecimal">SELECT IFNULL(SUM(receive_num),0) FROM application_receive_batch WHERE content_id=#{contentId}</select>
+</mapper>

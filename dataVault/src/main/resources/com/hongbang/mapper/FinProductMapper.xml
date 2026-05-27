@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.FinProductMapper">
+
+<!--    新增物料-->
+    <insert id="add" parameterType="finProduct">
+        insert into fin_product (id, fin_sort_id,fin_product_name , url, fin_material_number, price,fin_description,unit,priceUnit,vault)
+        values (null,#{finSortId},#{finProductName},#{url},#{finMaterialNumber},#{price},#{finDescription},#{unit},#{priceUnit},1);
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+    <!--    查询基本信息-->
+    <select id="selectProductByAllIdDisplay" resultType="com.hongbang.pojo.Product">
+        select id, fin_sort_id as parentId, fin_product_name as name, url, fin_material_number as material_number , price as brand, fin_description as description , fin_number as number, vault,deleteSign,unit,priceUnit from fin_product where deleteSign = 0 and id in
+        <foreach collection="integers" index="index" item="integers" open="(" close=")" separator=",">
+            #{integers,jdbcType=INTEGER}
+        </foreach>
+
+    </select>
+
+    <!--   筛选后的结果，按价格正序-->
+    <select id="BrandAscDisplay" resultType="com.hongbang.pojo.Product">
+        select  id, fin_sort_id as parentId, fin_product_name as name, url, fin_material_number as material_number , price as brand, fin_description as description , fin_number as number, vault,deleteSign,unit,priceUnit from fin_product where deleteSign = 0 and fin_product.id in
+        <foreach collection="integers" index="index" item="integers" open="(" close=")" separator=",">
+            #{integers,jdbcType=INTEGER}
+        </foreach>
+        order by price +0
+    </select>
+
+
+    <!--   筛选后的结果，按价格倒叙-->
+    <select id="BrandDescDisplay" resultType="com.hongbang.pojo.Product">
+        select  id, fin_sort_id as parentId, fin_product_name as name, url, fin_material_number as material_number , price as brand, fin_description as description , fin_number as number, vault,deleteSign,unit,priceUnit from fin_product where deleteSign = 0 and fin_product.id in
+        <foreach collection="integers" index="index" item="integers" open="(" close=")" separator=",">
+            #{integers,jdbcType=INTEGER}
+        </foreach>
+        order by price +0 desc
+    </select>
+
+    <!--    查询该分类下的所有物料,根据库存数量倒叙-->
+    <select id="NumberDescDisplay" resultType="com.hongbang.pojo.Product">
+        select  id, fin_sort_id as parentId, fin_product_name as name, url, fin_material_number as material_number , price as brand, fin_description as description , fin_number as number, vault,deleteSign,unit,priceUnit from fin_product where deleteSign = 0 and fin_product.id in
+        <foreach collection="integers" index="index" item="integers" open="(" close=")" separator=",">
+            #{integers,jdbcType=INTEGER}
+        </foreach>
+        order by fin_number +0 desc
+    </select>
+
+    <!--    查询该分类下的所有物料,根据库存数量倒叙-->
+    <select id="NumberAscDisplay" resultType="com.hongbang.pojo.Product">
+        select  id, fin_sort_id as parentId, fin_product_name as name, url, fin_material_number as material_number , price as brand, fin_description as description , fin_number as number, vault,deleteSign,unit,priceUnit from fin_product where deleteSign = 0 and fin_product.id in
+        <foreach collection="integers" index="index" item="integers" open="(" close=")" separator=",">
+            #{integers,jdbcType=INTEGER}
+        </foreach>
+        order by fin_number +0
+    </select>
+
+    <!--    分页-->
+    <select id="selectAllInSortLimitDisplay" resultType="com.hongbang.pojo.Product">
+        select id, fin_sort_id as parentId, fin_product_name as name, url, fin_material_number as material_number , price as brand, fin_description as description , fin_number as number, vault,deleteSign,unit,priceUnit from fin_product
+        where deleteSign = 0 and fin_sort_id in
+        <foreach collection="maps" index="index" item="maps" open="(" close=")" separator=",">
+            #{maps.id_list,jdbcType=INTEGER}
+        </foreach>
+        <if test="ifs==1">
+            order by case #{price} when 1 then price +0 end,
+            case #{priceDesc} when 1 then price +0 end desc,
+            case #{number} when 1 then fin_number +0 end,
+            case #{numberDesc} when 1 then fin_number +0 end desc
+        </if>
+
+        limit #{begin},#{size}
+    </select>
+    <select id="selectAllInSortLimitCount"  resultType="java.lang.Integer" >
+        select count(*) from fin_product
+        where deleteSign = 0 and fin_sort_id in
+        <foreach collection="maps" index="index" item="maps" open="(" close=")" separator=",">
+            #{maps.id_list,jdbcType=INTEGER}
+        </foreach>
+
+    </select>
+    <!--    分页-->
+    <select id="selectAllInSortLimitDisplayOnly" resultType="com.hongbang.pojo.Product">
+        select id, fin_sort_id as parentId, fin_product_name as name, url, fin_material_number as material_number , price as brand, fin_description as description , fin_number as number, vault,deleteSign,unit,priceUnit from fin_product where deleteSign = 0 and fin_sort_id = #{parentId}
+        <if test="ifs==1">
+            order by case #{price} when 1 then price +0 end,
+            case #{priceDesc} when 1 then price +0 end desc,
+            case #{number} when 1 then fin_number +0 end,
+            case #{numberDesc} when 1 then fin_number +0 end desc
+        </if>
+
+        limit #{begin},#{size}
+    </select>
+
+<!--    查询copy的BOM表内容-->
+    <select id="selectCopyContent" resultType="com.hongbang.pojo.Product">
+        (select * from product where id in
+             <foreach collection="finBoms" index="index" item="finBoms" separator=","  open="(" close=")">
+                #{finBoms.bomTitleId,jdbcType=INTEGER}
+             </foreach>
+        and vault = 0 ) UNION ALL(select * from fin_product where id in
+            <foreach collection="finBoms" index="index" item="finBoms" separator=","  open="(" close=")">
+                #{finBoms.bomTitleId,jdbcType=INTEGER}
+            </foreach>
+        and vault = 1)
+    </select>
+    <!-- 根据已有的物料id，筛选出来在某个分类下的物料id-->
+    <select id="selectPidBySidAndPid" resultType="java.lang.Integer">
+        select id from fin_product where fin_sort_id = #{sortId,jdbcType=INTEGER}
+        <if test="productsId.size>0">
+            and id in
+            <foreach collection="productsId" item="productsId" index="index" separator="," open="(" close=")">
+                #{productsId,jdbcType=INTEGER}
+            </foreach>
+        </if>
+    </select>
+
+
+    <!--    搜索功能不带单位-->
+    <select id="searchProduct" resultType="java.lang.Integer">
+
+        select id from fin_product where deleteSign = 0 and  (fin_product.fin_product_name like CONCAT('%',#{str},'%') or fin_product.price like  CONCAT('%',#{str},'%') or fin_product.fin_material_number like  CONCAT('%',#{str},'%') )
+        <if test="parentId != 0">
+            and fin_sort_id = #{parentId}
+        </if>
+
+    </select>
+
+    <!--    搜索功能带单位-->
+    <select id="searchProductUnit" resultType="java.lang.Integer">
+        select id from fin_product where deleteSign = 0 and (fin_product.fin_product_name like CONCAT('%',#{str},'%') or fin_product.price like  CONCAT('%',#{str},'%') or fin_product.fin_material_number like  CONCAT('%',#{str},'%' ))
+        <if test="parentId != 0">
+            and fin_sort_id = #{parentId}
+        </if>
+
+    </select>
+</mapper>

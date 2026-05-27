@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.QualityInspectMapper">
+
+    <insert id="insert">
+        INSERT INTO quality_inspect
+        (application_content_id,application_id, product_id, vault, inspect_result, inspect_remark)
+        VALUES
+        (#{applicationContentId},#{applicationId},#{productId},#{vault},#{inspectResult},#{inspectRemark})
+    </insert>
+</mapper>

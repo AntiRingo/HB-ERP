@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.FinAttributeValueMapper">
+
+    <insert id="addCodeAuto">
+        insert into fin_attribute_value (id, fin_att_name_id, code, fin_att_value)
+        VALUES
+        <foreach collection="finAttributeValues" item="finAttributeValues" index="index" separator="," >
+
+            (
+            null,
+            #{finAttributeValues.finAttNameId,jdbcType=INTEGER},
+            #{finAttributeValues.code},
+            #{finAttributeValues.finAttValue}
+            )
+        </foreach>
+
+    </insert>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.MaterialReturnReplaceMapper">
+
+    <select id="selectRangBuByUser" resultType="java.util.Map">
+        SELECT
+            r.*,
+
+            COALESCE(p.parentId, f.fin_sort_id) AS parentId,
+            COALESCE(p.name, f.fin_product_name) AS name,
+            COALESCE(p.url, f.url) AS url,
+            COALESCE(p.material_number, f.fin_material_number) AS material_number,
+            COALESCE(p.brand, f.price) AS brand,
+            COALESCE(p.description, f.fin_description) AS description,
+            COALESCE(p.number, f.fin_number) AS number,
+
+            COALESCE(p.unit, f.unit) AS unit,
+            COALESCE(p.priceUnit, f.priceUnit) AS priceUnit
+
+        FROM material_return_receive r
+
+                 LEFT JOIN product p
+                           ON r.product_id = p.id AND r.vault = p.vault
+
+                 LEFT JOIN fin_product f
+                           ON r.product_id = f.id AND r.vault = f.vault
+
+        WHERE r.handle_type = 2 AND LENGTH(material_number) > 0 and receive_user=#{user}
+
+        ORDER BY
+            CASE WHEN r.receive_user = 0 THEN 0 ELSE 1 END,
+            r.handle_time DESC
+
+            -- 分页：第 pageNum 页，每页 pageSize 条
+        LIMIT #{page}, #{pageSize}
+    </select>
+    <select id="selectRangBuByUserCount" resultType="java.lang.Integer">
+select count(*) from (
+        SELECT
+            r.*,
+
+            COALESCE(p.parentId, f.fin_sort_id) AS parentId,
+            COALESCE(p.name, f.fin_product_name) AS name,
+            COALESCE(p.url, f.url) AS url,
+            COALESCE(p.material_number, f.fin_material_number) AS material_number,
+            COALESCE(p.brand, f.price) AS brand,
+            COALESCE(p.description, f.fin_description) AS description,
+            COALESCE(p.number, f.fin_number) AS number,
+
+            COALESCE(p.unit, f.unit) AS unit,
+            COALESCE(p.priceUnit, f.priceUnit) AS priceUnit
+
+        FROM material_return_receive r
+
+                 LEFT JOIN product p
+                           ON r.product_id = p.id AND r.vault = p.vault
+
+                 LEFT JOIN fin_product f
+                           ON r.product_id = f.id AND r.vault = f.vault
+
+        WHERE r.handle_type = 2 AND LENGTH(material_number) > 0 and receive_user=#{user}
+
+        ORDER BY
+            CASE WHEN r.receive_user = 0 THEN 0 ELSE 1 END,
+            r.handle_time DESC) as a
+
+    </select>
+
+    <select id="getByReceiveId" resultType="com.hongbang.pojo.MaterialReturnReplace">
+        SELECT id, receive_id, new_product, new_vault, remark
+        FROM material_return_replace
+        WHERE receive_id = #{receiveId}
+    </select>
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.BomPurviewReviewMapper">
+
+    <insert id="addBomReviewApp">
+insert into bom_purview_review (id, times, applicant, bom_id, status) VALUES (null,#{times},#{applicant},#{bomId},#{status})
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+
+    <insert id="addAuthorUserReviewApp">
+        insert into author_user_review (id, times, applicant,  status) VALUES (null,#{times},#{applicant},#{status})
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+    <select id="selectByIdAuthor" resultType="com.hongbang.pojo.AuthorUserReview">
+        select * from author_user_review where id = #{id}
+    </select>
+</mapper>

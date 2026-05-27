@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.ProcurementOperationsMapper">
+
+
+    <!-- 根据 contentId 查询 -->
+    <select id="selectByContentId" resultType="com.hongbang.pojo.ProcurementOperations">
+        SELECT id,
+               content_id         AS contentId,
+               operator_id        AS operatorId,
+               operation_type     AS operationType,
+               operation_time     AS operationTime,
+               batch_quantity     AS batchQuantity,
+               notes,
+               created_at         AS createdAt
+        FROM procurement_operations
+        WHERE content_id = #{contentId}
+        ORDER BY created_at ASC
+    </select>
+
+    <!-- 根据ID更新到货数量 -->
+    <update id="updateById">
+        UPDATE procurement_operations
+        SET batch_quantity = #{batchQuantity}
+        WHERE id = #{id}
+    </update>
+</mapper>

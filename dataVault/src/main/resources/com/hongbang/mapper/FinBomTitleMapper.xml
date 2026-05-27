@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.FinBomTitleMapper">
+    <insert id="addBomTitle">
+        insert into fin_bom_title values(#{id},#{finProductId},#{title},#{description},#{author})
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+
+    <select id="selectAllByProductName" resultType="com.hongbang.pojo.FinBomTitle">
+select * from fin_bom_title left join fin_product on fin_bom_title.fin_product_id = fin_product.id where fin_bom_title.id in (
+
+    select distinct fin_bom.bom_title_id from fin_bom where (productId,vault) in (select * from(
+        select product.id,vault from product where concat(product.`name`,product.material_number)  LIKE CONCAT('%',#{str},'%') and deleteSign = 0
+        union all
+        select fin_product.id,vault from fin_product where concat(fin_product.fin_product_name,fin_product.fin_material_number)  LIKE CONCAT('%',#{str},'%') and deleteSign = 0
+        ) as a)
+        ) and fin_product.deleteSign = 0  limit #{begin},#{size}
+    </select>
+    <select id="selectAllByProductNameCount" resultType="java.lang.Integer">
+        select count(*) from fin_bom_title left join fin_product on fin_bom_title.fin_product_id = fin_product.id where fin_bom_title.id in (
+            select distinct fin_bom.bom_title_id from fin_bom where (productId,vault) in (select * from(
+            select product.id,vault from product where concat(product.`name`,product.material_number)  LIKE CONCAT('%',#{str},'%') and deleteSign = 0
+            union all
+            select fin_product.id,vault from fin_product where concat(fin_product.fin_product_name,fin_product.fin_material_number)  LIKE CONCAT('%',#{str},'%') and deleteSign = 0
+            ) as a)
+        ) and fin_product.deleteSign = 0
+    </select>
+</mapper>

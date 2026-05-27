@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.ExamineLogMapper">
+
+<!--    查询审核日志-->
+    <select id="selectExamineLog" resultType="java.util.Map">
+        select a.*,user.department from (select examine_log.*,order_number,sort,sort_two,application_form.user_id as app_user_id
+        from examine_log LEFT JOIN application_form on app_form_id = application_form.id) as a LEFT JOIN user on a.app_user_id = `user`.id
+
+            <where>
+                <if test="maps.sort !=null and maps.sort !=''  ">
+                    sort= #{maps.sort,jdbcType=INTEGER} and
+                </if>
+
+                <if test="maps.sortTwo !=null and maps.sortTwo !=''  ">
+                    sort_two= #{maps.sortTwo,jdbcType=INTEGER} and
+                </if>
+                <if test="maps.examineStatus !=null and maps.examineStatus !=''  ">
+                    examine_status= #{maps.examineStatus} and
+                </if>
+                <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                    date > #{maps.betweenDate} and
+                </if>
+                <if test="maps.andDate !=null and maps.andDate !='' ">
+                    #{maps.andDate} > date and
+                </if>
+                <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                    date between #{maps.betweenDate} and #{maps.andDate} and
+
+                </if>
+
+
+                <if  test=" maps.userId != null and maps.userId != '' " >
+
+                    user_id=#{maps.userId,jdbcType=INTEGER} and
+                </if>
+
+                <if  test=" maps.minister != null and maps.minister != '' " >
+
+                    minister = #{maps.minister,jdbcType=INTEGER} and
+                </if>
+                <if  test=" level == 2 " >
+
+                    department = #{department,jdbcType=INTEGER} and
+                </if>
+                <if test="maps.str != null and maps.str != ''">
+                   concat(order_number) LIKE CONCAT('%',#{maps.str},'%')  and
+                </if>
+                1>0
+            </where>
+
+            order by date desc limit #{begin},#{size}
+
+
+    </select>
+    <select id="selectExamineLogCount" resultType="java.lang.Integer">
+        select count(*) from (select examine_log.*,order_number,sort,sort_two,application_form.user_id as app_user_id
+        from examine_log LEFT JOIN application_form on app_form_id = application_form.id) as a LEFT JOIN user on a.app_user_id = `user`.id
+
+
+        <where>
+            <if test="maps.sort !=null and maps.sort !=''  ">
+                sort= #{maps.sort,jdbcType=INTEGER} and
+            </if>
+            <if test="maps.sortTwo !=null and maps.sortTwo !=''  ">
+                sort_two= #{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if test="maps.examineStatus !=null and maps.examineStatus !=''  ">
+                examine_status= #{maps.examineStatus} and
+            </if>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+                #{maps.andDate} > date and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+
+
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+
+            <if  test=" maps.minister != null and maps.minister != '' " >
+
+                minister = #{maps.minister,jdbcType=INTEGER} and
+            </if>
+            <if  test=" level == 2 " >
+
+                department = #{department,jdbcType=INTEGER} and
+            </if>
+            <if test="maps.str != null and maps.str != ''">
+                concat(order_number) LIKE CONCAT('%',#{maps.str},'%')  and
+            </if>
+            1>0
+        </where>
+
+
+    </select>
+    <select id="selectUser" resultType="java.util.Map">
+select distinct user.id,userName from user where user.id in (     select a.user_id from (select examine_log.*,order_number,sort,sort_two,application_form.user_id as app_user_id
+        from examine_log LEFT JOIN application_form on app_form_id = application_form.id) as a LEFT JOIN user on a.app_user_id = `user`.id
+
+
+        <where>
+            <if test="maps.sort !=null and maps.sort !=''  ">
+                sort= #{maps.sort,jdbcType=INTEGER} and
+            </if>
+            <if test="maps.sortTwo !=null and maps.sortTwo !=''  ">
+                sort_two= #{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if test="maps.examineStatus !=null and maps.examineStatus !=''  ">
+                examine_status= #{maps.examineStatus} and
+            </if>
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+                #{maps.andDate} > date and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+
+
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+
+            <if  test=" maps.minister != null and maps.minister != '' " >
+
+                minister = #{maps.minister,jdbcType=INTEGER} and
+            </if>
+            <if  test=" level == 2 " >
+
+                department = #{department,jdbcType=INTEGER} and
+            </if>
+            <if test="maps.str != null and maps.str != ''">
+                concat(order_number) LIKE CONCAT('%',#{maps.str},'%')  and
+            </if>
+            1>0
+        </where>
+        )
+
+    </select>
+
+    <select id="selectAppByLevel" resultType="com.hongbang.pojo.ApplicationForm">
+        select * from application_form where id in (
+        <if test="level == 3  and maps.minister == '否决'" >
+
+
+            #部长级别
+
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER}) and examine_status = '否决' and length(order_number)>0
+        </if>
+        <if test="level == 3  and maps.minister == '通过'" >
+            #部长级别
+
+            select DISTINCT a.app_form_id from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in(
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where  examine_status = '否决'
+            ) and (examine_log.user_id in (select id from user where department = 8)  )
+            ) as a LEFT JOIN application_form on a.app_form_id = application_form.id where circulation_boss = 1
+        </if>
+        <if test="level == 3  and maps.minister == '全部'" >
+
+            #部长级别
+
+            select DISTINCT a.app_form_id from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in(
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where  examine_status = '否决'
+            ) and (examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER})  )
+            ) as a LEFT JOIN application_form on a.app_form_id = application_form.id where circulation_boss = 1
+            union all
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER}) and examine_status = '否决' and length(order_number)>0
+        </if>
+           <if test=" 2 >= level  and maps.minister == '否决'" >
+               select DISTINCT app_form_id from examine_log where app_form_id  in (
+
+               select DISTINCT app_form_id from examine_log where examine_status = '否决'
+               )
+           </if>
+
+        <if test=" 2 >= level  and maps.minister == '通过'" >
+            select a.* from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+            ) as a left join application_form on a.app_form_id = application_form.id where circulation_boss = 1
+        </if>
+
+        <if test=" 2 >= level  and maps.minister == '全部'" >
+            select a.* from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+            ) as a left join application_form on a.app_form_id = application_form.id where circulation_boss = 1
+            union all
+            select DISTINCT app_form_id from examine_log where app_form_id  in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+        </if>
+
+
+        ) and
+
+
+            <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+                date > #{maps.betweenDate} and
+            </if>
+            <if test="maps.andDate !=null and maps.andDate !='' ">
+                #{maps.andDate} > date and
+            </if>
+            <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+                date between #{maps.betweenDate} and #{maps.andDate} and
+
+            </if>
+            <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+                sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.sort != null and maps.sort != '' " >
+
+                sort=#{maps.sort,jdbcType=INTEGER} and
+            </if>
+            <if  test=" maps.userId != null and maps.userId != '' " >
+
+                user_id=#{maps.userId,jdbcType=INTEGER} and
+            </if>
+        <if  test=" maps.department != null and maps.department != '' " >
+
+            user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+        </if>
+          id >0
+
+        order by date desc limit #{begin},#{size}
+
+
+
+    </select>
+    <select id="selectAppByLevelCount" resultType="java.lang.Integer">
+        select count(*) from application_form where id in (
+        <if test="level == 3  and maps.minister == '否决'" >
+
+
+            #部长级别
+
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER}) and examine_status = '否决' and length(order_number)>0
+        </if>
+        <if test="level == 3  and maps.minister == '通过'" >
+            #部长级别
+
+            select DISTINCT a.app_form_id from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in(
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where  examine_status = '否决'
+            ) and (examine_log.user_id in (select id from user where department = 8)  )
+            ) as a LEFT JOIN application_form on a.app_form_id = application_form.id where circulation_boss = 1
+        </if>
+        <if test="level == 3  and maps.minister == '全部'" >
+
+            #部长级别
+
+            select DISTINCT a.app_form_id from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in(
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where  examine_status = '否决'
+            ) and (examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER})  )
+            ) as a LEFT JOIN application_form on a.app_form_id = application_form.id where circulation_boss = 1
+            union all
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER}) and examine_status = '否决' and length(order_number)>0
+        </if>
+        <if test=" 2 >= level  and maps.minister == '否决'" >
+            select DISTINCT app_form_id from examine_log where app_form_id  in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+        </if>
+
+        <if test=" 2 >= level  and maps.minister == '通过'" >
+            select a.* from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+            ) as a left join application_form on a.app_form_id = application_form.id where circulation_boss = 1
+        </if>
+
+        <if test=" 2 >= level  and maps.minister == '全部'" >
+            select a.* from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+            ) as a left join application_form on a.app_form_id = application_form.id where circulation_boss = 1
+            union all
+            select DISTINCT app_form_id from examine_log where app_form_id  in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+        </if>
+
+
+        ) and
+
+
+        <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+            date > #{maps.betweenDate} and
+        </if>
+        <if test="maps.andDate !=null and maps.andDate !='' ">
+            #{maps.andDate} > date and
+        </if>
+        <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+            date between #{maps.betweenDate} and #{maps.andDate} and
+
+        </if>
+        <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+            sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.sort != null and maps.sort != '' " >
+
+            sort=#{maps.sort,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.userId != null and maps.userId != '' " >
+
+            user_id=#{maps.userId,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.department != null and maps.department != '' " >
+
+            user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+        </if>
+        id >0
+
+
+
+
+    </select>
+
+<!--    根据等级查询申请人-->
+    <select id="selectAppUser" resultType="java.util.Map">
+        select * from (
+        select distinct user_id,userName,department,name from application_form left join user on user_id = user.id  where application_form.id in (
+        <if test="level == 3  and maps.minister == '否决'" >
+
+
+            #部长级别
+
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER}) and examine_status = '否决' and length(order_number)>0
+        </if>
+        <if test="level == 3  and maps.minister == '通过'" >
+            #部长级别
+            select DISTINCT a.app_form_id from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in(
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where  examine_status = '否决'
+            ) and (examine_log.user_id in (select id from user where department = 8)  )
+            ) as a LEFT JOIN application_form on a.app_form_id = application_form.id where circulation_boss = 1
+        </if>
+        <if test="level == 3  and maps.minister == '全部'" >
+
+            #部长级别
+
+
+            select DISTINCT a.app_form_id from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in(
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where  examine_status = '否决'
+            ) and (examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER})  )
+            ) as a LEFT JOIN application_form on a.app_form_id = application_form.id where circulation_boss = 1
+            union all
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER}) and examine_status = '否决' and length(order_number)>0
+        </if>
+        <if test=" 2 >= level  and maps.minister == '否决'" >
+            select DISTINCT app_form_id from examine_log where app_form_id  in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+        </if>
+
+        <if test=" 2 >= level  and maps.minister == '通过'" >
+            select a.* from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+            ) as a left join application_form on a.app_form_id = application_form.id where circulation_boss = 1
+        </if>
+
+        <if test=" 2 >= level  and maps.minister == '全部'" >
+            select a.* from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+            ) as a left join application_form on a.app_form_id = application_form.id where circulation_boss = 1
+            union all
+            select DISTINCT app_form_id from examine_log where app_form_id  in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+        </if>
+
+
+        ) and
+
+
+        <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+            date > #{maps.betweenDate} and
+        </if>
+        <if test="maps.andDate !=null and maps.andDate !='' ">
+            #{maps.andDate} > date and
+        </if>
+        <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+            date between #{maps.betweenDate} and #{maps.andDate} and
+
+        </if>
+        <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+            sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.sort != null and maps.sort != '' " >
+
+            sort=#{maps.sort,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.userId != null and maps.userId != '' " >
+
+            user_id=#{maps.userId,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.department != null and maps.department != '' " >
+
+            user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+        </if>
+        application_form.id >0
+        ) as a LEFT JOIN department on department.id = a.department
+
+    </select>
+    <select id="selectAppDepartment" resultType="java.util.Map">
+        select distinct department.id,departmentName from (
+        select distinct user_id,userName,department,name from application_form left join user on user_id = user.id  where application_form.id in (
+        <if test="level == 3  and maps.minister == '否决'" >
+
+
+            #部长级别
+
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER}) and examine_status = '否决' and length(order_number)>0
+        </if>
+        <if test="level == 3  and maps.minister == '通过'" >
+            #部长级别
+            select DISTINCT a.app_form_id from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in(
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where  examine_status = '否决'
+            ) and (examine_log.user_id in (select id from user where department = 8)  )
+            ) as a LEFT JOIN application_form on a.app_form_id = application_form.id where circulation_boss = 1
+        </if>
+        <if test="level == 3  and maps.minister == '全部'" >
+
+            #部长级别
+
+
+            select DISTINCT a.app_form_id from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in(
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where  examine_status = '否决'
+            ) and (examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER})  )
+            ) as a LEFT JOIN application_form on a.app_form_id = application_form.id where circulation_boss = 1
+            union all
+            select DISTINCT app_form_id from examine_log
+            LEFT JOIN application_form on examine_log.app_form_id = application_form.id
+            where examine_log.user_id in (select id from user where department = #{department,jdbcType=INTEGER}) and examine_status = '否决' and length(order_number)>0
+        </if>
+        <if test=" 2 >= level  and maps.minister == '否决'" >
+            select DISTINCT app_form_id from examine_log where app_form_id  in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+        </if>
+
+        <if test=" 2 >= level  and maps.minister == '通过'" >
+            select a.* from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+            ) as a left join application_form on a.app_form_id = application_form.id where circulation_boss = 1
+        </if>
+
+        <if test=" 2 >= level  and maps.minister == '全部'" >
+            select a.* from (
+            select DISTINCT app_form_id from examine_log where app_form_id not in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+            ) as a left join application_form on a.app_form_id = application_form.id where circulation_boss = 1
+            union all
+            select DISTINCT app_form_id from examine_log where app_form_id  in (
+
+            select DISTINCT app_form_id from examine_log where examine_status = '否决'
+            )
+        </if>
+
+
+        ) and
+
+
+        <if test="maps.betweenDate !=null and maps.betweenDate !=''  ">
+            date > #{maps.betweenDate} and
+        </if>
+        <if test="maps.andDate !=null and maps.andDate !='' ">
+            #{maps.andDate} > date and
+        </if>
+        <if  test="maps.betweenDate !=null and maps.andDate !=null and maps.betweenDate !='' and maps.andDate !='' " >
+
+            date between #{maps.betweenDate} and #{maps.andDate} and
+
+        </if>
+        <if  test=" maps.sortTwo != null and maps.sortTwo != '' " >
+
+            sort_two=#{maps.sortTwo,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.sort != null and maps.sort != '' " >
+
+            sort=#{maps.sort,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.userId != null and maps.userId != '' " >
+
+            user_id=#{maps.userId,jdbcType=INTEGER} and
+        </if>
+        <if  test=" maps.department != null and maps.department != '' " >
+
+            user_id in (select id from user where department =#{maps.department,jdbcType=INTEGER} ) and
+        </if>
+        application_form.id >0
+        ) as a LEFT JOIN department on department.id = a.department
+
+    </select>
+
+</mapper>

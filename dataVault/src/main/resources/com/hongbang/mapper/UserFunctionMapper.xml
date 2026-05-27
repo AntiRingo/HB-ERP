@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.UserFunctionMapper">
+<!--    循环添加用户的功能信息-->
+    <insert id="addAll">
+
+            insert into user_function (id, user_id, function_id, open) VALUES
+            <foreach collection="userFunctions"  item="userFunctions" index="index" separator=",">
+                (
+                null,
+                #{userFunctions.userId,jdbcType=INTEGER},
+                #{userFunctions.functionId,jdbcType=INTEGER},
+                #{userFunctions.open,jdbcType=INTEGER}
+                )
+
+            </foreach>
+
+
+    </insert>
+<!--    //循环添加用户功能具体信息userfunctiontwo-->
+    <insert id="addAllUserFunctionTwo">
+    insert into user_function_two (id, function_two_id, user_id, open_status) VALUES
+    <foreach collection="userFunctionTwos" item="userFunctionTwos" index="index" separator=",">
+        (
+         null,
+         #{userFunctionTwos.functionTwoId,jdbcType=INTEGER},
+         #{userFunctionTwos.userId,jdbcType=INTEGER},
+         #{userFunctionTwos.openStatus,jdbcType=INTEGER}
+        )
+
+    </foreach>
+
+    </insert>
+    <!--    循环更新用户的功能信息-->
+    <update id="updateAll" parameterType="java.util.List">
+        <foreach collection="userFunctions"  item="userFunctions" index="index" separator=";">
+            update user_function
+                <set>
+                    user_function.open = #{userFunctions.open,jdbcType=INTEGER}
+                </set>
+                    where user_function.user_id=#{userFunctions.userId,jdbcType=INTEGER} and user_function.function_id = #{userFunctions.functionId,jdbcType=INTEGER}
+        </foreach>
+    </update>
+
+
+
+    <!--    循环更新映射-->
+    <update id="updateMapExcel" parameterType="java.util.List">
+        <foreach collection="mappings" item="mappings" index="index" separator=";">
+            update mapping
+            <set>
+                mapping.begin_location=#{mappings.beginLocation,jdbcType=INTEGER},
+                mapping.end_location = #{mappings.endLocation,jdbcType=INTEGER},
+                mapping.length = #{mappings.length,jdbcType=INTEGER}
+            </set>
+            where mapping.id = #{mappings.id,jdbcType=INTEGER}
+        </foreach>
+
+    </update>
+<!--      //循环更新userfunctiontwo-->
+    <update id="updateUserFunctionTwo">
+        <foreach collection="userFunctionTwos" item="userFunctionTwos" index="index" separator=";">
+        update user_function_two
+            <set>
+                user_function_two.open_status=#{userFunctionTwos.openStatus,jdbcType=INTEGER}
+            </set>
+        where user_function_two.user_id=#{userFunctionTwos.userId,jdbcType=INTEGER} and user_function_two.function_two_id = #{userFunctionTwos.functionTwoId,jdbcType=INTEGER}
+        </foreach>
+    </update>
+</mapper>

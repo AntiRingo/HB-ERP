@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.UserMapper">
+
+    <insert id="add">
+        insert into user (id, userName, passWord, department, name, age, sex, level,exitTime,secondary_password) VALUES (#{id},#{userName},#{passWord},#{department},#{name},#{age},#{sex},#{level},#{exitTime},#{secondaryPassword})
+        <selectKey  keyProperty="id" order="AFTER" resultType="java.lang.Integer" >
+            select last_insert_id();
+        </selectKey>
+    </insert>
+    <select id="executeLongQuery"  timeout="60">
+        SELECT SLEEP(40)
+    </select>
+    <select id="selectDepartByIds" resultType="java.util.Map">
+        select userName,name,departmentName,user.id from user LEFT JOIN department on department.id = user.department where user.id
+            in
+        <foreach collection="applicationForms" item="applicationForms" index="index" open="(" close=")" separator=",">
+        #{applicationForms.userId}
+
+        </foreach>
+    </select>
+
+</mapper>

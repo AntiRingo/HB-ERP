@@ -1,0 +1,68 @@
+.qzwindow{
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    z-index: 2147483647;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    -webkit-animation-name: fadeInQz;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeInQz;
+    animation-duration: 0.4s;
+}
+
+/* 弹窗内容 */
+.qz-window-content {
+    position: fixed;
+    top: 0;
+    background-color: aliceblue;
+    width: 100%;
+    -webkit-animation-name: slideInQz;
+    -webkit-animation-duration: 0.4s;
+    animation-name: slideInQz;
+    animation-duration: 0.4s;
+    height:100%;
+    /*min-height: 200px!important;*/
+    /*border-radius: 30px 30px 0 0 ;*/
+    z-index: 21474801;
+    overflow-y: auto;
+}
+/* 关闭按钮 */
+.qz-window-content-close {
+    color: black;
+    /*float: right;*/
+    /*margin-right: 50px;*/
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    margin-left: 90%;
+    top: 2%;
+
+}
+
+/* 添加动画 */
+@-webkit-keyframes slideInQz {
+    from {top: -300px; opacity: 0}
+    to {top:0; opacity: 1}
+}
+
+@keyframes slideInQz {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+@-webkit-keyframes fadeInQz {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+@keyframes fadeInQz {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+

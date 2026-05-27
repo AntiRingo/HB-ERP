@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <settings>
+        <!-- 设置全局默认 SQL 执行超时时间为 30 秒 -->
+        <setting name="defaultStatementTimeout" value="30"/>
+<!--        驼峰命名法-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+<!--将为空的字段显示出来-->
+        <setting name="callSettersOnNulls" value="true"/>
+    </settings>
+    <!--起别名-->
+    <typeAliases>
+        <package name="com.hongbang.pojo"/>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql:///data_vault_cg?useSSL=false&amp;useServerPrepStmts=true&amp;characterEncoding=UTF-8&amp;allowMultiQueries=true&amp;Timezone=UTC&amp;autoReconnect=true&amp;socketTimeout=30000&amp;connectTimeout=5000&amp;tcpKeepAlive=true"/>
+                <property name="username" value="root"/>
+                <property name="password" value="123456"/>
+                <!-- 连接检测参数 -->
+<!--                <property name="validationQuery" value="SELECT 1"/>-->
+<!--                <property name="testWhileIdle" value="true"/>-->
+<!--                <property name="timeBetweenEvictionRunsMillis" value="60000"/>-->
+<!--                <property name="minEvictableIdleTimeMillis" value="300000"/>-->
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <!--扫描mapper-->
+        <package name="com.hongbang.mapper"/>
+    </mappers>
+
+</configuration>

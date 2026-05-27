@@ -1,0 +1,8 @@
+{
+  "name": "dataVault",
+  "version": "1.0.0",
+  "dependencies": {
+    "drange": "^2.0.1",
+    "ret": "^0.5.0"
+  }
+}

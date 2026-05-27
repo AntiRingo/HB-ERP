@@ -1,0 +1,456 @@
+/**{*/
+/*    box-sizing: border-box;*/
+/*    margin: 0;padding: 0;*/
+/*}*/
+html{
+    width: 99%;
+    height: auto;
+    word-break:break-all;
+}
+body{
+    width: 100%;
+    height: auto;
+}
+
+
+a{
+    color: cornflowerblue;
+    text-decoration: none;
+    word-break: break-all;
+}
+a:hover{
+    color: #1890ff;
+}
+a:active{
+    color: red;
+}
+*:before,*:after{
+    box-sizing: border-box;
+}
+
+.completeStatus{
+    cursor: pointer;
+}
+.window,.dgContent-window{
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    z-index: 2147483640;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow:hidden;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    -webkit-animation-name: fadeIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeIn;
+    animation-duration: 0.4s;
+}
+
+/* 弹窗内容 */
+.window-content,.dgContent-window-content {
+    position: fixed;
+    top: 15%;
+    background-color: aliceblue;
+    width: 100%;
+    -webkit-animation-name: slideIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: slideIn;
+    animation-duration: 0.4s;
+    height:85%;
+    /*min-height: 200px!important;*/
+    border-radius: 30px 30px 0 0 ;
+    z-index: 21474801;
+    overflow-y: auto;
+}
+
+/* 关闭按钮 */
+.window-content-close,.dgContent-window-content-close {
+    color: black;
+    float: right;
+    margin-right: 50px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: sticky;
+    top: 10px;
+}
+
+/* 添加动画 */
+@-webkit-keyframes slideIn {
+    from {top: -300px; opacity: 0}
+    to {top: 15%; opacity: 1}
+}
+
+@keyframes slideIn {
+    from {top: -300px; opacity: 0}
+    to {top: 15%; opacity: 1}
+}
+
+@-webkit-keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+.aa{
+    border-top: solid 1px rgb(105, 140, 195);
+    border-left: solid 1px rgb(105, 140, 195);
+    border-right: solid 1px rgb(105, 140, 195);
+    border-bottom: solid 1px rgb(105, 140, 195);
+}
+
+
+
+input{
+    font-family: 微软雅黑, serif !important;
+}
+textarea{
+    font-family: 微软雅黑, serif !important;
+}
+
+.qwe{
+    position: relative;
+    min-height: 38px;
+}
+.qwe button{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto auto auto 82%;
+    height: 20px;
+}
+.qwe input{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    height: 20px;
+}
+
+.qwe textarea{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    min-height: 100px;max-height: 100px;max-width: 90%;min-width:90%
+}
+.qwe b{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto auto auto 85%;
+    height: 20px;
+}
+
+input{
+    ime-mode:disabled;
+}
+
+
+
+ul {list-style-type: none;font-size: 1em;}
+ul li span{color: #1890ff;border: 1px solid #1890ff;width: 15px;height: 15px;display: inline-block;text-align: center;
+    border-radius: 50%;vertical-align: middle;margin-right:15px;line-height: 12px;
+    cursor: default;background: #fff;}
+
+
+
+.left{
+    width:30%;
+    height: 100%;
+    max-height: 100%;
+}
+.lists {
+    width:100%;
+    height: 100%;
+    max-height: 100%;
+    position: relative;
+}
+
+.l_tree {
+    width: calc(100% - 0px);
+    height: 100%;
+    padding-left: 22px;
+}
+.l_tree_branch {
+    width: fit-content;
+    height: 100%;
+    display: block;
+
+    position: relative;
+    padding:5px 10px;
+}
+
+ul.l_tree:before {
+    content: '';
+    border-left: 1px dotted #999a9c;
+    height: calc(100%);
+    position: absolute;
+    left: 40px;
+    top: 20px;
+}
+.l_tree,
+.l_tree_branch {
+    position: relative;
+}
+
+.l_tree_branch::after {
+    content: '';
+    width: 15px;
+    height: 0;
+    border-bottom: 1px dotted #999a9c;
+    position: absolute;
+    right: calc(100% - 40px);
+    top: 18px;
+}
+
+
+.right{
+    width: 70%;
+    height: auto;
+    max-height: 90%;
+
+}
+
+.sticky{
+    position: sticky;
+    top: 50px;
+    width: 90%;
+    margin:50px auto auto 10px;
+}
+
+
+/*-------------------------------------------------------------------------------------------------------------*/
+.window-small{
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    z-index: 2147483641;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    -webkit-animation-name: fadeIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeIn;
+    animation-duration: 0.4s;
+}
+
+/* 弹窗内容 */
+.window-small-content {
+    position: fixed;
+
+    background-color: #f9fafc;
+    width: 30%;
+    margin-left:70%;
+    -webkit-animation-name: slideIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: slideInSmall;
+    animation-duration: 0.4s;
+    height:100%;
+    /*min-height: 200px!important;*/
+    z-index: 21474801;
+
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    /*overflow-y: auto;*/
+}
+
+.window-small-close{
+    position: absolute;
+    cursor: pointer;
+}
+
+
+
+.window-small-close{
+    position: fixed;
+    top: 1%;
+    right: 2%;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px #e6eaf0, 0 4px 10px #0c1f5014;
+    background-color: #fff;
+    height: 44px;
+    width: 44px;
+}
+.window-small-close button{
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border:none;
+    border-radius: 8px;
+    margin:2px;
+    font-size: 40px;
+    cursor: pointer;
+}
+.window-small-close button:hover{
+    background-color: #e6eaf0;
+}
+
+
+@-webkit-keyframes slideInSmall {
+    from {margin-left: 100%; opacity: 0}
+    to {margin-left: 70%;; opacity: 1}
+}
+
+@keyframes slideInSmall {
+    from {margin-left: 100%; opacity: 0}
+    to {margin-left: 70%;; opacity: 1}
+}
+
+@-webkit-keyframes fadeInSmall {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+@keyframes fadeInSmall {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+.window-title{
+    height:auto;
+    width: auto;
+    padding-bottom: 20px;
+    margin: 0 20px;
+    line-height: 64px;
+    cursor: pointer;
+
+}
+.window-title-bottom{
+    border-bottom: #fb9337 solid 4px;
+}
+.window-bottom{
+
+    display: flex;
+    width: 90%;
+    margin: 20px auto;
+    height: 64px;
+    background-color: white;
+    border:  #e6eaf0 solid 1px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px #0c1f500a, 0 0 0 1px #e6eaf0;
+    transition:width 0.5s;
+}
+
+.PN{
+    width: 90%;
+    font-weight: 600;
+    margin: 5px auto;
+}
+.PNI{
+    width: 90%;
+    height: 33px;
+    margin:5px auto;
+    background-color: #F4F5F5;
+    border-radius: 10px;
+}
+.PNI input{
+    width: 100%;
+    height: 33px;
+    border-radius: 10px;
+    border: #e6eaf0 solid 0.5px;
+    padding-left: 5px;
+}
+
+
+/*-------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+.window-small-one{
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    z-index: 2147483641;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    -webkit-animation-name: fadeIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeIn;
+    animation-duration: 0.4s;
+}
+
+/* 弹窗内容 */
+.window-small-content-one {
+    position: fixed;
+
+    background-color: #f9fafc;
+    width: 30%;
+    margin-left:70%;
+    -webkit-animation-name: slideIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: slideInSmall;
+    animation-duration: 0.4s;
+    height:100%;
+    /*min-height: 200px!important;*/
+    z-index: 2147483584;
+
+
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    /*overflow-y: auto;*/
+}
+
+.window-small-close-one{
+    position: absolute;
+    cursor: pointer;
+}
+
+
+
+.window-small-close-one{
+    position: fixed;
+    top: 1%;
+    right: 2%;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px #e6eaf0, 0 4px 10px #0c1f5014;
+    background-color: #fff;
+    height: 44px;
+    width: 44px;
+}
+.window-small-close-one button{
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border:none;
+    border-radius: 8px;
+    margin:2px;
+    font-size: 40px;
+    cursor: pointer;
+}
+.window-small-close-one button:hover{
+    background-color: #e6eaf0;
+}
+
+
+@-webkit-keyframes slideInSmall {
+    from {margin-left: 100%; opacity: 0}
+    to {margin-left: 70%;; opacity: 1}
+}
+
+@keyframes slideInSmall {
+    from {margin-left: 100%; opacity: 0}
+    to {margin-left: 70%;; opacity: 1}
+}
+
+@-webkit-keyframes fadeInSmall {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+@keyframes fadeInSmall {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+

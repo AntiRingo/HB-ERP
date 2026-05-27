@@ -1,0 +1,429 @@
+/*登录弹窗css*/
+
+/* 弹窗 (background) */
+.modal {
+    display: none; /* 默认隐藏 */
+    position:fixed;
+    top: 0;
+    z-index: 2147483647; /* 设置在顶层 */
+    margin: auto auto;
+    overflow:hidden ;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    opacity: 0;
+    transition:opacity 1s;
+    -webkit-transition: opacity 1s; /* Safari */
+    width: 100%;
+    height: 100%;
+
+}
+
+/* 弹窗内容 */
+.modal-content {
+    margin:0 auto;
+    padding:5px;
+    width: 400px ;
+    border: none ;
+    align-self: center;
+}
+
+/* 关闭按钮 */
+.close {
+    color: white;
+    margin-left: 350px;
+    font-size: 28px;
+    font-weight: bold;
+    width: fit-content;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.wrapper {
+
+    /* width: 884px; */
+    overflow:hidden;
+
+}
+
+.loginBox {
+    background-color: #F0F4F6;
+    /*上divcolor*/
+    border: 1px solid #BfD6E1;
+    border-radius: 5px;
+    color: #444;
+    font: 14px 'Microsoft YaHei', '微软雅黑';
+    margin: 0 auto;
+    width: 388px;
+
+}
+
+.loginBox .loginBoxCenter {
+    border-bottom: 1px solid #DDE0E8;
+    padding: 24px;
+    height: auto;
+}
+
+.loginBox .loginBoxCenter p {
+    margin-bottom: 10px
+}
+
+.loginBox .loginBoxButtons {
+    /*background-color: #F0F4F6;*/
+    /*下divcolor*/
+    border-top: 0 solid #FFF;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    line-height: 28px;
+    overflow: hidden;
+    padding: 20px 24px;
+    vertical-align: center;
+    filter: alpha(Opacity=80);
+    -moz-opacity: 0.5;
+
+}
+
+.loginBox .loginInput {
+
+    color: #444;
+    font: 12px 'Microsoft YaHei', '微软雅黑';
+    padding: 8px 14px;
+    margin-bottom: 8px;
+    width: 310px;
+    border: 0;
+    outline: none;
+    margin-right: 34px;
+}
+.loginBox .passwordInput {
+
+    color: #444;
+    font: 12px 'Microsoft YaHei', '微软雅黑';
+    padding: 8px 0 8px 14px;
+    margin-bottom: 8px;
+    width:290px;
+    border: 0;
+    /* 取消蓝色边框 */
+    outline: none;
+}
+
+/*.loginBox .loginInput:FOCUS {*/
+/*    border: 1px solid #B7D4EA;*/
+/*    box-shadow: 0 0 8px #B7D4EA;*/
+/*}*/
+
+.loginBox .loginBtn {
+    background-image: -moz-linear-gradient(to bottom, blue, #85CFEE);
+    border: 1px solid #98CCE7;
+    border-radius: 20px;
+    box-shadow: inset rgba(255, 255, 255, 0.6) 0 1px 1px, rgba(0, 0, 0, 0.1) 0 1px 1px;
+    color: #444;
+    /*登录*/
+    cursor: pointer;
+    float: right;
+    font: bold 13px Arial;
+    padding: 10px 50px;
+}
+
+.loginBox .loginBtn:HOVER {
+    background-image: -moz-linear-gradient(to top, blue, #85CFEE);
+}
+
+.loginBox a.forgetLink {
+    color: #ABABAB;
+    cursor: pointer;
+    float: right;
+    font: 11px/20px Arial;
+    text-decoration: none;
+    vertical-align: middle;
+    /*忘记密码*/
+}
+.loginBox a.registerLink {
+    color: #ABABAB;
+    cursor: pointer;
+    float: left;
+    font: 11px/20px Arial;
+    text-decoration: none;
+    vertical-align: middle;
+    /*新用户注册*/
+}
+.loginBox a.code {
+    color: #ABABAB;
+    cursor: pointer;
+    float: left;
+    font: 11px/20px Arial;
+    text-decoration: none;
+    vertical-align: middle;
+    /*验证码*/
+}
+.loginBox a.code:HOVER {
+    color: #000000;
+    text-decoration: none;
+    /*验证码*/
+}
+.loginBox a.registerLink:HOVER {
+    color: #000000;
+    text-decoration: none;
+    /*新用户注册*/
+}
+.loginBox a.forgetLink:HOVER {
+    color: #000000;
+    text-decoration: none;
+    /*忘记密码*/
+}
+
+.loginBox input#remember {
+    vertical-align: middle;
+}
+
+.loginBox label[for="remember"] {
+    font: 11px Arial;
+}
+.passwordDiv{
+    width:310px;
+    height: 32px;
+    background-color: white;
+    /*border: 1px solid #D2D9dC;*/
+    /*border-radius: 2px;*/
+
+}
+/*去除ie edge的密码框默认出现的小眼睛
+		给人添乱这一块，巨硬从来都没让我失望过*/
+input[type="password"]::-ms-reveal{
+    display: none;
+}
+input[type="password"]::-ms-clear{
+    display: none;
+}
+input[type="password"]::-o-clear{
+    display: none;
+}
+
+
+
+/*登录按钮scc*/
+#login{
+    cursor: pointer;
+    height: 25px;
+    position: absolute;
+    right: 50px;
+    top: 13px;
+}
+
+#fontModeToggle{
+    cursor: pointer;
+    height: 25px;
+    position: absolute;
+    right: 120px;
+    top: 13px;
+    padding: 0 10px;
+    min-width: 64px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-weight: bolder;
+}
+
+#fontModeToggle:hover{
+    background: rgba(255, 255, 255, 0.25);
+}
+
+#fontScalePopup{
+    position: absolute;
+    right: 120px;
+    top: 45px;
+    z-index: 2147483647;
+    width: 240px;
+    border: 1px solid #cfd8e3;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+
+#fontScalePopupTitle{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #333333;
+    font-weight: bolder;
+    margin-bottom: 8px;
+}
+
+#fontScalePopupValue{
+    min-width: 52px;
+    text-align: right;
+    color: #0070bb;
+}
+
+#fontScaleSlider{
+    width: 100%;
+    accent-color: #0070bb;
+}
+/*申请单按钮css*/
+.application{
+    background-color: #4F9BFF;
+    color: white;
+    width: 120px;
+    min-height: 40px;
+    height: auto;
+    text-align: center;
+    line-height: 40px;
+    /* 设置背景阴影 */
+    box-shadow: 10px 10px 10px #888888;
+    /* 设置div四个角圆滑 */
+    border-radius: 15px;
+    /* 固定在右下角 */
+    position: sticky;
+
+    top: 50px;
+    left: 90%;
+    cursor:pointer;
+    z-index: 11111;
+
+}
+.application li{
+    cursor:pointer;
+    list-style: none;
+    border: #4F9BFF solid 1px;
+    border-radius: 15px;
+}
+
+
+/*申请表弹窗css*/
+.window{
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    z-index: 2147483584;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    -webkit-animation-name: fadeIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: fadeIn;
+    animation-duration: 0.4s;
+}
+
+/* 弹窗内容 */
+.window-content {
+    position: fixed;
+    top: 20%;
+    background-color: aliceblue;
+    width: 100%;
+    -webkit-animation-name: slideIn;
+    -webkit-animation-duration: 0.4s;
+    animation-name: slideIn;
+    animation-duration: 0.4s;
+    height:80%;
+    /*min-height: 200px!important;*/
+    border-radius: 30px 30px 0 0 ;
+    z-index: 21474801;
+    /*overflow-y: auto;*/
+}
+
+/* 关闭按钮 */
+.window-content-close {
+    color: black;
+    float: right;
+    margin-right: 50px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 添加动画 */
+@-webkit-keyframes slideIn {
+    from {top: -300px; opacity: 0}
+    to {top: 20%; opacity: 1}
+}
+
+@keyframes slideIn {
+    from {top: -300px; opacity: 0}
+    to {top: 20%; opacity: 1}
+}
+
+@-webkit-keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+.aa{
+    border-top: solid 1px rgb(105, 140, 195);
+    border-left: solid 1px rgb(105, 140, 195);
+    border-right: solid 1px rgb(105, 140, 195);
+    border-bottom: solid 1px rgb(105, 140, 195);
+}
+
+
+/*选择整机还是零件*/
+
+.a-container {
+    text-align: center;
+}
+
+.a-trigger-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.a-trigger-btn:hover {
+    background-color: #0056b3;
+}
+
+.a-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 2147483589;
+}
+
+.a-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+}
+
+.a-option-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.a-option-btn:hover {
+    background-color: #e9ecef;
+}

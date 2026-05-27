@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hongbang.mapper.MaterialCategoryAssignMapper">
+
+
+
+    <!-- 1. 根据分类ID查询已分配的用户ID列表 -->
+    <select id="listAssignedUserIdsByCategoryId" resultType="java.lang.Long">
+        SELECT user_id
+        FROM material_category_assign
+        WHERE category_id = #{categoryId}
+    </select>
+
+    <!-- 2. 根据分类ID删除原有分配（保存时用） -->
+    <delete id="deleteByCategoryId">
+        DELETE FROM material_category_assign
+        WHERE category_id = #{categoryId}
+    </delete>
+
+    <!-- 3. 批量插入分配关系（核心！） -->
+    <insert id="batchInsert">
+        INSERT INTO material_category_assign (category_id, user_id)
+        VALUES
+        <foreach collection="userIds" item="userId" separator=",">
+            (#{categoryId}, #{userId})
+        </foreach>
+    </insert>
+
+    <!-- 4. 查询所有已分配的分类ID（前端已分配筛选） -->
+    <select id="listAssignedCategoryIds" resultType="java.lang.String">
+        SELECT DISTINCT category_id
+        FROM material_category_assign
+    </select>
+
+    <select id="listAllAssigns" resultType="java.util.Map">
+        SELECT category_id, user_id
+        FROM material_category_assign
+    </select>
+</mapper>
