@@ -1,0 +1,319 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>登录界面</title>
+    <style>
+        html {
+            height: 100%;
+            background: url("images/bg.jpg")no-repeat;
+            background-size: 100% 100%;
+            width: 100%;
+            font-family: 宋体,serif;
+
+
+        }
+        body{
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrapper {
+          width: 100%;
+            margin:10% auto;
+
+        }
+
+        .loginBox {
+            opacity: 1;
+            background-color: #F0F4F6;
+            /*上divcolor*/
+            border: 1px solid #BfD6E1;
+            border-radius: 5px;
+            color: #444;
+            font: 14px 'Microsoft YaHei', '微软雅黑';
+            margin: 0 auto;
+            width: 388px;
+        }
+
+        .loginBox .loginBoxCenter {
+            border-bottom: 1px solid #DDE0E8;
+            padding: 24px;
+            height: auto;
+        }
+
+        .loginBox .loginBoxCenter p {
+            margin-bottom: 10px
+        }
+
+        .loginBox .loginBoxButtons {
+            background-color: #F0F4F6;
+            /*下divcolor*/
+            border-top: 0  solid #FFF;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            line-height: 28px;
+            overflow: hidden;
+            padding: 20px 24px;
+            vertical-align: center;
+            filter: alpha(Opacity=80);
+            /*-moz-opacity: 0.5;*/
+            /*opacity: 0.5;*/
+        }
+
+        .loginBox .loginInput {
+            /*border: 1px solid #D2D9dC;*/
+            /*border-radius: 2px;*/
+            color: #444;
+            font: 12px 'Microsoft YaHei', '微软雅黑';
+            padding: 8px 14px;
+            margin-bottom: 8px;
+            width: 310px;
+            border: 0;
+            outline: none;
+
+
+        }
+        .loginBox .passwordInput {
+            /*border: 1px solid #D2D9dC;*/
+            /*border-radius: 2px;*/
+            color: #444;
+            font: 12px 'Microsoft YaHei', '微软雅黑';
+            padding: 8px 14px;
+            margin-bottom: 8px;
+            width: 278px;
+            border: 0;
+            /* 取消蓝色边框 */
+            outline: none;
+        }
+
+        /*.loginBox .loginInput:FOCUS {*/
+        /*    border: 1px solid #B7D4EA;*/
+        /*    box-shadow: 0 0 8px #B7D4EA;*/
+        /*}*/
+
+        .loginBox .loginBtn {
+            background-image: -moz-linear-gradient(to bottom, blue, #85CFEE);
+            border: 1px solid #98CCE7;
+            border-radius: 20px;
+            box-shadow: inset rgba(255, 255, 255, 0.6) 0 1px 1px, rgba(0, 0, 0, 0.1) 0 1px 1px;
+            color: #444;
+            /*登录*/
+            cursor: pointer;
+            float: right;
+            font: bold 13px Arial;
+            padding: 10px 50px;
+        }
+
+        .loginBox .loginBtn:HOVER {
+            background-image: -moz-linear-gradient(to top, blue, #85CFEE);
+        }
+
+        .loginBox a.forgetLink {
+            color: #ABABAB;
+            cursor: pointer;
+            float: right;
+            font: 11px/20px Arial;
+            text-decoration: none;
+            vertical-align: middle;
+            /*忘记密码*/
+        }
+        .loginBox a.registerLink {
+            color: #ABABAB;
+            cursor: pointer;
+            float: left;
+            font: 11px/20px Arial;
+            text-decoration: none;
+            vertical-align: middle;
+            /*新用户注册*/
+        }
+        .loginBox a.code {
+            color: #ABABAB;
+            cursor: pointer;
+            float: left;
+            font: 11px/20px Arial;
+            text-decoration: none;
+            vertical-align: middle;
+            /*验证码*/
+        }
+        .loginBox a.code:HOVER {
+            color: #000000;
+            text-decoration: none;
+            /*验证码*/
+        }
+        .loginBox a.registerLink:HOVER {
+            color: #000000;
+            text-decoration: none;
+            /*新用户注册*/
+        }
+        .loginBox a.forgetLink:HOVER {
+            color: #000000;
+            text-decoration: none;
+            /*忘记密码*/
+        }
+
+        .loginBox input#remember {
+            vertical-align: middle;
+        }
+
+        .loginBox label[for="remember"] {
+            font: 11px Arial;
+        }
+        .passwordDiv{
+            width:340px;
+            height: 34px;
+            background-color: white;
+            /*border: 1px solid #D2D9dC;*/
+            /*border-radius: 2px;*/
+
+        }
+
+        /*去除ie edge的密码框默认出现的小眼睛
+                给人添乱这一块，巨硬从来都没让我失望过*/
+        input[type="password"]::-ms-reveal{
+            display: none;
+        }
+        input[type="password"]::-ms-clear{
+            display: none;
+        }
+        input[type="password"]::-o-clear{
+            display: none;
+        }
+
+        .loginBtn:active{
+            border: cornflowerblue solid 1px;
+        }
+        .loginBtn:hover{
+           color: cornflowerblue;
+        }
+
+    </style>
+</head>
+<body>
+<div style="width: 100%;height: 100%">
+    <div class="wrapper">
+
+        <div class="loginBox">
+            <div class="loginBoxCenter">
+                <p style="text-align: center;font-weight: bolder;font-size: larger">用户登录</p>
+                <p><label for="username">用户名：</label></p>
+                <!--autofocus 规定当页面加载时按钮应当自动地获得焦点。 -->
+                <!-- placeholder提供可描述输入字段预期值的提示信息-->
+                <p><input id="username" type="text"  name="text" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入用户名" value="" /></p>
+                <!-- required 规定必需在提交之前填写输入字段-->
+                <p><label for="password">密码：</label></p>
+                <p>
+                <div class="passwordDiv ">
+                    <input  type="password" id="password" name="password" class="passwordInput" required="required" placeholder="请输入密码" value="" />
+                    <img id="eye" style="position: absolute;width: 34px;height: 34px;" src="./images/close.png" alt="">
+                </div>
+                </p>
+                <p><label style="display: none" for="checkCode">验证码：</label></p>
+                <p>
+                <div style="width: 344px;height: 25px;line-height: 22px;display:none;">
+                    <input class="loginInput" name="checkCode" type="text" value="" id="checkCode" style="width:158px;height: 13px;" >
+                    &nbsp;<img style="padding-top: 2px" id="checkCodeImg" src="checkCodeServlet" alt="">
+                    <a style="margin-top: 3px" class="code" href="#" id="changeImg">看不清？</a>
+                </div>
+
+                </p>
+
+            </div>
+            <div class="loginBoxButtons">
+
+
+                <button class="loginBtn" id="loginBtn">登录</button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+
+
+    window.onload=function (){
+
+        function login(){
+            let  username = document.getElementById("username").value;
+
+            let  password = document.getElementById("password").value;
+            let checkCode=document.getElementById("checkCode").value;
+
+
+            axios({
+                method:"post",
+                url:"user/loginVerification?password="+password+"&checkCode="+checkCode,
+                data:username,
+
+            }).then(function (resp){
+                console.log(resp.data)
+                if (resp.data==="success"){
+
+                    location.href="index.html";
+
+                } else if (resp.data==="codefalse"){
+                    alert("验证码错误，请重新输入！！！")
+
+                } else if(resp.data===false){
+                    alert("用户名或密码错误，请您重新输入！！！")
+                }else if (resp.data==="codenull"){
+                    alert("验证码已过期，请刷新后再试！")
+                }
+
+                else {
+                    alert("服务器错误，请稍后再试！")
+                }
+            })
+        }
+
+        document.getElementById("loginBtn").onclick=function (){
+          login();
+        }
+        window.onkeydown = function (event){
+            /* 解决兼容性问题 */
+            event = event || window.event;
+
+            if (event.keyCode === 13){
+               login();
+            }
+        }
+
+
+        var eye = document.getElementById("eye");
+        var pwd = document.getElementById("password");
+        var flag = 0;
+        eye.onclick = function() {
+            // 点击一次之后，flag一定要变化
+            if (flag === 0) {
+                pwd.type = "text";
+                eye.src = "images/open.png";
+                flag = 1; //赋值操作
+            } else {
+                pwd.type = "password";
+                eye.src = "images/close.png";
+                flag = 0;
+            }
+        }
+
+        //点击更换验证码
+        document.getElementById("changeImg").onclick = function (){
+
+            document.getElementById("checkCodeImg").src="checkCodeServlet?"+new Date().getMilliseconds();
+        }
+
+
+
+    }
+
+</script>
+
+
+</html>
