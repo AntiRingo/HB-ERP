@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>质检申请单管理</title>
+  <link href="css/product.css" rel="stylesheet" />
+  <link href="css/print.min.css">
+  <link href="css/window.css" rel="stylesheet">
+  <script src="js/axios-0.18.0.js"></script>
+  <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+  <script src="js/print.min.js"></script>
+  <link href="css/newStyle.css" rel="stylesheet">
+</head>
+<style>
+  html{
+    font-family: 宋体,serif;
+  }
+  thead tr{
+    background-color: #9eb6d8;
+  }
+  thead th{
+    outline: white solid 1px;
+    font-size: 14px;
+  }
+  thead{
+    position: sticky;
+    top: 32px;
+    display: table-header-group;
+  }
+  tbody td{
+    font-size: 12px;
+  }
+  td b{
+    font-weight: 600;
+  }
+  table{
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    page-break-before: avoid;
+    border-collapse: collapse;
+
+  }
+  th, td {
+
+    padding: 6px 4px;
+    font-size: 13px;
+    text-align: left !important;
+    position: relative;
+    white-space: nowrap; /* 强制不换行 */
+  }
+  .canvas-box {
+    border: 1px solid darkgrey;
+    margin:  10px auto auto;
+    width: 99%;
+    height: 99%;
+  }
+
+  .signImage {
+    display: none;
+  }
+
+  #qz button{
+    width: 100px;
+    height: calc(10vh);
+  }
+  .checkP{
+    cursor: pointer;
+  }
+  .checkP:hover{
+    color: #85CFEE;
+  }
+  #content b{
+    font-size: clamp(0.75rem, 0.659rem + 0.45vw, 1rem);
+    font-weight: normal;
+    /*align-self: center;*/
+    margin: auto 0;
+  }
+  .taked{
+    width:  20px;
+    height: 20px;
+  }
+  .pailie{
+    display: flex;
+  }
+  .pailie b{
+    margin: auto 0;
+  }
+  .goqz{
+    color: red;
+    white-space: nowrap;
+  }
+  b a{
+    white-space: nowrap;
+    display: inline-block;
+    margin: 0 5px;
+  }
+</style>
+<body>
+<input type="hidden" name="token" id="tokenField">
+<div style="display: flex;width: 100%;height: auto">
+  <div class="right" style="display: block;margin: auto;width: 90%">
+    <div class="sticky" style="width: 95%;">
+      <div style="width: 100% ;height: auto;padding: 1px;border: #9eb6d8 solid 1px">
+        <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px">
+          <div style="width:100%;background-color:#9eb6d8;margin: auto  ;height: 25px;"><b>质检申请单列表</b></div>
+        </div>
+
+        <div style="width: 99%;height: auto;margin: auto;display: flex;flex-wrap: wrap">
+          <div style="width: auto;height: auto;max-width: 30%;min-width:fit-content; margin: auto">
+            <div>开始日期：</div>
+            <input id="between" type="date" value="">
+          </div>
+          <div style="width: auto;height: auto;max-width: 30%;min-width:fit-content; margin: auto">
+            <div>结束日期：</div>
+            <input id="and" type="date" value="">
+          </div>
+          <div style="width: auto;height: auto;max-width: 25%;min-width:fit-content; margin: auto">
+            <div>申请人：</div>
+            <select id="applicationUserId">
+              <option class="sxUserId" value="">全部</option>
+            </select>
+          </div>
+          <div style="width:auto;height: auto;max-width: 20%;margin: auto;min-width: fit-content">
+            <div>状态：</div>
+            <select id="completeId">
+              <option class="sxComplete" value="">全部</option>
+              <option class="sxComplete" value="3">待查看</option>
+              <option class="sxComplete" value="0">质检中</option>
+              <option class="sxComplete" value="1">已完成</option>
+              <option class="sxComplete" value="5">待处理</option>
+            </select>
+          </div>
+          <div style="text-align: right;margin: 8px auto;width: auto;min-width: fit-content;">
+            <label>
+              <input id="searchValue" type="search" style="width: auto;max-width: 75%" placeholder="请输入单号">
+            </label>
+            <button id="search">搜索</button>
+          </div>
+        </div>
+
+        <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: auto">
+          <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;">
+            <div style="width: 20%;  height: auto; display: flex" ><b style="align-self: center;margin: auto">申请单号</b></div>
+            <div style="width: 20%;  height: auto; display: flex" ><b style="align-self: center;margin: auto">申请日期</b></div>
+            <div style="width: 10%;height: auto; display: flex" ><b style="align-self: center;margin: auto">类型</b></div>
+            <div style="width: 10%;height: auto; display: flex" ><b style="align-self: center;margin: auto">申请部门</b></div>
+            <div style="width: 10%;height: auto; display: flex" ><b style="align-self: center;margin: auto">申请人</b></div>
+            <div style="width: 10%;height: auto; display: flex" ><b style="align-self: center;margin: auto">完成状态</b></div>
+            <div style="width: 10%;height: auto; display: flex" ><b style="align-self: center;margin: auto">配送</b></div>
+            <div style="width: 10%;  height: auto; display: flex" ><b style="align-self: center;margin: auto">操作</b></div>
+          </div>
+          <div id="content" style="width: 100%;height: auto;margin: auto"></div>
+        </div>
+
+        <div id="pageDiv" style="width: 100%;margin: 10px auto auto auto;text-align: center;">
+          共<span style="margin: auto;color: orange;font-weight: bolder" id="pageSum"></span>页丨(总数:<span id="totalCount" style="color: #fb9337"></span>)
+          当前页：<span id="currentPage" style="color: red;margin: auto;font-weight: bolder"></span>丨
+          <button style="margin: auto" id="firstPage">首页</button>
+          <button style="margin: auto" id="lastPage">上一页</button>
+          <button style="margin: auto" id="nextPage">下一页</button>
+          <button style="margin: auto" id="endPage">尾页</button>丨
+          请输入页码：
+          <label for="jumpValue"></label><input style="width: 50px;margin: auto" type="text" id="jumpValue">
+          <button id="jump">跳转</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="window">
+  <div class="window-content">
+    <div class="window-content-close">×</div>
+    <div id="ckDiv" style="page-break-after:always;width:80% ;height: auto;max-height: 95%; margin: 2px 10%;background-color: white;position: absolute;overflow-y: auto">
+      <div style="width:99.9%;height: 29px;background-color: #698CC3;margin:1px auto;line-height: 29px;text-align: center;color: white;font-size: 9pt;position: sticky;top: 1px"><b>质检申请单详情</b></div>
+      <table border="0" cellspacing="1" width="100%" id="table">
+        <thead>
+        <tr id="title"></tr>
+        </thead>
+        <tbody id="content1"></tbody>
+      </table>
+      <input id="checkNotes" placeholder="备注信息" style="width: 96%;height: 30px;border-radius: 5px;border: black solid 1px;margin:5px 1.5%" disabled>
+      <div id="yj" style="width: 100%;height: auto;text-align: center; margin: 0 auto; background-color: white;position: sticky;bottom:0">
+        <button id="deal-with" style="margin-right: 20px">开始处理</button>
+        <button id="writeAll" style="margin-right: 20px">一键填写</button>
+        <button id="submit" style="margin-right: 20px">质检完成</button>
+      </div>
+    </div>
+
+    <!-- 签字确认弹窗 -->
+    <div id="qzDiv" style="page-break-after:always;width:80% ;height: auto;max-height: 95%; margin: 35px auto auto 10%;background-color: white;position: absolute;overflow-y: auto;display: none">
+      <div style="width:99.9%;height: 29px;background-color: #698CC3;margin:1px auto;line-height: 29px;text-align: center;color: white;font-size: 9pt;position: sticky;top: 1px"><b>确认</b></div>
+      <table border="0" cellspacing="1" width="100%" id="tableQz">
+        <thead>
+        <tr id="titleQz"></tr>
+        </thead>
+        <tbody id="contentQz"></tbody>
+      </table>
+      <div style="width: 100%;height: auto;text-align: center;padding-top:5px;padding-bottom: 5px; margin-top: 5px;position: sticky;bottom: 0;background-color: white">
+        <button type="button" id="imSure" style="margin-right: 20px;height: 50px;width: 100px">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 签字画板 -->
+<div class="qzwindow">
+  <div class="qz-window-content">
+    <div class="qz-window-content-close">×</div>
+    <div style="width: 100%;height: 85%;display: flex">
+      <canvas class="canvas-box" id="myCanvas"></canvas>
+      <img class="signImage" id="tsImage" src="" alt="">
+    </div>
+    <div id="qz" style="width: 100%;height:10%;text-align: center;padding-top:5px;padding-bottom: 5px; margin-top: 5px;">
+      <button type="button" id="clearSign" style="margin-right: 20px">清除签字</button>
+      <button type="button" id="saveSign" style="margin-right: 20px">确认签字</button>
+    </div>
+  </div>
+</div>
+
+<!-- 物料详情 -->
+<div class="window-small">
+  <div class="window-small-content">
+    <div style="width: 100%;height: 63px;background-color: white; border-bottom:  #e6eaf0 solid 1px; border-top-left-radius: 20px;border-top-right-radius: 20px;">
+      <div class="window-small-close"><button class="window-small-content-close">×</button></div>
+      <div style="width: auto;height: 64px;display: flex">
+        <div class="window-title" style="font-size: 16px">物料详细信息</div>
+      </div>
+    </div>
+    <div id="PAll" style="width: 100%;height: calc(100% - 63px);color: #121315;font-size: 14px;overflow-y: auto" >
+      <div class="PN">物料名称</div>
+      <div class="PNI"><input id="pName" disabled></div>
+      <div class="PN">物料编号</div>
+      <div class="PNI"><input id="pMaterialNumber" disabled></div>
+      <div class="PN">物料描述</div>
+      <div class="PNI"><input id="pDescription" disabled></div>
+      <div id="PAttContent" style="width: 100%;height: auto"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+<script type="text/javascript" src="js/axios-0.18.0.js"></script>
+<script>
+
+  //获取属性信息
+  function getAttribute(id) {
+
+    axios({
+      method: "post",
+      url: "applicationContent/selectAppContent",
+      data: id
+    }).then(function (resp) {
+      let contentData=resp.data[0];
+      let locationDz = resp.data[1];
+      let locationCp = resp.data[2];
+      for (let j = 0; j < contentData.length; j++) {
+        if (Number(contentData[j].vault) === 1) {
+
+
+          let attributeData = "";
+          let cfwz = "";
+          for (let k = 0; k < locationCp.length; k++) {
+            if (locationCp[k].attributeName){
+              if (Number(contentData[j].product_id === Number(locationCp[k].id)) && locationCp[k].attributeName !== '存放位置') {
+                if (locationCp[k].content.length > 0) {
+                  attributeData += '' + locationCp[k].attributeName + ':' + locationCp[k].content + '' + locationCp[k].attributeNameUnit + ';<span style="margin-left: 1px;width: fit-content;"></span>      '
+                }
+
+              } else if (Number(contentData[j].product_id === Number(locationCp[k].id)) && locationCp[k].attributeName.trim() === '存放位置') {
+
+                cfwz =' 存放位置:><b style="color: red">'+locationCp[k].content+'</b>' ;
+
+              }
+            }
+
+          }
+
+
+          let ss = document.querySelectorAll(".information"+contentData[j].product_id+1+"");
+          let aa = document.querySelectorAll(".location"+contentData[j].product_id+1+"");
+          for (let i = 0; i < ss.length; i++) {
+            ss[i].innerHTML=attributeData;
+            aa[i].innerHTML=cfwz;
+          }
+
+        } else if (Number(contentData[j].vault) === 0) {
+
+          let attributeData = "";
+          let cfwz = "";
+          for (let k = 0; k < locationDz.length; k++) {
+            if (locationDz[k].attributeName ){
+              if (Number(contentData[j].product_id === Number(locationDz[k].productId)) && locationDz[k].attributeName !== '存放位置') {
+                if (locationDz[k].content.length > 0) {
+                  attributeData += '' + locationDz[k].attributeName + ':' + locationDz[k].content + '' + locationDz[k].attributeNameUnit + ';<span style="margin-left: 1px;width: fit-content;"></span>      '
+                }
+
+              }
+              else if (Number(contentData[j].product_id === Number(locationDz[k].productId)) && locationDz[k].attributeName.trim() === '存放位置') {
+
+                cfwz =' 存放位置:<b style="color: red">'+locationDz[k].content+'</b>' ;
+
+              }
+            }
+
+          }
+
+          let ss = document.querySelectorAll(".information"+contentData[j].product_id+0+"");
+          let aa = document.querySelectorAll(".location"+contentData[j].product_id+0+"");
+          for (let i = 0; i < ss.length; i++) {
+            ss[i].innerHTML=attributeData;
+            if (aa[i]){
+              aa[i].innerHTML=cfwz;
+            }
+
+          }
+
+        }
+      }
+
+    })
+
+  }
+
+
+  // 固定为质检类型
+  const sort = 0;
+  let currentReturnMaterial = null;
+  let wdSmall = document.querySelector(".window-small");
+  let wd = document.querySelector(".window");
+  let qzw = document.querySelector(".qzwindow");
+  let userId = parent.document.getElementById("userId").value;
+
+  // 查询物料分类名称
+  async function getSortName(productId, vault) {
+    const res = await axios.get("sort/selectByProduct", { params: { productId, vault } });
+    return res.data[0]?.name || '';
+  }
+
+  //查询品牌封装
+  async function getBrandFz(productId, vault) {
+    const res = await axios.get("attribute/selectBrandFzByIdVault", { params: { productId, vault } });
+    let s="";
+    for (let i = 0; i < res.data.length; i++) {
+      s+=res.data[i].name+':'+res.data[i].content+';';
+    }
+    return s || '';
+  }
+  // 物料详情
+  function productAttribute(){
+    document.getElementById("content1").addEventListener('click', function(event) {
+      const yourElement = event.target.closest('.meterialNumber');
+      if (yourElement) {
+        const data = yourElement.innerText;
+        axios.post("product/selectByMaterialNumber", data).then(resp => {
+          let maDatas = resp.data;
+          if (maDatas.length>0){
+            wdSmall.style.display="block";
+            axios.post(`product/selectProductWhenAddBom?id=${maDatas[0].id}&vault=${maDatas[0].vault}`).then(resp => {
+              let productAttribute=resp.data;
+              if (productAttribute.length>0){
+                let formdata="";
+                productAttribute.forEach(item => {
+                  formdata += `<div class="PN">${item.attributeName}</div>
+                                    <div class="PNI"><input disabled value="${item.content}"></div>`;
+                });
+                document.getElementById("PAttContent").innerHTML=formdata;
+                document.getElementById("pName").value=productAttribute[0].name;
+                document.getElementById("pMaterialNumber").value=productAttribute[0].material_number;
+                document.getElementById("pDescription").value=productAttribute[0].description;
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // 关闭弹窗
+  document.querySelector(".window-small-content-close").onclick = () => { wdSmall.style.display="none"; }
+  document.querySelector(".window-content-close").onclick = () => { wd.style.display = "none"; }
+  document.querySelector(".qz-window-content-close").onclick = () => { qzw.style.display="none"; }
+  window.onclick = (event) => { if(event.target === wd) wd.style.display = "none"; }
+
+  // 签字画板
+  function canvas(){
+    var test = document.getElementById("myCanvas");
+    test.height=test.parentElement.offsetHeight * 0.99;
+    test.width=test.parentElement.offsetWidth * 0.99;
+    var ctx = test.getContext("2d");
+
+    test.onmousedown = function(event){
+      event = event || window.event;
+      let offsetLeft = test.getBoundingClientRect().left;
+      let offsetTop  = test.getBoundingClientRect().top;
+      var X = event.clientX - offsetLeft;
+      var Y = event.clientY - offsetTop;
+
+      ctx.beginPath();
+      ctx.moveTo(X,Y);
+      document.onmousemove = function(event){
+        event = event || window.event;
+        let proX = event.clientX - offsetLeft;
+        let proY = event.clientY - offsetTop;
+        ctx.strokeStyle = "skyblue";
+        ctx.lineTo(proX,proY);
+        ctx.stroke();
+      };
+      document.onmouseup = function(){
+        document.onmousemove = null;
+        document.onmouseup = null;
+      };
+    };
+
+    document.getElementById("clearSign").onclick = function(){
+      var cxt=document.getElementById("myCanvas").getContext("2d");
+      cxt.clearRect(0,0,test.width,test.height);
+    }
+  }
+
+  // 质检专用表格初始化
+  document.getElementById("title").innerHTML = `
+        <th> </th>
+        <th><b>物料号</b></th>
+         <th><b>品名</b></th>
+        <th><b>型号/图号</b></th>
+        <th><b>品牌</b></th>
+        <th><b>封装</b></th>
+        <th><b>申请数量</b></th>
+        <th><b>质检数量</b></th>
+        <th><b>合格/入库数量</b></th>
+        <th><b>备注</b></th>
+        <th><b>操作</b></th>`;
+
+  document.getElementById("titleQz").innerHTML = `
+        <th><b>物料号</b></th>
+        <th><b>物料名称</b></th>
+        <th><b>实际质检数量</b></th>`;
+
+  // 查询让步/退货数据
+  async function selectReturnReceiveByAppId(applicationId) {
+    let res = await axios.post("returnReceive/selectReturnReceiveByAppId", applicationId);
+    return res.data || [];
+  }
+
+  // 刷新质检数据
+  async function refreshZjItemData(applicationId) {
+    let resp = await axios.post("applicationContent/selectZjAndAppContent", applicationId);
+    let newData = resp.data || [];
+    let recordList = await selectReturnReceiveByAppId(applicationId);
+
+    let appNumbers = document.querySelectorAll(".appNumber");
+    let actualNumbers = document.querySelectorAll(".actualNumber");
+    let waitInputs = document.querySelectorAll(".waitNumber");
+    let concessionVal = document.querySelectorAll(".concession-val");
+    let returnVal = document.querySelectorAll(".return-val");
+
+    newData.forEach((item, index) => {
+      let itemRecords = recordList.filter(r => r.applicationContentId === item.id);
+      let totalReturn = itemRecords.filter(r => r.handleType === 1).reduce((s, r) => s + (parseFloat(r.returnQty) || 0), 0);
+      let totalConcession = itemRecords.filter(r => r.handleType === 2).reduce((s, r) => s + (parseFloat(r.returnQty) || 0), 0);
+
+      if(appNumbers[index]) appNumbers[index].innerText = item.app_number;
+      if(actualNumbers[index]) actualNumbers[index].innerText = item.actual_number;
+      if(waitInputs[index]) waitInputs[index].value = "";
+      if(concessionVal[index]) concessionVal[index].innerHTML = totalConcession;
+      if(returnVal[index]) returnVal[index].innerHTML = totalReturn;
+    });
+  }
+
+  // 退货/让步弹窗
+  function closeModal() {
+    if(document.getElementById('mask')) document.getElementById('mask').remove();
+    if(document.getElementById('modal')) document.getElementById('modal').remove();
+  }
+
+  function openReturnModal(index, contentData2) {
+    let item = contentData2[index];
+    closeModal();
+    let maxQty = item.app_number - item.actual_number - document.querySelectorAll(".concession-val")[index].innerHTML - document.querySelectorAll(".return-val")[index].innerHTML;
+    maxQty = maxQty < 0 ? 0 : maxQty;
+
+    let mask = document.createElement('div');
+    mask.id = 'mask';
+    mask.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2147483640;";
+
+    let modal = document.createElement('div');
+    modal.id = 'modal';
+    modal.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;background:#fff;padding:20px;border-radius:8px;z-index:2147483641;";
+
+    modal.innerHTML = `
+            <h3>退货处理</h3>
+            <div>物料：${item.name}</div>
+            <div>可退数量：${maxQty}</div>
+            <input type="number" id="returnQty" min="0" max="${maxQty}" style="width:100%;margin:10px 0;padding:6px;">
+            <div style="text-align:right;">
+                <button id="cancelReturn" style="padding:6px 12px;margin-right:8px;">取消</button>
+                <button id="confirmReturn" style="background:#e85356;color:white;border:none;padding:6px 12px;border-radius:4px;">确认退货</button>
+            </div>`;
+
+    document.body.appendChild(mask);
+    document.body.appendChild(modal);
+
+    document.getElementById('cancelReturn').onclick = closeModal;
+    document.getElementById('confirmReturn').onclick = () => {
+      let val = Number(document.getElementById('returnQty').value);
+      if(isNaN(val) || val <=0 || val > maxQty){
+        alert("输入数量无效");
+        return;
+      }
+      axios.post("returnReceive/saveReturnReceive", {
+        applicationId: item.application_id,
+        applicationContentId: item.id,
+        productId: item.product_id,
+        vault: item.vault,
+        returnQty: val,
+        handleType: 1,
+        handleRemark: "质检不合格退货"
+      }).then(async res => {
+        if(res.data){
+          alert("提交成功");
+          closeModal();
+          await refreshZjItemData(item.application_id);
+        }
+      });
+    };
+  }
+
+  function openConcessionModal(index, contentData2) {
+    let item = contentData2[index];
+    closeModal();
+    let maxQty = item.app_number - item.actual_number - document.querySelectorAll(".concession-val")[index].innerHTML - document.querySelectorAll(".return-val")[index].innerHTML;
+    maxQty = maxQty < 0 ? 0 : maxQty;
+
+    let mask = document.createElement('div');
+    mask.id = 'mask';
+    mask.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2147483640;";
+
+    let modal = document.createElement('div');
+    modal.id = 'modal';
+    modal.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;background:#fff;padding:20px;border-radius:8px;z-index:2147483641;";
+
+    modal.innerHTML = `
+            <h3>让步接收</h3>
+            <div>物料：${item.name}</div>
+            <div>可处理数量：${maxQty}</div>
+            <input type="number" id="concessionQty" min="0" max="${maxQty}" style="width:100%;margin:10px 0;padding:6px;">
+            <div style="text-align:right;">
+                <button id="cancelConcession" style="padding:6px 12px;margin-right:8px;">取消</button>
+                <button id="confirmConcession" style="background:#5b9bd5;color:white;border:none;padding:6px 12px;border-radius:4px;">确认让步</button>
+            </div>`;
+
+    document.body.appendChild(mask);
+    document.body.appendChild(modal);
+
+    document.getElementById('cancelConcession').onclick = closeModal;
+    document.getElementById('confirmConcession').onclick = () => {
+      let val = Number(document.getElementById('concessionQty').value);
+      if(isNaN(val) || val <=0 || val > maxQty){
+        alert("输入数量无效");
+        return;
+      }
+      axios.post("returnReceive/saveReturnReceive", {
+        applicationId: item.application_id,
+        applicationContentId: item.id,
+        productId: item.product_id,
+        vault: item.vault,
+        returnQty: val,
+        handleType: 2,
+        handleRemark: "让步接收"
+      }).then(async res => {
+        if(res.data){
+          alert("提交成功");
+          closeModal();
+          await refreshZjItemData(item.application_id);
+        }
+      });
+    };
+  }
+
+  // 分页加载数据
+  function pages(page){
+    axios.post(`applicationForm/selectAllZjRk?currentPage=${page}&user=${userId}`, sort).then(async resp => {
+      let data = resp.data.rows;
+      if(!data || data.length === 0){
+        document.getElementById("content").innerHTML = '<div style="text-align:center;color:red">暂无质检申请</div>';
+        return;
+      }
+
+      let totalCount = resp.data.totalCount;
+      document.getElementById("currentPage").innerHTML = page;
+      document.getElementById("pageSum").innerHTML = Math.ceil(totalCount / 15);
+      document.getElementById("totalCount").innerHTML = totalCount;
+
+      let formdata = "";
+      data.forEach(item => {
+        formdata += `
+                <div style="width:100%;display:flex;">
+                    <div class="pailie" style="width:20%;border:white solid 1px"><b>${item.order_number}</b></div>
+                    <div class="pailie" style="width:20%;border:white solid 1px"><b>${fDate(new Date(item.date))}</b></div>
+                    <div class="pailie" style="width:10%;border:white solid 1px"><b class="which"></b></div>
+                    <div class="pailie" style="width:10%;border:white solid 1px"><b>${item.departmentName}</b></div>
+                    <div class="pailie" style="width:10%;border:white solid 1px"><b>${item.name}</b></div>
+                    <div class="pailie" style="width:10%;border:white solid 1px"><b class="completeStatus"></b></div>
+                    <div class="pailie" style="width:10%;border:white solid 1px"><b class="ifRobot">否</b></div>
+                    <div style="width:10%;border:white solid 1px;display:flex;flex-wrap:wrap">
+                        <b><a class="applicationContent" href="javascript:void(0)">查看</a></b>
+                    </div>
+                </div>`;
+      });
+
+      document.getElementById("content").innerHTML = formdata;
+
+      // 状态渲染
+      let status = document.querySelectorAll(".completeStatus");
+      data.forEach((item, i) => {
+        if(item.complete_status === 0){
+          status[i].style.color = "red";
+          status[i].innerHTML = "质检中";
+        }else if(item.complete_status === 1){
+          status[i].style.color = "green";
+          status[i].innerHTML = "已完成";
+        }else if(item.complete_status === 3){
+          status[i].style.color = "#a1a126";
+          status[i].innerHTML = "待查看";
+        }else if(item.complete_status === 5){
+          status[i].style.color = "blue";
+          status[i].innerHTML = "待处理";
+        }
+      });
+
+      openWindows(data);
+      productAttribute();
+    });
+  }
+
+  // 打开详情
+  function openWindows(data) {
+    let applicationContents = document.querySelectorAll(".applicationContent");
+    applicationContents.forEach((btn, i) => {
+      btn.onclick = async function () {
+        wd.style.display = "block";
+        document.getElementById("ckDiv").style.display = "";
+        document.getElementById("qzDiv").style.display = "none";
+
+        let resp = await axios.post("applicationContent/selectZjAndAppContent", data[i].id);
+        let contentData2 = resp.data;
+        let recordList = await selectReturnReceiveByAppId(data[i].id);
+
+        let formdata = "";
+        for(let j=0; j<contentData2.length; j++){
+          let item = contentData2[j];
+          let itemRecords = recordList.filter(r => r.applicationContentId === item.id);
+          let totalReturn = itemRecords.filter(r => r.handleType === 1).reduce((s, r) => s + (parseFloat(r.returnQty) || 0), 0);
+          let totalConcession = itemRecords.filter(r => r.handleType === 2).reduce((s, r) => s + (parseFloat(r.returnQty) || 0), 0);
+          let passPercent = item.actual_number > 0 ? (item.pass_rate / item.actual_number * 100).toFixed(1) : "0";
+          let sortName =  await getSortName(item.product_id, item.vault);
+          let brandFz = await getBrandFz(item.product_id, item.vault);
+
+          // 提取封装（外壳代码）
+          const packageMatch = brandFz.match(/封装\s*:\s*([^;]+)/);
+          const packageValue = packageMatch ? packageMatch[1].trim() : null;
+
+// 提取品牌
+          const brandMatch = brandFz.match(/品牌\s*:\s*([^;]+)/);
+          const brandValue = brandMatch ? brandMatch[1].trim() : null;
+          formdata += `
+                    <tr class="takedColor">
+                        <td rowspan="2" style="text-align:center"><input style="display:none" type="checkbox" class="taked"></td>
+                        <td class="checkP"><b class="meterialNumber">${item.material_number}</b></td>
+                         <td><b>${sortName}</b></td>
+                        <td><b>${item.name}</b></td>
+                        <td><b>${brandValue}</b></td>
+                        <td><b>${packageValue}</b></td>
+                        <td><b class="appNumber">${item.app_number}</b></td>
+                        <td><input type="number" class="waitNumber" style="width:80px"></td>
+                        <td><input type="number" class="pass-rate" value="${item.pass_rate}" style="width:80px">合格率:${passPercent}%</td>
+                        <td><textarea class="pass-notes" style="width:150px;height:40px">${item.notes || ''}</textarea></td>
+                        <td>
+                            <button class="concession-btn" data-index="${j}" style="padding:2px 5px;background:#5b9bd5;color:white;border:none;border-radius:3px;margin-right:3px">让步</button>
+                            <button class="return-btn" data-index="${j}" style="padding:2px 5px;background:#e85356;color:white;border:none;border-radius:3px">退货</button>
+                            <div style="font-size:12px">让步:<span class="concession-val">${totalConcession}</span></div>
+                            <div style="font-size:12px">退货:<span class="return-val">${totalReturn}</span></div>
+                        </td>
+                    </tr>
+                    <tr><td colspan="10"  class="information${item.product_id}${item.vault}"></td></tr>`;
+        }
+
+        document.getElementById("content1").innerHTML = formdata;
+        document.getElementById("checkNotes").value = data[i].notes;
+
+        await getAttribute(data[i].id);
+
+        // 绑定事件
+        document.querySelectorAll('.concession-btn').forEach((btn, idx) => {
+          btn.onclick = () => openConcessionModal(idx, contentData2);
+        });
+        document.querySelectorAll('.return-btn').forEach((btn, idx) => {
+          btn.onclick = () => openReturnModal(idx, contentData2);
+        });
+
+        // 合格率计算
+        document.querySelectorAll(".pass-rate").forEach((input, idx) => {
+          input.oninput = function(){
+            let val = Number(this.value) || 0;
+            let total = Number(document.querySelectorAll(".appNumber")[idx].innerText) || 0;
+            let percent = total > 0 ? (val / total * 100).toFixed(1) : "0";
+            this.nextSibling.textContent = `合格率:${percent}%`;
+          };
+        });
+
+        // 一键填写
+        document.getElementById("writeAll").onclick = function(){
+          if(confirm("确定一键填写质检数量？")){
+            document.querySelectorAll(".waitNumber").forEach((input, idx) => {
+              let app = Number(document.querySelectorAll(".appNumber")[idx].innerText) || 0;
+              let actual = Number(document.querySelectorAll(".actualNumber")[idx].innerText) || 0;
+              input.value = app - actual > 0 ? app - actual : "";
+            });
+          }
+        };
+
+        // 质检完成提交
+        document.getElementById("submit").onclick = function(){
+          if(!confirm("确定完成质检？")) return;
+
+          let all = [];
+          let log = [];
+          let passDatas = [];
+          let m = 0;
+
+          let waitNumbers = document.querySelectorAll(".waitNumber");
+          let passRates = document.querySelectorAll(".pass-rate");
+          let passNotes = document.querySelectorAll(".pass-notes");
+
+          contentData2.forEach((item, idx) => {
+            let wNum = Number(waitNumbers[idx].value) || 0;
+            if(wNum <= 0) return;
+
+            let rb = Number(document.querySelectorAll(".concession-val")[idx].innerHTML) || 0;
+            let th = Number(document.querySelectorAll(".return-val")[idx].innerHTML) || 0;
+
+            all[m] = {
+              id: item.id,
+              applicationId: item.application_id,
+              productId: item.product_id,
+              actualNumber: item.app_number - rb - th,
+              vault: item.vault,
+              appPrice: item.app_price
+            };
+
+            log[m] = {
+              manager: userId,
+              appFormId: item.application_id,
+              productId: item.product_id,
+              vault: item.vault,
+              logNumber: wNum
+            };
+
+            passDatas[m] = {
+              id: item.passId,
+              passRate: passRates[idx].value,
+              notes: passNotes[idx].value,
+              pass: 1
+            };
+            m++;
+          });
+
+          if(m === 0){
+            alert("请填写质检数量");
+            return;
+          }
+
+          let sendData = [all, [], [], log, passDatas];
+          axios.post("token/token").then(tokenResp => {
+            let token = tokenResp.data;
+            axios.post(`applicationContent/updateAllZj?token=${token}`, sendData).then(res => {
+              if(res.data === "success"){
+                alert("质检完成");
+                location.reload();
+              }else{
+                alert("操作失败");
+              }
+            });
+          });
+        };
+      };
+    });
+  }
+
+  // 时间格式化
+  function fDate(t1, format = "YYYY-MM-DD HH:II"){
+    let minutes = t1.getMinutes() < 10 ? "0" + t1.getMinutes() : t1.getMinutes();
+    const config = {
+      YYYY: t1.getFullYear(),
+      MM: t1.getMonth() + 1,
+      DD: t1.getDate(),
+      HH: t1.getHours(),
+      II: minutes
+    };
+    for(let key in config) format = format.replace(key, config[key]);
+    return format;
+  }
+
+  // 初始化
+  pages(1);
+
+  // 分页按钮
+  document.getElementById("firstPage").onclick = () => pages(1);
+  document.getElementById("lastPage").onclick = () => {
+    let cur = Number(document.getElementById("currentPage").innerHTML);
+    if(cur > 1) pages(cur - 1);
+  };
+  document.getElementById("nextPage").onclick = () => {
+    let cur = Number(document.getElementById("currentPage").innerHTML);
+    let total = Number(document.getElementById("pageSum").innerHTML);
+    if(cur < total) pages(cur + 1);
+  };
+  document.getElementById("endPage").onclick = () => {
+    let total = document.getElementById("pageSum").innerHTML;
+    pages(total);
+  };
+  document.getElementById("jump").onclick = () => {
+    let val = document.getElementById("jumpValue").value;
+    let total = Number(document.getElementById("pageSum").innerHTML);
+    if(/^[1-9]\d*$/.test(val) && Number(val) <= total) pages(val);
+  };
+</script>
+</html>

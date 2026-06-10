@@ -1,0 +1,2465 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="">
+<head>
+    <meta charset="UTF-8">
+    <title>审核流程</title>
+    <link href="css/window.css" rel="stylesheet">
+</head>
+<style>
+    html{
+        font-family: 宋体,serif;
+
+    }
+    thead tr{
+        background-color: #9eb6d8;
+    }
+    thead th{
+        outline: white solid 1px;
+        font-size: 14px;
+    }
+    thead{
+        position: sticky;
+        top: 32px;
+        display: table-header-group;
+    }
+    tbody td{
+        outline: #9eb6d8 solid 1px;
+        font-size: 12px;
+    }
+    td b{
+        font-weight: 600;
+    }
+    table{
+        page-break-inside: avoid;
+        page-break-after: avoid;
+        page-break-before: avoid;
+    }
+
+    .process{
+        cursor: pointer;
+    }
+
+
+    /* 隐藏原生的select样式 */
+    select {
+        /*-webkit-appearance: none;*/
+        /*-moz-appearance: none;*/
+        /*appearance: none;*/
+        padding: 8px;
+        border: 1px solid #999;
+        border-radius: 5px;
+        background-color: #f1f1f1;
+        color: #333;
+        font-size: 16px;
+        width:90%;
+    }
+
+    #addDepartment{
+        cursor: pointer;
+        padding: 8px;
+        border: 1px solid #999;
+        border-radius: 5px;
+        position: absolute;
+        bottom: 20px;
+        right: calc(50% - 25px);
+    }
+
+    #addDepartment:active{
+        border: 1px solid black;
+    }
+
+    td button{
+        cursor:pointer;
+        margin: 0 2px;
+    }
+    td{
+        width: 16%;
+    }
+    #allCondition{
+        width: 90%;
+        margin: 5px auto;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    #haveCondition{
+        width: 90%;
+        margin: 5px auto;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .examineCondition{
+        cursor: pointer;
+        margin: 5px;
+        padding: 5px 15px;
+        /*flex-grow: 1;*/
+    }
+    .canMove{
+        min-height: 50px;
+        border: #85CFEE solid 1px;
+        border-radius: 5px;
+    }
+
+    .conditionIcon::before{
+        content: url("images/add-four.svg");
+        position: absolute;
+        top: 50%;
+        left: calc(10% - 25px);
+        pointer-events: all;
+
+
+    }
+    .deleteIcon::after{
+        content: url("images/delete.svg");
+        position: absolute;
+        right: 0;
+        pointer-events: all;
+
+
+    }
+    .conditionIcon{
+        position: relative;
+    }
+    .addIcon{
+        width: 24px;
+        height: 35px;
+        position: absolute;
+        top: 50%;
+        left: calc(10% - 25px);
+        cursor: pointer;
+        z-index: 100;
+    }
+    .deleteIcon{
+        width: 24px;
+        height: 35px;
+
+        position: absolute;
+        top: 0;
+        right: -25px;
+        cursor: pointer;
+        z-index: 100;
+    }
+
+
+
+
+    /* 权限复选框组样式 - 简洁版 */
+    .permission-checkbox-group {
+        display: inline-flex;
+        align-items: center;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 16px;
+        padding: 4px 12px;
+        margin: 0 4px;
+        transition: all 0.2s ease;
+    }
+
+    .permission-checkbox-group:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .permission-checkbox-group input[type="checkbox"] {
+        display: none;
+    }
+
+    .permission-checkbox-group input[type="checkbox"] + label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+        font-size: 13px;
+        color: #495057;
+        font-weight: 500;
+        padding: 2px 0;
+    }
+
+    .permission-checkbox-group input[type="checkbox"] + label::before {
+        content: "";
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-right: 6px;
+        border: 2px solid #6c757d;
+        border-radius: 4px;
+        background: white;
+        transition: all 0.2s ease;
+    }
+
+    .permission-checkbox-group input[type="checkbox"]:checked + label::before {
+        background: #28a745;
+        border-color: #28a745;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' d='M10.28 2.28L4 8.56 1.72 6.28a.75.75 0 00-1.06 1.06l3 3a.75.75 0 001.06 0l7-7a.75.75 0 00-1.06-1.06z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .permission-checkbox-group input[type="checkbox"]:checked + label {
+        color: #28a745;
+        font-weight: 600;
+    }
+
+    /* 简化按钮样式 */
+    .btn-primary { background: #007bff; color: white; border: none; border-radius: 16px; padding: 6px 16px; font-size: 13px; cursor: pointer; }
+    .btn-success { background: #28a745; color: white; border: none; border-radius: 16px; padding: 6px 16px; font-size: 13px; cursor: pointer; }
+    .btn-danger { background: #dc3545; color: white; border: none; border-radius: 16px; padding: 6px 16px; font-size: 13px; cursor: pointer; }
+
+    .btn-primary:hover { background: #0056b3; }
+    .btn-success:hover { background: #1e7e34; }
+    .btn-danger:hover { background: #bd2130; }
+</style>
+<body>
+<div style="display: flex;width: 100%;height: auto">
+    <div class="right" style="display: block;margin: auto;width: 80%">
+        <div class="sticky" style="width: 95%;">
+            <div style="width: 100%;height: auto;padding: 1px;border: #9eb6d8 solid 1px">
+                <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px">
+                    <div style="width:100%;background-color:#9eb6d8;margin: auto  ;height: 25px;"><b>审核分类列表</b></div>
+
+                </div>
+
+                <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin:5px auto">
+                    <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;">
+                        <div style="width: 40%;  height: auto; background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto">分类</b></div>
+
+                        <div style="width: 20%;height: auto; background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto">类型</b></div>
+                        <div style="width: 40%;height: auto; background-color: #9eb6d8  ; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto">操作</b></div>
+                    </div>
+                    <div id="content" style="width: 100%;height: auto;margin: auto">
+
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="window" style="display: none">
+
+    <div class="window-content">
+
+        <div class="window-content-close">×</div>
+        <div id="ckDiv"  class="aa" style=" page-break-after:always;width:80% ;height: auto;max-height: 95%; margin: 2px 10%;background-color: white;position: absolute;overflow-y: auto">
+
+
+            <div style="width:calc(100% - 2px);height: 29px;background-color: #698CC3;margin:1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt;position: sticky;top: 1px"><b id="typeName"></b><b>审核流程详情</b>
+            <button id="add" style="position: absolute;right: 10px;top: 2px">添加步骤</button>
+            </div>
+            <table border="0" cellspacing="1"  width="100%" id="table" >
+                <!--    标题-->
+                <thead >
+                <tr id="title" bgcolor="white">
+                    <th>类型</th>
+                    <th>审核部门</th>
+                    <th>步骤</th>
+                    <th>操作</th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody id="content1">
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+
+    </div>
+
+</div>
+<div class="window-small" style="display: none">
+
+    <div class="window-small-content">
+        <div style="width: 100%;height: 63px;background-color: white; border-bottom:  #e6eaf0 solid 1px; border-top-left-radius: 20px;
+        border-top-right-radius: 20px;">
+
+            <div class="window-small-close"><button class="window-small-content-close">×</button></div>
+
+            <div style="width: auto;height: 64px;display: flex">
+                <div class="window-title" style="font-size: 16px"></div>
+            </div>
+
+        </div>
+
+        <div  style="width: 100%;height: calc(100% - 63px);color: #121315;font-size: 14px;overflow-y: auto" >
+            <div class="PN">选择审核部门</div>
+            <div  class="PNI" style="background-color:#f9fafc">
+              <select id="department">
+
+              </select>
+          </div>
+
+                <div class="PN">条件</div>
+                <div id="haveCondition" class="canMove" >
+
+                </div>
+                <div class="PN">所有条件</div>
+                <div id="allCondition" class="canMove">
+
+                </div>
+            <div id="conditionContent">
+
+            </div>
+
+
+
+
+
+
+
+            <button id="addDepartment">提交</button>
+            <!--    移动的标识-->
+            <div style="display: none" id="move"></div>
+        </div>
+
+
+
+
+
+
+    </div>
+
+</div>
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    function height(){
+
+        let iframe = window.parent.document.getElementById("iframepage");
+        if (iframe){
+            let num= window.parent.innerHeight;
+            if (Number(num)>Number(60)){
+                let s = Number(num)-Number(60)
+                iframe.style.height=s+"px";
+            }
+
+        }
+
+
+    }
+    height();
+
+    //单位换算
+    function power(str){
+        let number= str.replace(/[fpnum%KMGT]/,'');
+        let power = str.replace(/([-]?[0-9]+[.][0-9]+)|([-]?[0-9]*)/,'');
+
+
+
+
+        if (power.length>0){
+            let num;
+            if (power==="f"){
+                num=0.000000000000001;
+            }else if (power==="p"){
+                num=0.000000000001;
+            }else if (power==="n"){
+                num=0.000000001;
+            }else if (power==="u"){
+                num=0.000001;
+            }else if (power==="m"){
+                num=0.001;
+            }else if (power==="%"){
+                num=0.01;
+            }else if (power==="K"){
+                num=1000;
+            }else if (power==="M"){
+                num=1000000;
+            }else if (power==="G"){
+                num=1000000000;
+            }else if (power==="T"){
+                num=1000000000000;
+            }
+
+            return Number(num)*Number(number);
+        }else {
+            return number
+        }
+
+    }
+
+    //在符合pattern后，判断范围规定是否符合规定，例如<100~80]就不符合规定
+    function compare (value){
+        //  console.log("范围"+ str)
+        // console.log("传入的值"+value)
+
+
+        if (value.length>0){
+            var pattern = /^\[.*\]$/;
+            var patterns= /^\<.*\]$/;
+            var pattern1= /^\<.*\>$/;
+            var patterns1= /^\[.*\>$/;
+            // var patternss=/^\<.*\>$/;
+            if (pattern.test(value)===true){
+                value=value.split("[").join("");
+                value=value.split("]").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = value.split("~");
+                // console.log(strings[0])
+                // console.log(strings[1])
+
+
+
+
+
+                //判断两个数是否正常，第一个数应该小于第二个数
+                if (strings[0]==="∞"||strings[1]==="∞" ){
+                   return true;
+                }
+                else {
+                    //将两个数解析是否含有power
+                    let power1 = power(strings[0]);
+                    let power2 = power(strings[1]);
+
+                    if (Number(power1)<Number(power2)){
+                        return true;
+                    }else {
+                        return false;
+                    }
+                }
+
+            }
+            else if (patterns.test(value)===true){
+
+                value=value.split("<").join("");
+                value=value.split("]").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = value.split("~");
+
+
+
+                //判断两个数是否正常，第一个数应该小于第二个数
+                if (strings[0]==="∞"||strings[1]==="∞"){
+                    return true;
+                }
+                else {
+                    //将两个数解析是否含有power
+                    let power1 = power(strings[0]);
+                    let power2 = power(strings[1]);
+                    if (Number(power1)<Number(power2)){
+                        return true;
+                    }else {
+                        return false;
+                    }
+                }
+
+            }
+            else if (pattern1.test(value)===true){
+                value=value.split("<").join("");
+                value=value.split(">").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = value.split("~");
+
+
+                //判断两个数是否正常，第一个数应该小于第二个数
+                if (strings[0]==="∞"||strings[1]==="∞"){
+                    return true;
+                }
+                else {
+                    //将两个数解析是否含有power
+                    let power1 = power(strings[0]);
+                    let power2 = power(strings[1]);
+                    if (Number(power1)<Number(power2)){
+                        return true;
+                    }else {
+                        return false;
+                    }
+                }
+
+            }
+            else if (patterns1.test(value)===true){
+                value=value.split("[").join("");
+                value=value.split(">").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = value.split("~");
+
+
+                //判断两个数是否正常，第一个数应该小于第二个数
+                if (strings[0]==="∞"||strings[1]==="∞"){
+                    return true;
+                }
+                else {
+                    //将两个数解析是否含有power
+                    let power1 = power(strings[0]);
+                    let power2 = power(strings[1]);
+                    if (Number(power1)<Number(power2)){
+                        return true;
+                    }else {
+                        return false;
+                    }
+                }
+
+            }
+            else {
+                return false;
+            }
+
+        }
+        else {
+            return false;
+        }
+    }
+
+    function ifRange(value,e){
+        var pattern = /^(<|\[)([-]?[0-9]+[.]?[0-9]*[fpnum%KMGT]?|[∞])[~]([-]?[0-9]+[.]?[0-9]*[fpnum%KMGT]?|[∞])(>|])$/;
+        if (pattern.test(value)){
+            console.log("aaa")
+            let b = compare(value);
+            if (b===false){
+                e.blur();
+                alert("您输入的数据不符合范围类型！");
+
+            }
+        }
+        else {
+            e.blur();
+            alert("您输入的数据不符合范围类型！");
+        }
+
+    }
+
+    function submitIfRange(){
+        let have = document.getElementById("haveCondition");
+        let haveButton = have.querySelectorAll(".examineCondition");
+        let bb = true;
+
+        for (let i = 0; i < haveButton.length; i++) {
+            let haveValue = haveButton[i].value;
+            let haveInput = document.querySelectorAll(".content"+haveValue+"");
+            // var pattern = /^(<|\[)[-]?[0-9]+[.]?[0-9]*[fpnum%KMGT]?[~][-]?[0-9]+[.]?[0-9]*[fpnum%KMGT]?(>|])$/;
+            var pattern = /^(<|\[)([-]?[0-9]+[.]?[0-9]*[fpnum%KMGT]?|[∞])[~]([-]?[0-9]+[.]?[0-9]*[fpnum%KMGT]?|[∞])(>|])$/;
+            for (let j = 0; j < haveInput.length; j++) {
+                let value = haveInput[j].value;
+                if (pattern.test(value)){
+                    let b = compare(value);
+                    if (b===false){
+                        haveInput[j].blur();
+                        bb = false;
+
+                    }
+                }
+                else {
+                    haveInput[j].blur();
+                    bb = false;
+                }
+                if (bb===false){
+                    break;
+                }
+            }
+            if (bb===false){
+                break;
+            }
+
+        }
+
+        return bb;
+    }
+
+
+
+//查询现在拥有的的审核条件是什么
+    function existCondition(){
+        let haveCondition = document.getElementById("haveCondition");
+        // //获取存在的条件框中的
+        let condition = haveCondition.querySelectorAll(".examineCondition");
+        //获取所有的
+        let allCondition = document.querySelectorAll(".examineCondition");
+
+        let exist
+        for (let i = 0; i < allCondition.length; i++) {
+            //获取按钮的id
+              let id = allCondition[i].id;
+              exist=false;
+                let value;
+            for (let j = 0; j < condition.length; j++) {
+                if (condition[j].id===id){
+                    //存在
+                    exist=true;
+                    value=condition[j].value;
+                }
+            }
+            if (exist===true){
+                function deletes(){
+                    //查询现在都有什么条件
+
+                    for (let i = 0; i < condition.length; i++) {
+                        let value1 = condition[i].value;//这个是条件的id
+                        let elementById = document.getElementById("condition"+value1+"contentDisplay");
+                        let deleteIcon = elementById.querySelectorAll(".deleteIcon");
+
+                        for (let j = 0; j < deleteIcon.length; j++) {
+                            deleteIcon[j].onclick=function (){
+                                //查询还有多少个输入框
+                                let number = document.querySelectorAll(".content"+value1+"");
+                                if (number.length>1){
+
+                                    if (window.confirm("您确定要删除一个条件的内容吗？")){
+                                        //删除该元素以及父级元素
+                                        let parent = number[j].parentElement;
+                                        parent.parentElement.removeChild(parent);
+                                        number[j].remove();
+
+                                        return true;
+                                    }
+                                    else {
+                                        return false;
+                                    }
+
+                                }
+                                else {
+                                    alert("已经是最后一个了！")
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+                // console.log("aaaa")
+                document.getElementById(""+id+"contentDisplay").style.display="";
+
+                axios({
+                    method:"post",
+                    url:"examineCondition/selectAll"
+                }).then(function (resp){
+                    let datas = resp.data;
+
+                    let addIcon = document.querySelectorAll(".addIcon");
+
+                    for (let k = 0; k < datas.length; k++) {
+
+                        if (Number(datas[k].id)===Number(value)){
+
+                            addIcon[k].onclick=function (){
+
+                                if ( window.confirm("这样将会添加新的条件，确定继续吗？")){
+
+                                    let s =    '                    <div style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin:5px auto;height: 33px;position:relative;">\n' +
+                                        '                       <input class="content'+datas[k].id+'" style="width: 97%;border: none;height: 30px;margin: 0 1%"   onblur="ifRange(value,this)"">\n' +
+                                        '                    <div class="deleteIcon"></div></div>'
+                                    // 在元素前面插入HTML
+                                    document.getElementById("condition"+datas[k].id+"contentDisplay").insertAdjacentHTML("beforeend", s);
+                                    deletes();
+                                    return true;
+                                }
+                                else {
+                                    return false;
+                                }
+
+                            }
+
+
+                        }
+
+
+                    }
+
+                    deletes();
+
+
+
+                })
+
+
+            }
+            else {
+                document.getElementById(""+id+"contentDisplay").style.display="none";
+            }
+
+
+        }
+
+    }
+
+
+
+    //查询所有的审核条件
+    function selectAllCondition(){
+        axios({
+            method:"post",
+            url:"examineCondition/selectAll"
+        }).then(function (resp){
+            let datas = resp.data;
+            let formdata='';
+            let content='';
+            for (let i = 0; i < datas.length; i++) {
+                formdata+='<button draggable="true" id="condition'+datas[i].id+'" class="examineCondition" value='+datas[i].id+'>'+datas[i].name+'</button>'
+                if (datas[i].name==='单价' || datas[i].name==='总价'){
+                    content+=' <div class="conditionIcon" id="condition'+datas[i].id+'contentDisplay" style="display: none">\n' +
+                        '                    <div class="addIcon"></div><div class="PN">'+datas[i].name+'(注： ∞ 代表无穷)</div>\n' +
+                        '                    <div style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin: auto;height: 33px;position: relative">\n' +
+                        '                       <input class="content'+datas[i].id+'" style="width: 97%;border: none;height: 30px;margin: 0 1%"   onblur="ifRange(value,this)"">\n' +
+                        '                    <div class="deleteIcon"></div></div>\n' +
+                        '                </div>'
+                }
+            }
+
+            document.getElementById("allCondition").innerHTML=formdata;
+            document.getElementById("conditionContent").innerHTML=content;
+            function deletes(){
+                for (let i = 0; i < datas.length; i++) {
+                    let value1 = datas[i].id;//这个是条件的id
+                    let elementById = document.getElementById("condition"+value1+"contentDisplay");
+                    let deleteIcon = elementById.querySelectorAll(".deleteIcon");
+                    for (let j = 0; j < deleteIcon.length; j++) {
+                        deleteIcon[j].onclick=function (){
+                            //查询还有多少个输入框
+                            let number = document.querySelectorAll(".content"+value1+"");
+                            if (number.length>1){
+
+                                if (window.confirm("您确定要删除一个条件的内容吗？")){
+                                    //删除该元素以及父级元素
+                                    let parent = deleteIcon[j].parentElement;
+                                    parent.parentElement.removeChild(parent);
+                                    deleteIcon[j].remove();
+
+                                    return true;
+                                }
+                                else {
+                                    return false;
+                                }
+
+                            }
+                            else {
+                                alert("已经是最后一个了！")
+                            }
+                        }
+
+                    }
+                }
+            }
+
+
+            let addIcon = document.querySelectorAll(".addIcon");
+            for (let i = 0; i < addIcon.length; i++) {
+
+                addIcon[i].onclick=function (){
+
+                    if ( window.confirm("这样将会添加新的条件，确定继续吗？")){
+
+                        let s =    '                    <div style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin:5px auto;height: 33px;position:relative;">\n' +
+                            '                       <input class="content'+datas[i].id+'" style="width: 97%;border: none;height: 30px;margin: 0 1%"   onblur="ifRange(value,this)">\n' +
+                            '                    <div class="deleteIcon"></div></div>'
+                        // 在元素前面插入HTML
+                      document.getElementById("condition"+datas[i].id+"contentDisplay").insertAdjacentHTML("beforeend", s);
+                        deletes();
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+
+                }
+
+
+            }
+
+         deletes();
+
+
+
+        })
+    }
+
+
+    function move(){
+        /* 拖动时触发 */
+        document.addEventListener("dragstart", function(event) {
+            event.dataTransfer.setData("Text", event.target.id);
+
+        });
+        document.addEventListener("dragend", function(event) {
+
+        });
+        /* 拖动完成后触发*/
+        document.addEventListener("dragover", function(event) {
+            event.preventDefault();
+        });
+        document.addEventListener("drop", function(event) {
+            event.preventDefault();
+            if ( event.target.className === "canMove" ) {
+                var data = event.dataTransfer.getData("Text");
+                event.target.appendChild(document.getElementById(data));
+                existCondition();
+
+            }
+        });
+
+    }
+
+
+    //查询所有出入库分类
+    axios({
+        method:"post",
+        url:"outBoundType/selectAllType"
+    }).then(function (resp){
+        let outBoundType = resp.data;
+        let formdata='';
+        for (let i = 0; i < outBoundType.length; i++) {
+            formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                '                        <div style="width: 40%;height: auto; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto">'+outBoundType[i].type+'</b></div>\n' +
+                '                        <div style="width: 20%;height: auto; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto" class="crk"></b></div>\n' +
+                '                        <div style="width: 40%;height: auto; border:white solid 1px;display: flex" ><div style="align-self: center;margin: auto"><button class="process">审核流程</button></div> </div>\n' +
+                '                    </div>'
+        }
+        document.getElementById("content").innerHTML=formdata;
+        let crks = document.querySelectorAll(".crk");
+        for (let i = 0; i < outBoundType.length; i++) {
+            if (Number(outBoundType[i].sort)===1){
+                crks[i].innerHTML="出库";
+            }
+            else if (Number(outBoundType[i].sort)===0){
+                crks[i].innerHTML="入库";
+            }
+            else if(Number(outBoundType[i].sort)===2){
+                crks[i].innerHTML="采购";
+            }
+        }
+
+
+        //点击查看审核流程;部长审核开关
+        let process = document.querySelectorAll(".process");
+
+        for (let i = 0; i < process.length; i++) {
+            process[i].onclick=function (){
+                //打开窗口
+                let wd = document.querySelector(".window");
+                wd.style.display="block";
+                //关闭窗口
+                let close = document.querySelector(".window-content-close");
+                close.onclick=function (){
+                    wd.style.display="none"
+                }
+                document.getElementById("typeName").innerHTML=outBoundType[i].type;
+                document.getElementById("ckDiv").style.display="";
+
+                // //查询审核步骤
+                // function selectStep(){
+                //     axios({
+                //         method: "post",
+                //         url: "examineAllType/selectStep",
+                //         data:outBoundType[i].id
+                //     }).then(async function (resp)
+                //     {
+                //         let datas = resp.data;
+                //         let formdata = "";
+                //         if (datas.length > 0) {
+                //             for (let j = 0; j < datas.length; j++) {
+                //                 formdata += ' <tr>\n' +
+                //                     '                    <td>'+outBoundType[i].type+'</td>\n' +
+                //                     '                    <td class="insertDepartment"></td>\n' +
+                //                     '                    <td>第' + datas[j].step + '步</td>\n' +
+                //                     '                    <td><button class="update">修改</button><button class="insert">插入</button><button class="delete">删除</button></td>\n' +
+                //                     '                </tr>';
+                //             }
+                //             document.getElementById("content1").innerHTML = formdata;
+                //             //查询部门并插入
+                //             let de = document.querySelectorAll(".insertDepartment");
+                //             for (let j = 0; j < datas.length; j++) {
+                //                 await axios({
+                //                     method: "post",
+                //                     url: "department/selectById",
+                //                     data: datas[j].departmentId
+                //                 }).then(function (resp){
+                //                     let datas=resp.data;
+                //                     de[j].innerHTML=datas[0].departmentName;
+                //                 })
+                //             }
+                //
+                //             //修改功能
+                //             let update = document.querySelectorAll(".update");
+                //             for (let j = 0; j < update.length; j++) {
+                //                 update[j].onclick=function (){
+                //                     let swd = document.querySelector(".window-small");
+                //                     swd.style.display="block";
+                //                     //设置关闭窗口
+                //                     let close = document.querySelector(".window-small-content-close");
+                //                     close.onclick=function (){
+                //                         swd.style.display="none";
+                //                     }
+                //                     //设置标题
+                //                     sTitle.innerHTML="修改步骤（"+outBoundType[i].type+"）";
+                //
+                //                     //查询部门
+                //                     axios({
+                //                         method:"post",
+                //                         url:"department/selectDepartment"
+                //                     }).then(function (resp){
+                //                         let departmentDatas=resp.data;
+                //                         let formdata='';
+                //                         for (let k = 0; k <departmentDatas.length ; k++) {
+                //                             if (Number(datas[j].departmentId)===Number(departmentDatas[k].id)){
+                //                                 formdata+='<option selected value='+departmentDatas[k].id+'>'+departmentDatas[k].departmentName+'</option>'
+                //                             }
+                //                             else {
+                //                                 formdata+='<option value='+departmentDatas[k].id+'>'+departmentDatas[k].departmentName+'</option>'
+                //                             }
+                //
+                //                         }
+                //
+                //                         document.getElementById("department").innerHTML=formdata;
+                //
+                //                     })
+                //                     //
+                //
+                //
+                //                     //查询该步骤拥有的条件
+                //                     axios({
+                //                         method:"post",
+                //                         url:"examineConditionContent/selectByStep",
+                //                         data:datas[j].id
+                //                     }).then(async function (resp){
+                //                         let have = resp.data;
+                //
+                //                             document.getElementById("allCondition").innerHTML="";
+                //                             document.getElementById("haveCondition").innerHTML="";
+                //
+                //                         //求所有的
+                //                         await axios({
+                //                             method:"post",
+                //                             url:"examineCondition/selectAll"
+                //                         }).then(async function (resp) {
+                //                             let all = resp.data;
+                //                             let content = '';
+                //                             let re;
+                //
+                //                             for (let k = 0; k < all.length; k++) {
+                //                                 re = false;
+                //
+                //                                 let id = all[k].id;
+                //                                 let s;
+                //
+                //                                 for (let l = 0; l < have.length; l++) {
+                //                                     let con_id = have[l].examine_condition_id;
+                //                                     if (Number(id) === Number(con_id)) {
+                //                                         re = true;
+                //                                         s = l;
+                //                                         //已经存在该步骤了
+                //                                         document.getElementById("haveCondition").innerHTML += '<button draggable="true" id="condition' + id + '" class="examineCondition" value=' + id + '>' + have[l].name + '</button>'
+                //                                     }
+                //                                     if (re === true) {
+                //                                         break;
+                //                                     }
+                //                                 }
+                //                                 if (re === false) {
+                //                                     //不存在，在所有中添加
+                //                                     document.getElementById("allCondition").innerHTML += '<button draggable="true" id="condition' + id + '" class="examineCondition" value=' + id + '>' + all[k].name + '</button>'
+                //                                 }
+                //                                 // all[k].name==='单价' || all[k].name==='总价'
+                //                                 if (re === true) {
+                //                                     let s = '';
+                //                                     for (let l = 0; l < have.length; l++) {
+                //
+                //                                         if (Number(have[l].examine_condition_id) === Number(all[k].id)) {
+                //                                             s += '                    <div  style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin:5px auto;height: 33px;position: relative">\n' +
+                //                                                 '                        <input class="content' + all[k].id + '" style="width: 97%;border: none;height: 30px;margin: 0 1%" value= "'+have[l].content+'"  onblur="ifRange(value,this)">\n' +
+                //                                                 '                    <div class="deleteIcon"></div></div>\n'
+                //                                         }
+                //                                     }
+                //                                     content += ' <div class="conditionIcon" id="condition' + all[k].id + 'contentDisplay">\n' +
+                //                                         '                   <div class="addIcon"></div> <div class="PN">' + all[k].name + '(注： ∞ 代表无穷)</div>\n' +
+                //
+                //                                         '               ' + s + '</div>'
+                //                                 }
+                //                                 else {
+                //                                     content += ' <div class="conditionIcon" id="condition' + all[k].id + 'contentDisplay" style="display: none">\n' +
+                //                                         '                    <div class="addIcon"></div><div class="PN">' + all[k].name + '(注： ∞ 代表无穷)</div>\n' +
+                //                                         '                    <div style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin:5px auto;height: 33px;position: relative">\n' +
+                //                                         '                        <input class="content' + all[k].id + '" style="width: 97%;border: none;height: 30px;margin: 0 1%" value=""  onblur="ifRange(value,this)">\n' +
+                //                                         '                   <div class="deleteIcon"></div>  </div>\n' +
+                //                                         '               </div>'
+                //                                 }
+                //                             }
+                //                             move();
+                //                             document.getElementById("conditionContent").innerHTML = "";
+                //                             document.getElementById("conditionContent").innerHTML = content;
+                //
+                //                             //查询拥有的条件（不重复的）
+                //                             await axios({
+                //                                 method: "post",
+                //                                 url: "examineConditionContent/selectCondition",
+                //                                 data: datas[j].id
+                //                             }).then(function (resp) {
+                //                                 let haveOnlyOne = resp.data;
+                //
+                //                                 for (let k = 0; k < haveOnlyOne.length; k++) {
+                //                                     let conditionContentDisplay = document.getElementById("condition"+haveOnlyOne[k]+"contentDisplay");
+                //                                     let addIcon = conditionContentDisplay.querySelector(".addIcon");
+                //                                     function deletes(){
+                //                                         //获取这个框，以及框中的所有删除键
+                //                                         let elementById = document.getElementById("condition"+haveOnlyOne[k]+"contentDisplay");
+                //                                         let deleteIcon = elementById.querySelectorAll(".deleteIcon");
+                //                                         for (let l = 0; l < deleteIcon.length; l++) {
+                //                                             deleteIcon[l].onclick = function () {
+                //                                                 //查询还有多少个输入框
+                //                                                 let number = document.querySelectorAll(".content" + haveOnlyOne[k] + "");
+                //
+                //
+                //                                                 if (number.length > 1) {
+                //
+                //                                                     if (window.confirm("您确定要删除一个条件的内容吗？")) {
+                //                                                         //删除该元素以及父级元素
+                //                                                         let parent = deleteIcon[l].parentElement;
+                //                                                         parent.parentElement.removeChild(parent);
+                //                                                         deleteIcon[l].remove();
+                //
+                //                                                         return true;
+                //                                                     } else {
+                //                                                         return false;
+                //                                                     }
+                //
+                //                                                 } else {
+                //                                                     alert("已经是最后一个了！")
+                //                                                 }
+                //                                             }
+                //                                         }
+                //                                     }
+                //
+                //                                     addIcon.onclick = function () {
+                //
+                //                                         if (window.confirm("这样将会添加新的条件，确定继续吗？")) {
+                //
+                //                                             let s = '                    <div style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin:5px auto;height: 33px;position: relative">\n' +
+                //                                                 '                       <input class="content' + haveOnlyOne[k] + '" style="width: 97%;border: none;height: 30px;margin: 0 1%"   onblur="ifRange(value,this)">\n' +
+                //                                                 '                    <div class="deleteIcon"> </div>'
+                //                                             // 在元素前面插入HTML
+                //                                            document.getElementById("condition" +haveOnlyOne[k]+ "contentDisplay").insertAdjacentHTML("beforeend", s);
+                //                                             deletes();
+                //                                             return true;
+                //                                         } else {
+                //                                             return false;
+                //                                         }
+                //
+                //                                     }
+                //
+                //                                   deletes();
+                //
+                //
+                //                                 }
+                //                             })
+                //
+                //
+                //                         })
+                //                     })
+                //
+                //
+                //                     //修改
+                //                     document.getElementById("addDepartment").onclick=function (){
+                //                         if (window.confirm("您确定要修改该步骤吗？")){
+                //                             let typeData={
+                //                                 id:datas[j].id,
+                //                                 typeId:outBoundType[i].id,
+                //                                 departmentId:"",
+                //                                 level:2,
+                //                                 step:datas[j].step,
+                //                             }
+                //                             let department = document.getElementById("department");
+                //                             let selectedIndex = department.selectedIndex;
+                //                             typeData.departmentId=department.options[selectedIndex].value;
+                //                             let allConditionContent=[];
+                //                             let conditionContent={
+                //                                 id:"",
+                //                                 examineStepId:datas[j].id,
+                //                                 examineConditionId:"",
+                //                                 content:""
+                //                             }
+                //                             //获取条件内容
+                //                             let have = document.getElementById("haveCondition");
+                //                             let examineConditionClass= have.querySelectorAll(".examineCondition");
+                //                             for (let k = 0; k < examineConditionClass.length; k++) {
+                //                                 let id = examineConditionClass[k].value;
+                //                                 let htmlInputElement = document.getElementById("condition"+id+"contentDisplay").querySelectorAll("input");
+                //                                 for (let l = 0; l < htmlInputElement.length; l++) {
+                //                                     conditionContent={
+                //                                         id:"",
+                //                                         examineStepId:datas[j].id,
+                //                                         examineConditionId:id,
+                //                                         content:htmlInputElement[l].value
+                //                                     }
+                //                                     allConditionContent.push(conditionContent);
+                //                                     conditionContent={
+                //                                         id:"",
+                //                                         examineStepId:datas[j].id,
+                //                                         examineConditionId:"",
+                //                                         content:""
+                //                                     }
+                //                                 }
+                //
+                //                             }
+                //
+                //                             let all=[];
+                //                             all[0]=[typeData];
+                //                             // if (allConditionContent.length>0){
+                //                                 all[1]=allConditionContent;
+                //                             // }
+                //
+                //                             function update(){
+                //                                 //在审核流程中，该部门不存在,提交流程
+                //                                 axios({
+                //                                     method:"post",
+                //                                     url:"examineAllType/update",
+                //                                     data:all
+                //                                 }).then(function (resp){
+                //                                     let datas=resp.data;
+                //                                     if (datas==="success"){
+                //                                         alert("修改步骤成功！")
+                //                                         //关闭小窗口
+                //                                         swd.style.display="none";
+                //                                         //刷新显示已添加的步骤
+                //                                         selectStep();
+                //                                     }
+                //                                     else {
+                //                                         alert("添加步骤失败，请联系相关人员！")
+                //                                     }
+                //                                 })
+                //                             }
+                //
+                //                             //查询审核过程中是否已经存在当前部门
+                //                             axios({
+                //                                 method:"post",
+                //                                 url:"examineAllType/selectDepartExistUpdate",
+                //                                 data:typeData
+                //                             }).then(function (resp)
+                //                             {
+                //                                 if (resp.data===true){
+                //                                     //在审核流程中，该部门已经存在
+                //                                     alert("审核流程中已包含该部门的操作！")
+                //                                 }
+                //                                 else {
+                //                                     //判断条件是否为空
+                //                                     let have = document.getElementById("haveCondition");
+                //                                     let conButton = have.querySelectorAll(".examineCondition");
+                //                                     if (conButton.length>0){
+                //                                         //判断输入框中是否有条件
+                //                                         let b;
+                //                                         for (let k = 0; k < conButton.length; k++) {
+                //                                              b = true;
+                //                                             let value = conButton[k].value;
+                //                                             let condition = document.querySelectorAll(".content"+value+"");
+                //                                             if (condition.length>0){
+                //                                                 for (let l = 0; l < condition.length; l++) {
+                //                                                     if (condition[l].value.length===0){
+                //                                                         b = false;
+                //                                                         break;
+                //                                                     }
+                //                                                 }
+                //
+                //                                             }
+                //                                             else {
+                //                                                 b = false;
+                //                                                 break;
+                //                                             }
+                //                                             if (b === false){
+                //                                                 break;
+                //                                             }
+                //                                         }
+                //                                         if (b===false){
+                //                                             alert("请将条件填写完整！")
+                //                                         }
+                //                                         else {
+                //                                             let b1 = submitIfRange();
+                //                                             if (b1){
+                //                                                 //执行更新
+                //                                                 update();
+                //                                             }
+                //                                             else {
+                //                                                 alert("您输入的数据不符合范围类型！");
+                //                                             }
+                //
+                //                                         }
+                //                                     }
+                //                                     else {
+                //                                         //执行更新
+                //                                        update();
+                //                                     }
+                //
+                //
+                //                                 }
+                //                             })
+                //
+                //                             return true;
+                //                         }
+                //                         else {
+                //                             return false;
+                //                         }
+                //                     }
+                //
+                //                 }
+                //             }
+                //
+                //             //删除
+                //             let deletes = document.querySelectorAll(".delete");
+                //             for (let k = 0; k < deletes.length; k++) {
+                //                 deletes[k].onclick=async function () {
+                //
+                //                         if (window.confirm("您确定要删除这个步骤吗？")) {
+                //                             axios({
+                //                                 method: "post",
+                //                                 url: "examineAllType/delete",
+                //                                 data: datas[k].id
+                //                             }).then(function (resp) {
+                //                                 if (resp.data === "success") {
+                //                                     alert("删除成功！");
+                //                                     selectStep();
+                //                                 } else {
+                //                                     alert("删除失败，请联系相关人员！")
+                //                                 }
+                //                             })
+                //                             return true;
+                //                         }
+                //                         else {
+                //                             return false;
+                //                         }
+                //
+                //                 }
+                //             }
+                //
+                //             //插入
+                //             let insert = document.querySelectorAll(".insert");
+                //             for (let j = 0; j < insert.length; j++) {
+                //                 insert[j].onclick=function (){
+                //                     let swd = document.querySelector(".window-small");
+                //                     swd.style.display="block";
+                //                     //设置关闭窗口
+                //                     let close = document.querySelector(".window-small-content-close");
+                //                     close.onclick=function (){
+                //                         swd.style.display="none";
+                //                     }
+                //                     //设置标题
+                //                     sTitle.innerHTML="插入步骤（"+outBoundType[i].type+"）";
+                //                     document.getElementById("haveCondition").innerHTML="";
+                //
+                //                     //查询部门
+                //                     axios({
+                //                         method:"post",
+                //                         url:"department/selectDepartment"
+                //                     }).then(function (resp){
+                //                         let departmentDatas=resp.data;
+                //                         let formdata='';
+                //                         for (let k = 0; k <departmentDatas.length ; k++) {
+                //                             if (Number(datas[j].departmentId)===Number(departmentDatas[k].id)){
+                //                                 formdata+='<option selected value='+departmentDatas[k].id+'>'+departmentDatas[k].departmentName+'</option>'
+                //                             }
+                //                             else {
+                //                                 formdata+='<option value='+departmentDatas[k].id+'>'+departmentDatas[k].departmentName+'</option>'
+                //                             }
+                //
+                //                         }
+                //
+                //                         document.getElementById("department").innerHTML=formdata;
+                //
+                //                     })
+                //                     //查询条件
+                //                     selectAllCondition();
+                //                     move();
+                //                     document.getElementById("addDepartment").onclick=function (){
+                //                         if (window.confirm("您确定要在该步骤前插入一条？")){
+                //                             let typeData={
+                //                                 id:'',
+                //                                 typeId:outBoundType[i].id,
+                //                                 departmentId:"",
+                //                                 level:2,
+                //                                 step:datas[j].step,
+                //
+                //                             }
+                //                             let department = document.getElementById("department");
+                //                             let selectedIndex = department.selectedIndex;
+                //                             let de = department.options[selectedIndex].value;
+                //                             if (Number(de)===Number(30)){
+                //                                 typeData.level=1;
+                //                             }
+                //                             typeData.departmentId=department.options[selectedIndex].value;
+                //                             let allConditionContent=[];
+                //                             let conditionContent={
+                //                                 id:"",
+                //                                 examineStepId:"",
+                //                                 examineConditionId:"",
+                //                                 content:""
+                //                             }
+                //                             //获取条件内容
+                //                             let have = document.getElementById("haveCondition");
+                //                             let examineConditionClass= have.querySelectorAll(".examineCondition");
+                //                             for (let k = 0; k < examineConditionClass.length; k++) {
+                //                                 let id = examineConditionClass[k].value;
+                //                                 let htmlInputElement = document.getElementById("condition"+id+"contentDisplay").querySelectorAll("input");
+                //                                 for (let l = 0; l < htmlInputElement.length; l++) {
+                //                                     conditionContent={
+                //                                         id:"",
+                //                                         examineStepId:"",
+                //                                         examineConditionId:id,
+                //                                         content:htmlInputElement[l].value
+                //                                     }
+                //                                     allConditionContent.push(conditionContent);
+                //                                     conditionContent={
+                //                                         id:"",
+                //                                         examineStepId:"",
+                //                                         examineConditionId:"",
+                //                                         content:""
+                //                                     }
+                //                                 }
+                //
+                //                             }
+                //
+                //                             let all=[];
+                //                             all[0]=[typeData];
+                //                             // if (allConditionContent.length>0){
+                //                                 all[1]=allConditionContent;
+                //                             // }
+                //
+                //                             function insert(){
+                //                                 //在审核流程中，该部门不存在,提交流程
+                //                                 axios({
+                //                                     method:"post",
+                //                                     url:"examineAllType/insert",
+                //                                     data:all
+                //                                 }).then(function (resp){
+                //                                     let datas=resp.data;
+                //                                     if (datas==="success"){
+                //                                         alert("插入步骤成功！")
+                //                                         //关闭小窗口
+                //                                         swd.style.display="none";
+                //                                         //刷新显示已添加的步骤
+                //                                         selectStep();
+                //                                     }
+                //                                     else {
+                //                                         alert("插入步骤失败，请联系相关人员！")
+                //                                     }
+                //                                 })
+                //                             }
+                //                             //查询审核过程中是否已经存在当前部门
+                //
+                //                             axios({
+                //                                 method:"post",
+                //                                 url:"examineAllType/selectDepartExist",
+                //                                 data:typeData
+                //                             }).then(function (resp)
+                //                             {
+                //                                 if (resp.data===true){
+                //                                     //在审核流程中，该部门已经存在
+                //                                     alert("审核流程中已包含该部门的操作！")
+                //                                 }
+                //                                 else {
+                //                                     //判断条件是否为空
+                //                                     let have = document.getElementById("haveCondition");
+                //                                     let conButton = have.querySelectorAll(".examineCondition");
+                //                                     if (conButton.length>0){
+                //                                         //判断输入框中是否有条件
+                //                                         let b;
+                //                                         for (let k = 0; k < conButton.length; k++) {
+                //                                             b = true;
+                //                                             let value = conButton[k].value;
+                //                                             let condition = document.querySelectorAll(".content"+value+"");
+                //                                             if (condition.length>0){
+                //                                                 for (let l = 0; l < condition.length; l++) {
+                //                                                     if (condition[l].value.length===0){
+                //                                                         b = false;
+                //                                                         break;
+                //                                                     }
+                //                                                 }
+                //                                             }
+                //                                             else {
+                //                                                 b = false;
+                //                                                 break;
+                //                                             }
+                //                                             if (b === false){
+                //                                                 break;
+                //                                             }
+                //                                         }
+                //                                         if (b===false){
+                //                                             alert("请将条件填写完整！")
+                //                                         }
+                //                                         else {
+                //                                             let b1 = submitIfRange();
+                //                                             if (b1){
+                //                                                //执行插入
+                //                                                 insert();
+                //                                             }
+                //                                             else {
+                //                                                 alert("您输入的数据不符合范围类型！")
+                //                                             }
+                //
+                //                                         }
+                //                                     }
+                //                                     else {
+                //                                         //执行插入
+                //                                         insert();
+                //                                     }
+                //
+                //                                 }
+                //                             })
+                //
+                //                             return true;
+                //                         }
+                //                         else {
+                //                             return false;
+                //                         }
+                //                     }
+                //
+                //                 }
+                //             }
+                //
+                //         }
+                //         else {
+                //             document.getElementById("content1").innerHTML = "暂未添加审核步骤！"
+                //         }
+                //
+                //         //小窗口标题
+                //         let sTitle = document.querySelector(".window-title");
+                //         //添加新步骤
+                //         document.getElementById("add").onclick=function (){
+                //             //打开窗口
+                //             let swd = document.querySelector(".window-small");
+                //             swd.style.display="block";
+                //             //设置关闭窗口
+                //             let close = document.querySelector(".window-small-content-close");
+                //             close.onclick=function (){
+                //                 swd.style.display="none";
+                //             }
+                //             //设置标题
+                //             sTitle.innerHTML="添加步骤（"+outBoundType[i].type+"）";
+                //             document.getElementById("haveCondition").innerHTML="";
+                //
+                //             //查询部门
+                //             axios({
+                //                 method:"post",
+                //                 url:"department/selectDepartment"
+                //             }).then(function (resp){
+                //                 let departmentDatas=resp.data;
+                //                 let formdata='';
+                //                 for (let j = 0; j < departmentDatas.length; j++) {
+                //                     formdata+='<option value='+departmentDatas[j].id+'>'+departmentDatas[j].departmentName+'</option>'
+                //                 }
+                //
+                //                 document.getElementById("department").innerHTML=formdata;
+                //
+                //             })
+                //             //查询条件
+                //             selectAllCondition();
+                //             move();
+                //             document.getElementById("addDepartment").onclick=function (){
+                //                 if (window.confirm("您确定要添加该步骤吗？")){
+                //                     let typeData={
+                //                         id:"",
+                //                         typeId:outBoundType[i].id,
+                //                         departmentId:"",
+                //                         level:2,
+                //                         step:"",
+                //
+                //                     }
+                //                     let department = document.getElementById("department");
+                //                     let selectedIndex = department.selectedIndex;
+                //                     let de = department.options[selectedIndex].value;
+                //                     if (Number(de)===Number(30)){
+                //                         typeData.level=1;
+                //                     }
+                //                     typeData.departmentId=department.options[selectedIndex].value;
+                //                     let allConditionContent=[];
+                //                     let conditionContent={
+                //                         id:"",
+                //                         examineStepId:"",
+                //                         examineConditionId:"",
+                //                         content:""
+                //                     }
+                //                     //获取条件内容
+                //                     let have = document.getElementById("haveCondition");
+                //                     let examineConditionClass= have.querySelectorAll(".examineCondition");
+                //                     for (let k = 0; k < examineConditionClass.length; k++) {
+                //                         let id = examineConditionClass[k].value;
+                //                         let htmlInputElement = document.getElementById("condition"+id+"contentDisplay").querySelectorAll("input");
+                //                         console.log(htmlInputElement.length)
+                //                         for (let l = 0; l < htmlInputElement.length; l++) {
+                //                             conditionContent={
+                //                                 id:"",
+                //                                 examineStepId:"",
+                //                                 examineConditionId:id,
+                //                                 content:htmlInputElement[l].value
+                //                             }
+                //                             allConditionContent.push(conditionContent);
+                //                             conditionContent={
+                //                                 id:"",
+                //                                 examineStepId:"",
+                //                                 examineConditionId:"",
+                //                                 content:""
+                //                             }
+                //                         }
+                //
+                //                     }
+                //
+                //                     let all=[];
+                //                     all[0]=[typeData];
+                //                     // if (allConditionContent.length>0){
+                //                         all[1]=allConditionContent;
+                //                     // }
+                //
+                //                     function submit(){
+                //                         //在审核流程中，该部门不存在,提交流程
+                //                         axios({
+                //                             method:"post",
+                //                             url:"examineAllType/add",
+                //                             data:all
+                //                         }).then(function (resp){
+                //                             let datas=resp.data;
+                //                             if (datas==="success"){
+                //                                 alert("添加步骤成功！")
+                //                                 //关闭小窗口
+                //                                 swd.style.display="none";
+                //                                 //刷新显示已添加的步骤
+                //                                 selectStep();
+                //                             }
+                //                             else {
+                //                                 alert("添加步骤失败，请联系相关人员！")
+                //                             }
+                //                         })
+                //                     }
+                //
+                //                     //查询审核过程中是否已经存在当前部门
+                //                     axios({
+                //                         method:"post",
+                //                         url:"examineAllType/selectDepartExist",
+                //                         data:typeData
+                //                     }).then(function (resp)
+                //                     {
+                //                         if (resp.data===true){
+                //                             //在审核流程中，该部门已经存在
+                //                             alert("审核流程中已包含该部门的操作！")
+                //                         }
+                //                         else {
+                //                             //判断条件是否为空
+                //                             let have = document.getElementById("haveCondition");
+                //                             let conButton = have.querySelectorAll(".examineCondition");
+                //                             if (conButton.length>0){
+                //                                 //判断输入框中是否有条件
+                //                                 let b;
+                //                                 for (let k = 0; k < conButton.length; k++) {
+                //                                     b = true;
+                //                                     let value = conButton[k].value;
+                //                                     let condition = document.querySelectorAll(".content"+value+"");
+                //                                     if (condition.length>0){
+                //                                         for (let l = 0; l < condition.length; l++) {
+                //                                             if (condition[l].value.length===0){
+                //                                                 b = false;
+                //                                                 break;
+                //                                             }
+                //                                         }
+                //                                     }
+                //                                     else {
+                //                                         b = false;
+                //                                         break;
+                //                                     }
+                //                                     if (b === false){
+                //                                         break;
+                //                                     }
+                //                                 }
+                //                                 if (b===false){
+                //                                     alert("请将条件填写完整！")
+                //                                 }
+                //                                 else {
+                //                                     let b1 = submitIfRange();
+                //                                     if (b1){
+                //                                        //执行添加
+                //                                         submit();
+                //                                     }
+                //                                     else {
+                //                                         alert("您输入的数据不符合范围类型！")
+                //                                     }
+                //
+                //                                 }
+                //                             }
+                //                             else {
+                //                                 //执行添加
+                //                                 submit();
+                //                             }
+                //
+                //                         }
+                //                     })
+                //
+                //
+                //                     return true;
+                //                 }
+                //                 else {
+                //                     return false;
+                //                 }
+                //             }
+                //
+                //         }
+                //     })
+                //
+                // }
+
+
+
+                //查询审核步骤
+                function selectStep(){
+                    axios({
+                        method: "post",
+                        url: "examineAllType/selectStep",
+                        data:outBoundType[i].id
+                    }).then(async function (resp)
+                    {
+                        let datas = resp.data;
+                        let formdata = "";
+                        if (datas.length > 0) {
+                            for (let j = 0; j < datas.length; j++) {
+                                // 优化后的表格行结构
+                                formdata += ' <tr>\n' +
+                                    '                    <td>'+outBoundType[i].type+'</td>\n' +
+                                    '                    <td class="insertDepartment"></td>\n' +
+                                    '                    <td>第' + datas[j].step + '步</td>\n' +
+                                    '                    <td>\n' +
+                                    '                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">\n' +
+                                    '                            <button class="update btn-primary">修改</button>\n' +
+                                    '                            <button class="insert btn-success">插入</button>\n' +
+                                    '                            <button class="delete btn-danger">删除</button>\n' +
+                                    '                            <div class="permission-checkbox-group">\n' +
+                                    '                                <input type="checkbox" class="modifyPrice" id="modifyPrice_' + j + '" data-id="' + datas[j].id + '">\n' +
+                                    '                                <label  title="修改价格" for="modifyPrice_' + j + '">价格</label>\n' +
+                                    '                            </div>\n' +
+                                    '                            <div class="permission-checkbox-group">\n' +
+                                    '                                <input type="checkbox" class="modifyQuantity" id="modifyQuantity_' + j + '" data-id="' + datas[j].id + '">\n' +
+                                    '                                <label title="修改数量" for="modifyQuantity_' + j + '">数量</label>\n' +
+                                    '                            </div>\n' +
+                                    '                        </div>\n' +
+                                    '                    </td>\n' +
+                                    '                </tr>';
+                            }
+                            document.getElementById("content1").innerHTML = formdata;
+
+                            // 加载保存的复选框状态
+                            loadCheckboxStatus();
+
+                            // 为复选框添加事件监听器
+                            let modifyPriceCheckboxes = document.querySelectorAll(".modifyPrice");
+                            let modifyQuantityCheckboxes = document.querySelectorAll(".modifyQuantity");
+
+                            modifyPriceCheckboxes.forEach(checkbox => {
+                                checkbox.addEventListener("change", function() {
+                                    saveCheckboxStatus();
+                                    updateStepPermissions(this.getAttribute("data-id"), "price", this.checked);
+                                });
+                            });
+
+                            modifyQuantityCheckboxes.forEach(checkbox => {
+                                checkbox.addEventListener("change", function() {
+                                    saveCheckboxStatus();
+                                    updateStepPermissions(this.getAttribute("data-id"), "quantity", this.checked);
+                                });
+                            });
+
+                            //查询部门并插入
+                            let de = document.querySelectorAll(".insertDepartment");
+                            for (let j = 0; j < datas.length; j++) {
+                                await axios({
+                                    method: "post",
+                                    url: "department/selectById",
+                                    data: datas[j].departmentId
+                                }).then(function (resp){
+                                    let datas=resp.data;
+                                    de[j].innerHTML=datas[0].departmentName;
+                                })
+                            }
+
+                            //修改功能
+                            let update = document.querySelectorAll(".update");
+                            for (let j = 0; j < update.length; j++) {
+                                update[j].onclick=function (){
+                                    let swd = document.querySelector(".window-small");
+                                    swd.style.display="block";
+                                    //设置关闭窗口
+                                    let close = document.querySelector(".window-small-content-close");
+                                    close.onclick=function (){
+                                        swd.style.display="none";
+                                    }
+                                    //设置标题
+                                    sTitle.innerHTML="修改步骤（"+outBoundType[i].type+"）";
+
+                                    //查询部门
+                                    axios({
+                                        method:"post",
+                                        url:"department/selectDepartment"
+                                    }).then(function (resp){
+                                        let departmentDatas=resp.data;
+                                        let formdata='';
+                                        for (let k = 0; k <departmentDatas.length ; k++) {
+                                            if (Number(datas[j].departmentId)===Number(departmentDatas[k].id)){
+                                                formdata+='<option selected value='+departmentDatas[k].id+'>'+departmentDatas[k].departmentName+'</option>'
+                                            }
+                                            else {
+                                                formdata+='<option value='+departmentDatas[k].id+'>'+departmentDatas[k].departmentName+'</option>'
+                                            }
+
+                                        }
+
+                                        document.getElementById("department").innerHTML=formdata;
+
+                                    })
+                                    //
+
+                                    //查询该步骤拥有的条件
+                                    axios({
+                                        method:"post",
+                                        url:"examineConditionContent/selectByStep",
+                                        data:datas[j].id
+                                    }).then(async function (resp){
+                                        let have = resp.data;
+
+                                        document.getElementById("allCondition").innerHTML="";
+                                        document.getElementById("haveCondition").innerHTML="";
+
+                                        //求所有的
+                                        await axios({
+                                            method:"post",
+                                            url:"examineCondition/selectAll"
+                                        }).then(async function (resp) {
+                                            let all = resp.data;
+                                            let content = '';
+                                            let re;
+
+                                            for (let k = 0; k < all.length; k++) {
+                                                re = false;
+
+                                                let id = all[k].id;
+                                                let s;
+
+                                                for (let l = 0; l < have.length; l++) {
+                                                    let con_id = have[l].examine_condition_id;
+                                                    if (Number(id) === Number(con_id)) {
+                                                        re = true;
+                                                        s = l;
+                                                        //已经存在该步骤了
+                                                        document.getElementById("haveCondition").innerHTML += '<button draggable="true" id="condition' + id + '" class="examineCondition" value=' + id + '>' + have[l].name + '</button>'
+                                                    }
+                                                    if (re === true) {
+                                                        break;
+                                                    }
+                                                }
+                                                if (re === false) {
+                                                    //不存在，在所有中添加
+                                                    document.getElementById("allCondition").innerHTML += '<button draggable="true" id="condition' + id + '" class="examineCondition" value=' + id + '>' + all[k].name + '</button>'
+                                                }
+                                                // all[k].name==='单价' || all[k].name==='总价'
+                                                if (re === true) {
+                                                    let s = '';
+                                                    for (let l = 0; l < have.length; l++) {
+
+                                                        if (Number(have[l].examine_condition_id) === Number(all[k].id)) {
+                                                            s += '                    <div  style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin:5px auto;height: 33px;position: relative">\n' +
+                                                                '                        <input class="content' + all[k].id + '" style="width: 97%;border: none;height: 30px;margin: 0 1%" value= "'+have[l].content+'"  onblur="ifRange(value,this)">\n' +
+                                                                '                    <div class="deleteIcon"></div></div>\n'
+                                                        }
+                                                    }
+                                                    content += ' <div class="conditionIcon" id="condition' + all[k].id + 'contentDisplay">\n' +
+                                                        '                   <div class="addIcon"></div> <div class="PN">' + all[k].name + '(注： ∞ 代表无穷)</div>\n' +
+
+                                                        '               ' + s + '</div>'
+                                                }
+                                                else {
+                                                    content += ' <div class="conditionIcon" id="condition' + all[k].id + 'contentDisplay" style="display: none">\n' +
+                                                        '                    <div class="addIcon"></div><div class="PN">' + all[k].name + '(注： ∞ 代表无穷)</div>\n' +
+                                                        '                    <div style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin:5px auto;height: 33px;position: relative">\n' +
+                                                        '                        <input class="content' + all[k].id + '" style="width: 97%;border: none;height: 30px;margin: 0 1%" value=""  onblur="ifRange(value,this)">\n' +
+                                                        '                   <div class="deleteIcon"></div>  </div>\n' +
+                                                        '               </div>'
+                                                }
+                                            }
+                                            move();
+                                            document.getElementById("conditionContent").innerHTML = "";
+                                            document.getElementById("conditionContent").innerHTML = content;
+
+                                            //查询拥有的条件（不重复的）
+                                            await axios({
+                                                method: "post",
+                                                url: "examineConditionContent/selectCondition",
+                                                data: datas[j].id
+                                            }).then(function (resp) {
+                                                let haveOnlyOne = resp.data;
+
+                                                for (let k = 0; k < haveOnlyOne.length; k++) {
+                                                    let conditionContentDisplay = document.getElementById("condition"+haveOnlyOne[k]+"contentDisplay");
+                                                    let addIcon = conditionContentDisplay.querySelector(".addIcon");
+                                                    function deletes(){
+                                                        //获取这个框，以及框中的所有删除键
+                                                        let elementById = document.getElementById("condition"+haveOnlyOne[k]+"contentDisplay");
+                                                        let deleteIcon = elementById.querySelectorAll(".deleteIcon");
+                                                        for (let l = 0; l < deleteIcon.length; l++) {
+                                                            deleteIcon[l].onclick = function () {
+                                                                //查询还有多少个输入框
+                                                                let number = document.querySelectorAll(".content" + haveOnlyOne[k] + "");
+
+
+                                                                if (number.length > 1) {
+
+                                                                    if (window.confirm("您确定要删除一个条件的内容吗？")) {
+                                                                        //删除该元素以及父级元素
+                                                                        let parent = deleteIcon[l].parentElement;
+                                                                        parent.parentElement.removeChild(parent);
+                                                                        deleteIcon[l].remove();
+
+                                                                        return true;
+                                                                    } else {
+                                                                        return false;
+                                                                    }
+
+                                                                } else {
+                                                                    alert("已经是最后一个了！")
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    addIcon.onclick = function () {
+
+                                                        if (window.confirm("这样将会添加新的条件，确定继续吗？")) {
+
+                                                            let s = '                    <div style="border-radius: 5px;border: #85CFEE solid 1px;width: 80%;margin:5px auto;height: 33px;position: relative">\n' +
+                                                                '                       <input class="content' + haveOnlyOne[k] + '" style="width: 97%;border: none;height: 30px;margin: 0 1%"   onblur="ifRange(value,this)">\n' +
+                                                                '                    <div class="deleteIcon"> </div>'
+                                                            // 在元素前面插入HTML
+                                                            document.getElementById("condition" +haveOnlyOne[k]+ "contentDisplay").insertAdjacentHTML("beforeend", s);
+                                                            deletes();
+                                                            return true;
+                                                        } else {
+                                                            return false;
+                                                        }
+
+                                                    }
+
+                                                    deletes();
+
+
+                                                }
+                                            })
+
+
+                                        })
+                                    })
+
+                                    //修改
+                                    document.getElementById("addDepartment").onclick=function (){
+                                        if (window.confirm("您确定要修改该步骤吗？")){
+                                            let typeData={
+                                                id:datas[j].id,
+                                                typeId:outBoundType[i].id,
+                                                departmentId:"",
+                                                level:2,
+                                                step:datas[j].step,
+                                            }
+                                            let department = document.getElementById("department");
+                                            let selectedIndex = department.selectedIndex;
+                                            typeData.departmentId=department.options[selectedIndex].value;
+                                            let allConditionContent=[];
+                                            let conditionContent={
+                                                id:"",
+                                                examineStepId:datas[j].id,
+                                                examineConditionId:"",
+                                                content:""
+                                            }
+                                            //获取条件内容
+                                            let have = document.getElementById("haveCondition");
+                                            let examineConditionClass= have.querySelectorAll(".examineCondition");
+                                            for (let k = 0; k < examineConditionClass.length; k++) {
+                                                let id = examineConditionClass[k].value;
+                                                let htmlInputElement = document.getElementById("condition"+id+"contentDisplay").querySelectorAll("input");
+                                                for (let l = 0; l < htmlInputElement.length; l++) {
+                                                    conditionContent={
+                                                        id:"",
+                                                        examineStepId:datas[j].id,
+                                                        examineConditionId:id,
+                                                        content:htmlInputElement[l].value
+                                                    }
+                                                    allConditionContent.push(conditionContent);
+                                                    conditionContent={
+                                                        id:"",
+                                                        examineStepId:datas[j].id,
+                                                        examineConditionId:"",
+                                                        content:""
+                                                    }
+                                                }
+
+                                            }
+
+                                            let all=[];
+                                            all[0]=[typeData];
+                                            // if (allConditionContent.length>0){
+                                            all[1]=allConditionContent;
+                                            // }
+
+                                            function update(){
+                                                //在审核流程中，该部门不存在,提交流程
+                                                axios({
+                                                    method:"post",
+                                                    url:"examineAllType/update",
+                                                    data:all
+                                                }).then(function (resp){
+                                                    let datas=resp.data;
+                                                    if (datas==="success"){
+                                                        alert("修改步骤成功！")
+                                                        //关闭小窗口
+                                                        swd.style.display="none";
+                                                        //刷新显示已添加的步骤
+                                                        selectStep();
+                                                    }
+                                                    else {
+                                                        alert("添加步骤失败，请联系相关人员！")
+                                                    }
+                                                })
+                                            }
+
+                                            //查询审核过程中是否已经存在当前部门
+                                            axios({
+                                                method:"post",
+                                                url:"examineAllType/selectDepartExistUpdate",
+                                                data:typeData
+                                            }).then(function (resp)
+                                            {
+                                                if (resp.data===true){
+                                                    //在审核流程中，该部门已经存在
+                                                    alert("审核流程中已包含该部门的操作！")
+                                                }
+                                                else {
+                                                    //判断条件是否为空
+                                                    let have = document.getElementById("haveCondition");
+                                                    let conButton = have.querySelectorAll(".examineCondition");
+                                                    if (conButton.length>0){
+                                                        //判断输入框中是否有条件
+                                                        let b;
+                                                        for (let k = 0; k < conButton.length; k++) {
+                                                            b = true;
+                                                            let value = conButton[k].value;
+                                                            let condition = document.querySelectorAll(".content"+value+"");
+                                                            if (condition.length>0){
+                                                                for (let l = 0; l < condition.length; l++) {
+                                                                    if (condition[l].value.length===0){
+                                                                        b = false;
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                            }
+                                                            else {
+                                                                b = false;
+                                                                break;
+                                                            }
+                                                            if (b === false){
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (b===false){
+                                                            alert("请将条件填写完整！")
+                                                        }
+                                                        else {
+                                                            let b1 = submitIfRange();
+                                                            if (b1){
+                                                                //执行更新
+                                                                update();
+                                                            }
+                                                            else {
+                                                                alert("您输入的数据不符合范围类型！");
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else {
+                                                        //执行更新
+                                                        update();
+                                                    }
+
+
+                                                }
+                                            })
+
+                                            return true;
+                                        }
+                                        else {
+                                            return false;
+                                        }
+                                    }
+
+                                }
+                            }
+
+                            //删除
+                            let deletes = document.querySelectorAll(".delete");
+                            for (let k = 0; k < deletes.length; k++) {
+                                deletes[k].onclick=async function () {
+
+                                    if (window.confirm("您确定要删除这个步骤吗？")) {
+                                        axios({
+                                            method: "post",
+                                            url: "examineAllType/delete",
+                                            data: datas[k].id
+                                        }).then(function (resp) {
+                                            if (resp.data === "success") {
+                                                alert("删除成功！");
+                                                selectStep();
+                                            } else {
+                                                alert("删除失败，请联系相关人员！")
+                                            }
+                                        })
+                                        return true;
+                                    }
+                                    else {
+                                        return false;
+                                    }
+
+                                }
+                            }
+
+                            //插入
+                            let insert = document.querySelectorAll(".insert");
+                            for (let j = 0; j < insert.length; j++) {
+                                insert[j].onclick=function (){
+                                    let swd = document.querySelector(".window-small");
+                                    swd.style.display="block";
+                                    //设置关闭窗口
+                                    let close = document.querySelector(".window-small-content-close");
+                                    close.onclick=function (){
+                                        swd.style.display="none";
+                                    }
+                                    //设置标题
+                                    sTitle.innerHTML="插入步骤（"+outBoundType[i].type+"）";
+                                    document.getElementById("haveCondition").innerHTML="";
+
+                                    //查询部门
+                                    axios({
+                                        method:"post",
+                                        url:"department/selectDepartment"
+                                    }).then(function (resp){
+                                        let departmentDatas=resp.data;
+                                        let formdata='';
+                                        for (let k = 0; k <departmentDatas.length ; k++) {
+                                            if (Number(datas[j].departmentId)===Number(departmentDatas[k].id)){
+                                                formdata+='<option selected value='+departmentDatas[k].id+'>'+departmentDatas[k].departmentName+'</option>'
+                                            }
+                                            else {
+                                                formdata+='<option value='+departmentDatas[k].id+'>'+departmentDatas[k].departmentName+'</option>'
+                                            }
+
+                                        }
+
+                                        document.getElementById("department").innerHTML=formdata;
+
+                                    })
+                                    //查询条件
+                                    selectAllCondition();
+                                    move();
+                                    document.getElementById("addDepartment").onclick=function (){
+                                        if (window.confirm("您确定要在该步骤前插入一条？")){
+                                            let typeData={
+                                                id:'',
+                                                typeId:outBoundType[i].id,
+                                                departmentId:"",
+                                                level:2,
+                                                step:datas[j].step,
+
+                                            }
+                                            let department = document.getElementById("department");
+                                            let selectedIndex = department.selectedIndex;
+                                            let de = department.options[selectedIndex].value;
+                                            if (Number(de)===Number(30)){
+                                                typeData.level=1;
+                                            }
+                                            typeData.departmentId=department.options[selectedIndex].value;
+                                            let allConditionContent=[];
+                                            let conditionContent={
+                                                id:"",
+                                                examineStepId:"",
+                                                examineConditionId:"",
+                                                content:""
+                                            }
+                                            //获取条件内容
+                                            let have = document.getElementById("haveCondition");
+                                            let examineConditionClass= have.querySelectorAll(".examineCondition");
+                                            for (let k = 0; k < examineConditionClass.length; k++) {
+                                                let id = examineConditionClass[k].value;
+                                                let htmlInputElement = document.getElementById("condition"+id+"contentDisplay").querySelectorAll("input");
+                                                for (let l = 0; l < htmlInputElement.length; l++) {
+                                                    conditionContent={
+                                                        id:"",
+                                                        examineStepId:"",
+                                                        examineConditionId:id,
+                                                        content:htmlInputElement[l].value
+                                                    }
+                                                    allConditionContent.push(conditionContent);
+                                                    conditionContent={
+                                                        id:"",
+                                                        examineStepId:"",
+                                                        examineConditionId:"",
+                                                        content:""
+                                                    }
+                                                }
+
+                                            }
+
+                                            let all=[];
+                                            all[0]=[typeData];
+                                            // if (allConditionContent.length>0){
+                                            all[1]=allConditionContent;
+                                            // }
+
+                                            function insert(){
+                                                //在审核流程中，该部门不存在,提交流程
+                                                axios({
+                                                    method:"post",
+                                                    url:"examineAllType/insert",
+                                                    data:all
+                                                }).then(function (resp){
+                                                    let datas=resp.data;
+                                                    if (datas==="success"){
+                                                        alert("插入步骤成功！")
+                                                        //关闭小窗口
+                                                        swd.style.display="none";
+                                                        //刷新显示已添加的步骤
+                                                        selectStep();
+                                                    }
+                                                    else {
+                                                        alert("插入步骤失败，请联系相关人员！")
+                                                    }
+                                                })
+                                            }
+                                            //查询审核过程中是否已经存在当前部门
+
+                                            axios({
+                                                method:"post",
+                                                url:"examineAllType/selectDepartExist",
+                                                data:typeData
+                                            }).then(function (resp)
+                                            {
+                                                if (resp.data===true){
+                                                    //在审核流程中，该部门已经存在
+                                                    alert("审核流程中已包含该部门的操作！")
+                                                }
+                                                else {
+                                                    //判断条件是否为空
+                                                    let have = document.getElementById("haveCondition");
+                                                    let conButton = have.querySelectorAll(".examineCondition");
+                                                    if (conButton.length>0){
+                                                        //判断输入框中是否有条件
+                                                        let b;
+                                                        for (let k = 0; k < conButton.length; k++) {
+                                                            b = true;
+                                                            let value = conButton[k].value;
+                                                            let condition = document.querySelectorAll(".content"+value+"");
+                                                            if (condition.length>0){
+                                                                for (let l = 0; l < condition.length; l++) {
+                                                                    if (condition[l].value.length===0){
+                                                                        b = false;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }
+                                                            else {
+                                                                b = false;
+                                                                break;
+                                                            }
+                                                            if (b === false){
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (b===false){
+                                                            alert("请将条件填写完整！")
+                                                        }
+                                                        else {
+                                                            let b1 = submitIfRange();
+                                                            if (b1){
+                                                                //执行插入
+                                                                insert();
+                                                            }
+                                                            else {
+                                                                alert("您输入的数据不符合范围类型！")
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else {
+                                                        //执行插入
+                                                        insert();
+                                                    }
+
+                                                }
+                                            })
+
+                                            return true;
+                                        }
+                                        else {
+                                            return false;
+                                        }
+                                    }
+
+                                }
+                            }
+
+                        }
+                        else {
+                            document.getElementById("content1").innerHTML = "暂未添加审核步骤！"
+                        }
+
+                        //小窗口标题
+                        let sTitle = document.querySelector(".window-title");
+                        //添加新步骤
+                        document.getElementById("add").onclick=function (){
+                            //打开窗口
+                            let swd = document.querySelector(".window-small");
+                            swd.style.display="block";
+                            //设置关闭窗口
+                            let close = document.querySelector(".window-small-content-close");
+                            close.onclick=function (){
+                                swd.style.display="none";
+                            }
+                            //设置标题
+                            sTitle.innerHTML="添加步骤（"+outBoundType[i].type+"）";
+                            document.getElementById("haveCondition").innerHTML="";
+
+                            //查询部门
+                            axios({
+                                method:"post",
+                                url:"department/selectDepartment"
+                            }).then(function (resp){
+                                let departmentDatas=resp.data;
+                                let formdata='';
+                                for (let j = 0; j < departmentDatas.length; j++) {
+                                    formdata+='<option value='+departmentDatas[j].id+'>'+departmentDatas[j].departmentName+'</option>'
+                                }
+
+                                document.getElementById("department").innerHTML=formdata;
+
+                            })
+                            //查询条件
+                            selectAllCondition();
+                            move();
+                            document.getElementById("addDepartment").onclick=function (){
+                                if (window.confirm("您确定要添加该步骤吗？")){
+                                    let typeData={
+                                        id:"",
+                                        typeId:outBoundType[i].id,
+                                        departmentId:"",
+                                        level:2,
+                                        step:"",
+
+                                    }
+                                    let department = document.getElementById("department");
+                                    let selectedIndex = department.selectedIndex;
+                                    let de = department.options[selectedIndex].value;
+                                    if (Number(de)===Number(30)){
+                                        typeData.level=1;
+                                    }
+                                    typeData.departmentId=department.options[selectedIndex].value;
+                                    let allConditionContent=[];
+                                    let conditionContent={
+                                        id:"",
+                                        examineStepId:"",
+                                        examineConditionId:"",
+                                        content:""
+                                    }
+                                    //获取条件内容
+                                    let have = document.getElementById("haveCondition");
+                                    let examineConditionClass= have.querySelectorAll(".examineCondition");
+                                    for (let k = 0; k < examineConditionClass.length; k++) {
+                                        let id = examineConditionClass[k].value;
+                                        let htmlInputElement = document.getElementById("condition"+id+"contentDisplay").querySelectorAll("input");
+                                        console.log(htmlInputElement.length)
+                                        for (let l = 0; l < htmlInputElement.length; l++) {
+                                            conditionContent={
+                                                id:"",
+                                                examineStepId:"",
+                                                examineConditionId:id,
+                                                content:htmlInputElement[l].value
+                                            }
+                                            allConditionContent.push(conditionContent);
+                                            conditionContent={
+                                                id:"",
+                                                examineStepId:"",
+                                                examineConditionId:"",
+                                                content:""
+                                            }
+                                        }
+
+                                    }
+
+                                    let all=[];
+                                    all[0]=[typeData];
+                                    // if (allConditionContent.length>0){
+                                    all[1]=allConditionContent;
+                                    // }
+
+                                    function submit(){
+                                        //在审核流程中，该部门不存在,提交流程
+                                        axios({
+                                            method:"post",
+                                            url:"examineAllType/add",
+                                            data:all
+                                        }).then(function (resp){
+                                            let datas=resp.data;
+                                            if (datas==="success"){
+                                                alert("添加步骤成功！")
+                                                //关闭小窗口
+                                                swd.style.display="none";
+                                                //刷新显示已添加的步骤
+                                                selectStep();
+                                            }
+                                            else {
+                                                alert("添加步骤失败，请联系相关人员！")
+                                            }
+                                        })
+                                    }
+
+                                    //查询审核过程中是否已经存在当前部门
+                                    axios({
+                                        method:"post",
+                                        url:"examineAllType/selectDepartExist",
+                                        data:typeData
+                                    }).then(function (resp)
+                                    {
+                                        if (resp.data===true){
+                                            //在审核流程中，该部门已经存在
+                                            alert("审核流程中已包含该部门的操作！")
+                                        }
+                                        else {
+                                            //判断条件是否为空
+                                            let have = document.getElementById("haveCondition");
+                                            let conButton = have.querySelectorAll(".examineCondition");
+                                            if (conButton.length>0){
+                                                //判断输入框中是否有条件
+                                                let b;
+                                                for (let k = 0; k < conButton.length; k++) {
+                                                    b = true;
+                                                    let value = conButton[k].value;
+                                                    let condition = document.querySelectorAll(".content"+value+"");
+                                                    if (condition.length>0){
+                                                        for (let l = 0; l < condition.length; l++) {
+                                                            if (condition[l].value.length===0){
+                                                                b = false;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                    else {
+                                                        b = false;
+                                                        break;
+                                                    }
+                                                    if (b === false){
+                                                        break;
+                                                    }
+                                                }
+                                                if (b===false){
+                                                    alert("请将条件填写完整！")
+                                                }
+                                                else {
+                                                    let b1 = submitIfRange();
+                                                    if (b1){
+                                                        //执行添加
+                                                        submit();
+                                                    }
+                                                    else {
+                                                        alert("您输入的数据不符合范围类型！")
+                                                    }
+
+                                                }
+                                            }
+                                            else {
+                                                //执行添加
+                                                submit();
+                                            }
+
+                                        }
+                                    })
+
+
+                                    return true;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+
+                        }
+                    })
+                }
+
+// 加载复选框状态的函数
+                function loadCheckboxStatus() {
+                    let modifyPriceCheckboxes = document.querySelectorAll(".modifyPrice");
+                    let modifyQuantityCheckboxes = document.querySelectorAll(".modifyQuantity");
+
+                    modifyPriceCheckboxes.forEach(checkbox => {
+                        let stepId = checkbox.getAttribute("data-id");
+                        let savedState = localStorage.getItem(`modifyPrice_${stepId}`);
+                        if (savedState !== null) {
+                            checkbox.checked = savedState === "true";
+                        }
+                    });
+
+                    modifyQuantityCheckboxes.forEach(checkbox => {
+                        let stepId = checkbox.getAttribute("data-id");
+                        let savedState = localStorage.getItem(`modifyQuantity_${stepId}`);
+                        if (savedState !== null) {
+                            checkbox.checked = savedState === "true";
+                        }
+                    });
+                }
+
+// 保存复选框状态的函数
+                function saveCheckboxStatus() {
+                    let modifyPriceCheckboxes = document.querySelectorAll(".modifyPrice");
+                    let modifyQuantityCheckboxes = document.querySelectorAll(".modifyQuantity");
+
+                    modifyPriceCheckboxes.forEach(checkbox => {
+                        let stepId = checkbox.getAttribute("data-id");
+                        localStorage.setItem(`modifyPrice_${stepId}`, checkbox.checked);
+                    });
+
+                    modifyQuantityCheckboxes.forEach(checkbox => {
+                        let stepId = checkbox.getAttribute("data-id");
+                        localStorage.setItem(`modifyQuantity_${stepId}`, checkbox.checked);
+                    });
+                }
+
+// 更新步骤权限到后端
+                function updateStepPermissions(stepId) {
+                    // 获取当前行的两个复选框状态
+                    const row = document.querySelector(`[data-id="${stepId}"]`).closest('tr');
+                    const priceChecked = row.querySelector('.modifyPrice').checked;
+                    const quantityChecked = row.querySelector('.modifyQuantity').checked;
+
+                    let formdata = {
+                        id: "",  // 如果是新增，这个为空
+                        examineId: stepId,  // 步骤ID
+                        canPrice: priceChecked ? 1 : 0,  // 1=可以修改，0=不可以修改
+                        canNumber: quantityChecked ? 1 : 0  // 1=可以修改，0=不可以修改
+                    };
+
+                    axios({
+                        method: "post",
+                        url: "examineTypeCan/updatePermissions",
+                        data: formdata
+                    }).then(function (resp) {
+                        if (resp.data === "success") {
+                           alert(`权限已更新: 价格${priceChecked ? "可以" : "不可以"}修改, 数量${quantityChecked ? "可以" : "不可以"}修改`);
+                        } else {
+                            alert("更新权限失败");
+                        }
+                    }).catch(function (error) {
+                        console.error("请求失败:", error);
+                    });
+                }
+
+                selectStep();
+
+
+
+            }
+
+        }
+    })
+</script>
+</html>

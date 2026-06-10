@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div style="margin: auto">
+    <div style="width: 100%;text-align: center"><h2>一键导入</h2></div>
+    <div style="text-align: center">
+        <input type="hidden" name="id"  value="">
+        <label for="url0">&nbsp;</label><input style="width:80%;height: 20px;" type="text" name="" id="url0" value="">&nbsp; <input style="width: 223px;height: 24px;display: none" id="file0" type="file" >
+        <button   type="button" class="uploads" >上传</button>
+    </div>
+
+</div>
+<img id="image" src="">
+
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+   function getBase64(file) {
+        return new Promise(function (resolve, reject) {
+            const reader = new FileReader()
+            let imgResult = ''
+            reader.readAsDataURL(file)
+            reader.onload = function () {
+                imgResult = reader.result
+            }
+            reader.onerror = function (error) {
+                reject(error)
+            }
+            reader.onloadend = function () {
+                resolve(imgResult)
+            }
+        })
+    }
+
+
+    let uploads = document.querySelectorAll(".uploads");
+
+    for (let i = 0; i < uploads.length; i++) {
+        uploads[i].onclick=function (){
+            document.getElementById('file'+i+'').click();
+        }
+
+
+    }
+
+    //自动上传
+  for (let i = 0; i < uploads.length; i++) {
+    document.getElementById('file'+i+'').onchange=async function () {
+        let files = document.getElementById('file' + i + '').files[0];
+
+        const baseResult = await getBase64(files)
+        console.log(baseResult)
+        document.getElementById("image").src = baseResult;
+
+
+        // let formdata = new FormData();
+        // formdata.append('file'+i+'', files);
+
+        //   axios({
+        //     method:"post",
+        //     url:"fileProductSortAndMappingServlet",
+        //     data:formdata,
+        //     headers: {'Content-Type': 'multipart/form-data'},
+        //   }).then(function (resp){
+        //     let datas=resp.data;
+        // if (datas.length>0){
+        //     alert(datas);
+        //     location.reload();
+        // }else {
+        //     alert("系统错误！");
+        //     location.reload();
+        // }
+
+
+    // })
+    }
+  }
+
+
+</script>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>产品仓库新增分类</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+  <link href="css/product.css" rel="stylesheet" />
+
+
+</head>
+<style>
+  html{
+    height: auto;
+    font-family: 宋体,serif;
+  }
+  body{
+    height: auto;
+  }
+
+
+  * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  ul {
+    list-style-type: none;
+    margin: auto;
+    width: 213px;
+  }
+
+
+
+  .menu_body a {
+    width: 213px;
+    display: block; 	/*不能去掉，只有是block，高度才有效*/
+    line-height: 26px;
+    color: #003366 !important;
+    text-decoration: none;
+    overflow: hidden; 	/*与高度为0 结合，溢出的部分隐藏*/
+    height: 0 ; 		/*高度0*/
+    transition: all .3s;
+    text-align: center;
+    font-size: 9pt;
+
+  }
+
+
+
+  a{
+    text-decoration: none;
+
+
+  }
+  a:link{
+    color: #003366;
+  }
+  a:visited{
+    color: #003366;
+  }
+  a:hover{
+    text-decoration-line: underline;
+  }
+
+  .aa{
+    border-top: solid 1px rgb(105, 140, 195);
+    border-left: solid 1px rgb(105, 140, 195);
+    border-right: solid 1px rgb(105, 140, 195);
+    border-bottom: solid 1px rgb(105, 140, 195);
+  }
+
+
+</style>
+<body>
+
+
+<div class="aa" style="width:750px ;height: auto;margin: 5px auto auto;background-color: white;padding-bottom: 5px">
+  <input type="hidden"  value="" id="id">
+  <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>产品分类信息添加</b></div>
+  <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+    <div style="width:738px ;height: 38px;display: flex;">
+      <div  style="width: 37px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;line-height: 19px;">分类<br> 名称</div>
+      <div  style="width:701px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+        &nbsp;<input maxlength="20" style="width: 90%;height: 20px;margin-top: 8px;" type="text" name="" id="name" value="" οnkeyup="this.value=this.value.replace(/\s+/g,'')"> &nbsp;<b>*</b>
+      </div>
+    </div>
+
+<!--    <div style="width:738px ;height: 62px;display: flex;">-->
+<!--      <div style="width:37px ;height: 62px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;line-height: 31px;"> 图片<br>地址</div>-->
+
+<!--      <div style="width:701px ;height: 62px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">-->
+
+<!--        <input type="hidden" name="id"  value="">-->
+<!--        &nbsp;<input style="width: 327px;height: 20px;margin-top: 1px;" type="text" name="" id="url0" value="">&nbsp;<b>*</b>-->
+<!--        <div style="width: 275px;height: 24px; display: flex;margin-top: 10px" >&nbsp;-->
+<!--          <input style="width: 223px;height: 24px" id="file0" type="file" accept="image/*">-->
+<!--          <input style="width:40px;border-right: 2px solid black;border-bottom: 2px solid black;-->
+<!--                     border-top: 2px solid grey;border-left: 2px solid grey ;"  type="button" value="上传" class="uploads" >-->
+
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
+    <div style="width:738px;height:auto;display:flex;margin-top: 1px;color: black;line-height: 24px;">
+      <div class="bb2" style="width: 37px;height:auto;text-align: center;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;padding-top: 25px">分类<br>概述:</div>
+      <div class="bb2" style="width: 701px;height: auto;padding-left: 2px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+        <label for="describe"></label><textarea name="describe" id="describe" value="" style="min-width: 400px;max-width: 630px;min-height: 100px;max-height: 150px;" οnkeyup="this.value=this.value.replace(/\s+/g,'')"></textarea>
+      </div>
+
+    </div>
+    <div style="width:738px ;height: 38px;display: flex;">
+      <div  style="width: 37px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;line-height: 19px;">编码<br>规则</div>
+      <div id="codeRule" style="width:701px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;line-height: 38px">
+        &nbsp;
+      </div>
+    </div>
+    <div style="width:738px ;height: 38px;display: flex;">
+      <div  style="width: 37px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;line-height: 38px;">编码</div>
+      <div  style="width:701px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+        &nbsp;<input style="width: 90%;height: 20px;margin-top: 8px;" type="text" name="" id="code" value=""
+                     onkeyup="this.value=this.value.replace(/\s+/g,'')"> &nbsp;<b>*</b>
+      </div>
+    </div>
+
+
+
+
+    <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+      <input  style="width:64px ;height: 22px;" type="button" name="" id="produceCode" value="随机编码">&nbsp;
+      <input style="width:64px ;height: 22px;" type="button" name="" id="submit" value="确定添加">&nbsp;
+      <input style="width:40px ;height: 22px;" type="button" value="返回" onclick="history.back()">
+    </div>
+  </div>
+</div>
+<div class="window">
+
+  <div class="window-content">
+
+    <div class="window-content-close">×</div>
+
+    <div id="codeView" class="aa" style="width:750px ;height: auto;max-height: 88%; margin: 5px auto auto;background-color: white;padding-bottom: 5px;">
+      <div style="width: 100%;height: auto;display: flex;margin: auto;position: sticky;top: 0">
+        <div style="width: 100%;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;"><b>添加编码规则</b></div>
+
+      </div>
+
+      <div class="aa" id="formdata" style="width:99% ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;">
+        <div style="width:100% ;height: auto;display: flex;">
+
+          <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+              编码长度：
+            </div>
+          </div>
+          <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+            &nbsp;<input style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="length" value="" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')"> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+        <div style="width:100% ;height: auto;display: flex;">
+
+          <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+              所需的内容：
+            </div>
+          </div>
+          <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+            &nbsp;<input style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="description" value="" onkeyup="this.value=this.value.replace(/[ ]/g,'')"/> &nbsp;<b>*</b>
+          </div>
+        </div>
+        <div style="width:100% ;height: auto;display: flex;">
+
+          <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+              去除的内容：
+            </div>
+          </div>
+          <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+            &nbsp;<input style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="remove" value="" onkeyup="this.value=this.value.replace(/[ ]/g,'')"/> &nbsp;
+          </div>
+        </div>
+
+
+      </div>
+
+      <div style="width: 100%;height: auto;text-align: center">
+        <button id="codeAdd" style="padding: 5px 10px;margin: 10px auto 5px auto">提交规则</button>
+      </div>
+    </div>
+
+
+  </div>
+
+</div>
+
+<!--引入axios文件-->
+<script src="js/axios-0.18.0.js"></script>
+<script src="js/randexp.min.js"></script>
+
+<script>
+
+
+  //接收从物料页面传来的id，然后通过id获取数据
+  function getHref(){
+    var url = decodeURI(location.search);
+    var theRequest = new Object();
+    if (url.indexOf("?") !== -1) {
+      var str = url.substr(1);
+      strs = str.split("&");
+      for(var i = 0; i < strs.length; i ++) {
+        theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+      }
+    }
+    return theRequest;
+  }
+  //用法  var 自己变量名字 = getHref().要获取的参数名字
+  var parentId=getHref().parentId;
+  console.log(parentId)
+
+  //根据parentId获取level
+  axios({
+    method: "post",
+    url: "finSort/selectLevel",
+    data:parentId,
+  }).then(function (resp){
+    let level= Number(resp.data)+Number(1);
+
+    //查询编码规则是否存在
+    axios({
+      method:"post",
+      url:"finCode/ifCode",
+      data:level
+    }).then(function (resp){
+      if (resp.data===true){
+        //存在
+        axios({
+          method:"post",
+          url:"finCode/selectCode",
+          data:level
+        }).then(async function (resp){
+          let datas=resp.data;
+          let data1='';
+          let datas2='';
+          let result="";
+          let description="";
+          let remove="";
+          if (datas[0].description.length>0){
+            result= datas[0].description.split(",");
+            description=datas[0].description;
+          }
+          else {
+          await  axios({
+              method:"post",
+              url:"finCode/selectCode",
+              data:0
+            }).then(function (resp){
+              result= resp.data[0].description.split(",");
+              description=resp.data[0].description;
+            })
+          }
+          for (let i = 0; i < result.length; i++) {
+            data1+=result[i]
+          }
+          let result2="";
+          if (datas[0].remove.length>0){
+            result2=  datas[0].remove.split(",");
+            remove=datas[0].remove;
+          }
+          else {
+            await  axios({
+              method:"post",
+              url:"finCode/selectCode",
+              data:0
+            }).then(function (resp){
+              result2= resp.data[0].remove.split(",");
+              remove=resp.data[0].remove;
+            })
+          }
+
+          for (let i = 0; i < result2.length; i++) {
+            datas2+=result2[i]
+          }
+          if (remove.length>0){
+            document.getElementById("codeRule").innerHTML='长度为：'+datas[0].length+';范围是在'+description+'之间;不能包含'+remove+''
+          }else {
+            document.getElementById("codeRule").innerHTML='长度为：'+datas[0].length+';范围是在'+description+'之间;'
+          }
+          reg= new RegExp('^['+data1+']{'+datas[0].length+'}$');
+          reg1= new RegExp('['+datas2+']');
+
+          let ban=""
+          for (let i = 0; i < datas[0].length; i++) {
+            ban+='0'
+          }
+          //生成符合随机正则表达式的随机数
+          document.getElementById("produceCode").onclick=function (){
+            var regex = new RegExp(reg);
+
+
+            // 生成符合正则表达式的随机字符串
+            function produceCode(){
+              var randomString = new RandExp(regex).gen();
+
+              //判断是否符合第二个正则
+              let b = reg1.test(randomString);
+              if (b===false){
+                //判断是否为系统默认禁用编码
+                if (Number(ban)===Number(randomString)){
+                  produceCode();
+                }else {
+                  document.getElementById("code").value=randomString;
+                }
+
+              }
+              else {
+                produceCode();
+              }
+
+            }
+
+            produceCode();
+          }
+
+
+
+        })
+      }else {
+        //不存在
+        document.getElementById("codeRule").innerHTML="编码规则不存在，请先创建编码规则！"
+        document.getElementById("produceCode").onclick=function (){
+          alert("请先创建编码规则！")
+        }
+      }
+    })
+  })
+
+
+  //添加分类数据
+  document.getElementById("submit").onclick=function (){
+    //检测是否为空
+    let value1 = document.getElementById("name").value;
+    let value2 = document.getElementById("code").value;
+    if (value1.length===0||value2.length===0){
+      alert("有必填项未填写！")
+    }else {
+      //判断分类名是否重复
+      axios({
+        method:"post",
+        url:"finSort/selectNameAdd",
+        data:value1
+      }).then(function (resp){
+        if (resp.data===false){
+          if (window.confirm("您确定要添加分类吗？")){
+            let data={
+              id:"",
+              parentId:parentId,
+              finSortName:"",
+              finSortLevel:"",
+              finSortDescribe:"",
+              finSortCode:""
+
+            }
+            //获取level
+            axios({
+              method: "post",
+              url: "finSort/selectLevel",
+              data:parentId,
+            }).then(function (resp){
+
+              data.finSortLevel= Number(resp.data)+Number(1);
+
+              //查询编码规则是否存在
+              axios({
+                method:"post",
+                url:"finCode/ifCode",
+                data:data.finSortLevel
+              }).then(function (resp){
+                if (resp.data===true){
+                  //编码规则存在
+                  //根据level查询规则
+                  axios({
+                    method:"post",
+                    url:"finCode/selectCode",
+                    data:data.finSortLevel
+                  }).then(async function (resp) {
+                    let datas=resp.data;
+                    let data1='';
+                    let datas2='';
+                    let result="";
+                    let description="";
+                    let remove="";
+                    if (datas[0].description.length>0){
+                      result= datas[0].description.split(",");
+                      description=datas[0].description;
+                    }
+                    else {
+                      await  axios({
+                        method:"post",
+                        url:"finCode/selectCode",
+                        data:0
+                      }).then(function (resp){
+                        result= resp.data[0].description.split(",");
+                        description=resp.data[0].description;
+                      })
+                    }
+
+                    for (let i = 0; i < result.length; i++) {
+                      data1+=result[i]
+                    }
+                    let result2="";
+                    if (datas[0].remove.split(",").length>0){
+                      result2=  datas[0].remove.split(",");
+                      remove=datas[0].remove;
+                    }
+                    else {
+                      await  axios({
+                        method:"post",
+                        url:"finCode/selectCode",
+                        data:0
+                      }).then(function (resp){
+                        result2= resp.data[0].remove.split(",");
+                        remove=resp.data[0].remove;
+                      })
+                    }
+
+                    for (let i = 0; i < result2.length; i++) {
+                      datas2+=result2[i]
+                    }
+
+                    reg= new RegExp('^['+data1+']{'+datas[0].length+'}$');
+                    reg1= new RegExp('['+datas2+']');
+                    //得到长度，判断是否与相同长度的0相同
+                    let ban=""
+                    for (let i = 0; i < datas[0].length; i++) {
+                      ban+='0'
+                    }
+
+                    data.finSortName= document.getElementById("name").value;
+                    data.finSortDescribe=document.getElementById("describe").value;
+                    data.finSortCode=document.getElementById("code").value;
+                    // console.log(data)
+                    //判断code是否符合条件
+                    let value = data.finSortCode;
+                    //判断长度和包含哪些
+                    let b = reg.test(value);
+                    if (b===true){
+                      //符合第一个和第二个条件，判断第三个条件
+                      if (datas[0].remove){
+
+                        //判断是否有第三个条件，有的话
+                        let b1 = reg1.test(value);
+                        if (b1===false){
+                          if (Number(ban)===Number(value)){
+                            alert(""+ban+"为系统默认的编码，不可以使用！")
+                          }else {
+                            //不包含，执行下面的操作
+                            //判断编码是否重复
+                            if (Number(datas.finSortLevel)===Number(1)){
+                              axios({
+                                method:"post",
+                                url:"sort/ifCodeExistAddFromTwoTable?code="+value+"&level="+data.finSortLevel+"&parentId="+parentId+"",
+
+                              }).then(function (resp){
+                                //证明不重复可以执行修改操作
+                                if (resp.data===false){
+                                  //调用axios
+                                  axios({
+                                    method: "post",
+                                    url:"finSort/addSort",
+                                    data:data
+                                  }).then(function (resp){
+                                    if (resp.data==="success"){
+                                      alert("添加成功！");
+                                      // history.back();
+                                    }else {
+                                      alert("添加失败，请联系相关人员！")
+                                    }
+                                  })
+                                }else {
+                                  //重复
+                                  alert("该编码已被使用！")
+                                }
+                              })
+                            }
+                            else {
+                              axios({
+                                method:"post",
+                                url:"finSort/ifCodeExistAdd?code="+value+"&level="+data.finSortLevel+"&parentId="+parentId+"",
+
+                              }).then(function (resp){
+                                //证明不重复可以执行修改操作
+                                if (resp.data===false){
+                                  //调用axios
+                                  axios({
+                                    method: "post",
+                                    url:"finSort/addSort",
+                                    data:data
+                                  }).then(function (resp){
+                                    if (resp.data==="success"){
+                                      alert("添加成功！");
+                                      // history.back();
+                                    }else {
+                                      alert("添加失败，请联系相关人员！")
+                                    }
+                                  })
+                                }else {
+                                  //重复
+                                  alert("该编码已被使用！")
+                                }
+                              })
+                            }
+
+                          }
+
+
+                        }
+                        else {
+                          //包含，提示编码不符合要求
+                          alert("编码不符合编码规则！")
+                        }
+                      }else {
+                        //没有去除条件
+                        //判断编码是否重复
+                        if (Number(ban)===Number(value)){
+                          alert(""+ban+"为系统默认的编码，不可以使用！")
+                        }else {
+                          if (Number(data.finSortLevel)===Number(1)){
+                            axios({
+                              method:"post",
+                              url:"sort/ifCodeExistAddFromTwoTable?code="+value+"&level="+data.finSortLevel+"&parentId="+parentId+"",
+                              data:value
+                            }).then(function (resp){
+                              //证明不重复可以执行修改操作
+                              if (resp.data===false){
+                                //调用axios
+                                axios({
+                                  method: "post",
+                                  url:"finSort/addSort",
+                                  data:data
+                                }).then(function (resp){
+                                  if (resp.data==="success"){
+                                    alert("添加成功！");
+                                    location.href='finsort.html?nextId='+parentId+''
+                                  }else {
+                                    alert("添加失败，请联系相关人员！")
+                                  }
+                                })
+                              }else {
+                                //重复
+                                alert("该编码已被使用！")
+                              }
+                            })
+                          }
+                          else {
+                            axios({
+                              method:"post",
+                              url:"finSort/ifCodeExistAdd?code="+value+"&level="+data.finSortLevel+"&parentId="+parentId+"",
+                              data:value
+                            }).then(function (resp){
+                              //证明不重复可以执行修改操作
+                              if (resp.data===false){
+                                //调用axios
+                                axios({
+                                  method: "post",
+                                  url:"finSort/addSort",
+                                  data:data
+                                }).then(function (resp){
+                                  if (resp.data==="success"){
+                                    alert("添加成功！");
+                                    location.href='finsort.html?nextId='+parentId+''
+                                  }else {
+                                    alert("添加失败，请联系相关人员！")
+                                  }
+                                })
+                              }else {
+                                //重复
+                                alert("该编码已被使用！")
+                              }
+                            })
+                          }
+
+                        }
+
+
+                      }
+                    }
+                    else {
+
+                      alert("编码不符合编码规则！")
+
+                    }
+
+
+
+
+
+                  })
+
+                }else {
+                  alert("编码规则不存在，请先添加"+data.finSortLevel+"级分类的编码规则！");
+                  // 在用户点击其他地方时，关闭弹窗
+                  let wd = document.querySelector(".window");
+                  window.onclick = function(event) {
+                    if (event.target === wd) {
+                      wd.style.display = "none";
+                    }
+                  }
+
+                  //点击close也可以关闭弹窗
+                  document.querySelector(".window-content-close").onclick=function (){
+                    wd.style.display="none";
+                  }
+
+
+
+                  //打开窗口
+                  document.querySelector(".window").style.display="block";
+                  //设置默认规则
+                  document.getElementById("length").value=2;
+                  document.getElementById("description").value="0-9,A-Z,a-z";
+
+                  document.getElementById("codeAdd").onclick=function (){
+                    //判断长度和规则是否为空
+                    let value = document.getElementById("length").value;
+                    let value3 = document.getElementById("description").value;
+                    if (value.length===0||value3.length===0){
+                      alert("有必填项未填写！")
+                    }else {
+
+                      if (window.confirm("确定要添加这条编码规则吗？")){
+                        let formdata={
+                          id:"",
+                          length:"",
+                          description:"",
+                          remove:"",
+                          level:data.finSortLevel
+                        }
+
+                        formdata.length=document.getElementById("length").value;
+                        formdata.description=document.getElementById("description").value;
+                        formdata.remove=document.getElementById("remove").value;
+                        axios({
+                          method:"post",
+                          url:"finCode/addCode",
+                          data:formdata
+                        }).then(function (resp){
+                          if (resp.data==="success"){
+                            alert("添加规则成功！");
+                            wd.style.display = "none";
+                          }else {
+                            alert("规则添加失败，请联系相关人员！")
+                          }
+                        })
+
+                        return true;
+                      }else {
+                        return false;
+                      }
+                    }
+
+
+                  }
+
+                }
+              })
+
+
+
+
+
+
+            })
+            return true;
+
+
+          }else {
+            return false;
+          }
+        }else {
+          alert("该分类名已被使用，请核对后再试！")
+        }
+      })
+
+    }
+
+  }
+
+
+
+
+
+  //上传图片
+  let uploads = document.querySelectorAll(".uploads");
+
+  for (let i = 0; i < uploads.length; i++) {
+    uploads[i].onclick=function (){
+      let files = document.getElementById("file"+i+"").files[0];
+      let formdata=new FormData();
+      formdata.append('file'+i+'',files);
+
+      axios({
+        method:"post",
+        url:"uploadServlet",
+        data:formdata,
+        headers: {'Content-Type': 'multipart/form-data'},
+      }).then(function (resp){
+        document.getElementById("url"+i+"").value=resp.data;
+      })
+    }
+  }
+
+</script>
+</body>
+</html>

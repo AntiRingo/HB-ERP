@@ -10,12 +10,28 @@
       margin: 0;
       padding: 0;
       /*box-sizing: border-box;*/
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
+    }
+
+    :root {
+      --bg: #eef5ff;
+      --surface: #ffffff;
+      --surface-alt: #f5faff;
+      --primary: #0f4aa8;
+      --primary-strong: #0b2f6b;
+      --accent: #1d63d4;
+      --border: #cfe3ff;
+      --text: #1f2937;
+      --text-muted: #5b6b7a;
+      --shadow: rgba(15, 74, 168, 0.12);
+      --shadow-strong: rgba(11, 47, 107, 0.18);
+      --danger: #c62828;
+      --danger-bg: #ffe8ea;
     }
 
     body {
-      background: linear-gradient(135deg, #1a2a6c, #2c3e50);
-      color: #333;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
       padding: 20px;
     }
@@ -27,9 +43,13 @@
 
     header {
       text-align: center;
-      padding: 20px 0;
+      padding: 22px 20px;
       color: white;
       margin-bottom: 20px;
+      background: var(--primary);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 10px 22px var(--shadow-strong);
     }
 
     header h1 {
@@ -42,7 +62,7 @@
       font-size: 1.1rem;
       max-width: 800px;
       margin: 0 auto;
-      opacity: 0.9;
+      opacity: 0.92;
     }
 
     .dashboard {
@@ -53,10 +73,11 @@
     }
 
     .stats-card {
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--surface);
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 16px var(--shadow);
       text-align: center;
       transition: transform 0.3s ease;
     }
@@ -68,21 +89,22 @@
     .stats-card h3 {
       font-size: 1rem;
       margin-bottom: 12px;
-      color: #444;
+      color: var(--text-muted);
       font-weight: 600;
     }
 
     .stats-card .number {
       font-size: 2.2rem;
       font-weight: 700;
-      color: #1a2a6c;
+      color: var(--primary);
     }
 
     .filters-container {
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--surface-alt);
       border-radius: 12px;
       padding: 25px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 16px var(--shadow);
       margin-bottom: 25px;
     }
 
@@ -94,7 +116,7 @@
     }
 
     .filters-header h2 {
-      color: #1a2a6c;
+      color: var(--primary-strong);
       font-size: 1.5rem;
       display: flex;
       align-items: center;
@@ -116,17 +138,25 @@
     .filter-item label {
       margin-bottom: 8px;
       font-weight: 500;
-      color: #555;
+      color: var(--text-muted);
       font-size: 0.95rem;
     }
 
     .filter-item select,
     .filter-item input {
       padding: 7px;
-      border: 1px solid #ddd;
+      border: 1px solid #b9d6ff;
       border-radius: 6px;
       font-size: 1rem;
-      background: #f8f9fa;
+      background: #ffffff;
+      color: var(--text);
+    }
+
+    .filter-item select:focus,
+    .filter-item input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(29, 99, 212, 0.16);
     }
 
     .filter-actions {
@@ -150,12 +180,17 @@
     }
 
     .btn-primary {
-      background: #1a6c1b;
+      background: var(--primary);
       color: white;
     }
 
     .btn-secondary {
-      background: #6c757d;
+      background: #355c8c;
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
       color: white;
     }
 
@@ -165,10 +200,11 @@
     }
 
     .review-section {
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--surface);
       border-radius: 12px;
       padding: 25px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 16px var(--shadow);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -180,11 +216,11 @@
       align-items: center;
       margin-bottom: 20px;
       padding-bottom: 15px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #dde9ff;
     }
 
     .section-header h2 {
-      color: #1a2a6c;
+      color: var(--primary-strong);
       font-size: 1.5rem;
       display: flex;
       align-items: center;
@@ -198,32 +234,78 @@
     }
 
     .stat-item {
-      background: #f0f4f8;
+      background: #dcecff;
       padding: 6px 12px;
       border-radius: 20px;
       font-weight: 500;
+      color: var(--primary-strong);
     }
 
     .stat-item.pending {
-      background: #fff8e1;
-      color: #ff8f00;
+      background: #eef6ff;
+      color: var(--primary);
     }
 
     .stat-item.approved {
-      background: #e8f5e9;
-      color: #2e7d32;
+      background: #d9ecff;
+      color: var(--primary-strong);
     }
 
     .stat-item.rejected {
-      background: #ffebee;
-      color: #c62828;
+      background: var(--danger-bg);
+      color: var(--danger);
     }
 
     .table-container {
       flex: 1;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
       border-radius: 8px;
-      border: 1px solid #eee;
+      border: 1px solid var(--border);
+    }
+
+    .sticky-h-scroll {
+      display: none;
+      height: 14px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      z-index: 999;
+      box-shadow: 0 -6px 14px rgba(11, 47, 107, 0.08);
+      box-sizing: border-box;
+    }
+
+    .sticky-h-scroll__inner {
+      height: 1px;
+    }
+
+    .sticky-table-header {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      z-index: 1000;
+      box-shadow: 0 8px 16px rgba(11, 47, 107, 0.12);
+      box-sizing: border-box;
+    }
+
+    .review-table--sticky {
+      table-layout: fixed;
+    }
+
+    .review-table--sticky th {
+      position: static;
+      top: auto;
+      box-sizing: border-box;
     }
 
     .review-table {
@@ -235,24 +317,24 @@
     }
 
     .review-table th {
-      background: #1a2a6c;
+      background: var(--primary-strong);
       color: white;
       text-align: left;
-      padding: 14px 15px;
+      padding: 10px 12px;
       font-weight: 600;
       position: sticky;
       top: 0;
     }
 
     .review-table td {
-      padding: 14px 15px;
-      border-bottom: 1px solid #eee;
+      padding: 10px 12px;
+      border-bottom: 1px solid #e0ecff;
       font-size: 0.95rem;
     }
 
     .review-table th,
     .review-table td {
-      border-right: 1px solid #e3e8ef;
+      border-right: 1px solid #e0ecff;
     }
 
     .review-table th:last-child,
@@ -261,7 +343,7 @@
     }
 
     .review-table tbody tr:nth-child(even) {
-      background-color: #f6f8fb;
+      background-color: #f6faff;
     }
 
     .review-table tbody tr:nth-child(odd) {
@@ -269,12 +351,20 @@
     }
 
     .review-table tbody tr:hover {
-      background-color: #f8f9fa;
+      background-color: #eaf3ff;
     }
 
     .review-table th,
     .review-table td {
       white-space: nowrap;
+    }
+
+    .review-table th.col-view,
+    .review-table td.col-view {
+      width: 64px;
+      text-align: center;
+      padding-left: 10px;
+      padding-right: 10px;
     }
 
     .pagination {
@@ -283,19 +373,19 @@
       justify-content: flex-start;
       flex-wrap: wrap;
       gap: 6px;
-      padding-top: 12px;
+      padding-top: 8px;
     }
 
     .pager-btn {
       min-width: 38px;
       height: 36px;
       padding: 0 12px;
-      border: 1px solid #d0d7de;
+      border: 1px solid var(--border);
       border-radius: 10px;
-      background: #ffffff;
+      background: var(--surface);
       cursor: pointer;
       font-weight: 600;
-      color: #1a2a6c;
+      color: var(--primary-strong);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -308,8 +398,8 @@
     }
 
     .pager-btn.is-active {
-      background: #0b3a78;
-      border-color: #0b3a78;
+      background: var(--primary);
+      border-color: var(--primary);
       color: #ffffff;
       cursor: default;
     }
@@ -322,13 +412,13 @@
     .pager-total {
       height: 36px;
       padding: 0 12px;
-      border: 1px solid #d0d7de;
+      border: 1px solid var(--border);
       border-radius: 10px;
       display: inline-flex;
       align-items: center;
       font-weight: 700;
-      color: #1a2a6c;
-      background: #ffffff;
+      color: var(--primary-strong);
+      background: var(--surface);
       margin-left: 6px;
     }
 
@@ -337,7 +427,7 @@
       align-items: center;
       gap: 6px;
       margin-left: 6px;
-      color: #444;
+      color: var(--text-muted);
       font-weight: 600;
     }
 
@@ -345,9 +435,15 @@
       width: 60px;
       height: 36px;
       padding: 0 8px;
-      border: 1px solid #d0d7de;
+      border: 1px solid #b9d6ff;
       border-radius: 10px;
       text-align: center;
+    }
+
+    .pager-jump input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(29, 99, 212, 0.16);
     }
 
     .status {
@@ -359,18 +455,18 @@
     }
 
     .status-pending {
-      background: #fff8e1;
-      color: #ff8f00;
+      background: #eef6ff;
+      color: var(--primary);
     }
 
     .status-approved {
-      background: #e8f5e9;
-      color: #2e7d32;
+      background: #d9ecff;
+      color: var(--primary-strong);
     }
 
     .status-rejected {
-      background: #ffebee;
-      color: #c62828;
+      background: var(--danger-bg);
+      color: var(--danger);
     }
 
     .actions-cell {
@@ -379,20 +475,21 @@
     }
 
     .action-btn {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 5px;
+      padding: 4px 10px;
+      border: 1px solid currentColor;
+      background: transparent;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 500;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 5px;
       transition: all 0.2s ease;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      line-height: 1.2;
     }
 
     .approve-btn {
-      background: #2e7d32;
+      background: var(--primary);
       color: white;
     }
 
@@ -402,13 +499,13 @@
     }
 
     .view-btn {
-      background: #1a2a6c;
-      color: white;
+      color: var(--primary);
     }
 
     .action-btn:hover {
-      opacity: 0.9;
-      transform: scale(1.05);
+      background: rgba(15, 74, 168, 0.10);
+      transform: none;
+      opacity: 1;
     }
 
     .material-number {
@@ -428,19 +525,20 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(11, 47, 107, 0.55);
       z-index: 1000;
       justify-content: center;
       align-items: center;
     }
 
     .modal-content {
-      background: white;
+      background: var(--surface);
       border-radius: 12px;
       width: 90%;
       max-width: 1000px;
       padding: 30px;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 40px rgba(11, 47, 107, 0.22);
       position: relative;
       height: 80vh;
       overflow-y: auto;
@@ -452,17 +550,17 @@
       right: 20px;
       font-size: 1.5rem;
       cursor: pointer;
-      color: #777;
+      color: var(--text-muted);
     }
 
     .modal-header {
       margin-bottom: 20px;
       padding-bottom: 15px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #dde9ff;
     }
 
     .modal-header h2 {
-      color: #1a2a6c;
+      color: var(--primary-strong);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -476,7 +574,7 @@
       display: block;
       margin-bottom: 8px;
       font-weight: 500;
-      color: #555;
+      color: var(--text-muted);
       font-size: 0.95rem;
     }
 
@@ -485,9 +583,19 @@
     .form-group select {
       width: 100%;
       padding: 12px;
-      border: 1px solid #ddd;
+      border: 1px solid #b9d6ff;
       border-radius: 6px;
       font-size: 1rem;
+      background: #ffffff;
+      color: var(--text);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(29, 99, 212, 0.16);
     }
 
     .form-group textarea {
@@ -577,15 +685,15 @@
       margin-top: 5px;
     }
     .attribute-table th {
-      background-color: #f8f9fa;
+      background-color: #f1f7ff;
       font-weight: 600;
       padding: 8px 12px;
-      border-bottom: 1px solid #eee;
-      color: black;
+      border-bottom: 1px solid #dde9ff;
+      color: var(--primary-strong);
     }
     .attribute-table td {
       padding: 8px 12px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #dde9ff;
     }
     .attribute-table tr:last-child td {
       border-bottom: none;
@@ -595,25 +703,26 @@
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 25px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(11, 47, 107, 0.06);
       border-radius: 8px;
       overflow: hidden;
+      border: 1px solid var(--border);
     }
 
     .info-table th {
-      background: #f8fafc;
-      color: black;
+      background: #f7fbff;
+      color: var(--primary-strong);
       font-weight: 600;
       padding: 16px 20px;
       text-align: left;
       width: 30%;
-      border-bottom: 1px solid #eef2f7;
+      border-bottom: 1px solid #dde9ff;
     }
 
     .info-table td {
       padding: 16px 20px;
-      background: #f8fafc;
-      border-bottom: 1px solid #eef2f7;
+      background: #f7fbff;
+      border-bottom: 1px solid #dde9ff;
     }
 
     .info-table tr:last-child td {
@@ -639,7 +748,7 @@
     .section-title {
       font-size: 1.3rem;
       font-weight: 600;
-      color: #1a2a6c;
+      color: var(--primary-strong);
       margin-bottom: 15px;
       display: flex;
       align-items: center;
@@ -652,23 +761,23 @@
 
     /* 审核人标签 跟随状态配色 */
     .assignee-label {
-      color: #2d3748;
+      color: var(--text);
       font-weight: 600;
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 12px;
     }
     .assignee-pending {
-      background: #fff8e1;
-      color: #ff8f00;
+      background: #eef6ff;
+      color: var(--primary);
     }
     .assignee-approved {
-      background: #e8f5e9;
-      color: #2e7d32;
+      background: #d9ecff;
+      color: var(--primary-strong);
     }
     .assignee-rejected {
-      background: #ffebee;
-      color: #c62828;
+      background: var(--danger-bg);
+      color: var(--danger);
     }
 
     /* 分类信息展示样式 - 和页面表格保持统一风格 */
@@ -676,23 +785,24 @@
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 25px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(11, 47, 107, 0.06);
       border-radius: 8px;
       overflow: hidden;
+      border: 1px solid var(--border);
     }
     .sort-info-table th {
-      background: #f8fafc;
-      color: black;
+      background: #f7fbff;
+      color: var(--primary-strong);
       font-weight: 600;
       padding: 16px 20px;
       text-align: left;
       width: 30%;
-      border-bottom: 1px solid #eef2f7;
+      border-bottom: 1px solid #dde9ff;
     }
     .sort-info-table td {
       padding: 16px 20px;
-      background: #f8fafc;
-      border-bottom: 1px solid #eef2f7;
+      background: #f7fbff;
+      border-bottom: 1px solid #dde9ff;
     }
     .sort-info-table tr:last-child td {
       border-bottom: none;
@@ -705,7 +815,7 @@
     /* 分类名称展示 */
     .sort-path-text {
       font-size: 14px;
-      color: #333;
+      color: var(--text);
       font-weight: 500;
     }
   </style>
@@ -790,6 +900,7 @@
       <table class="review-table">
         <thead>
         <tr>
+          <th class="col-view">查看</th>
           <th>ID</th>
           <th>申请人</th>
           <th>物料名</th>
@@ -798,7 +909,6 @@
           <th>状态</th>
           <th>提交时间</th>
           <th>审核人</th>
-          <th>操作</th>
         </tr>
         </thead>
         <tbody>
@@ -806,6 +916,10 @@
         </tbody>
       </table>
     </div>
+    <div class="sticky-h-scroll" id="stickyHScroll" aria-hidden="true">
+      <div class="sticky-h-scroll__inner" id="stickyHScrollInner"></div>
+    </div>
+    <div class="sticky-table-header" id="stickyTableHeader" aria-hidden="true"></div>
     <div class="pagination" id="pagination"></div>
   </div>
 </div>
@@ -902,6 +1016,161 @@
   let assignMap = {};
   let userMap = {};
 
+  function initStickyTableScrollbar() {
+    let tableContainer = document.querySelector(".table-container");
+    let table = document.querySelector(".review-table");
+    let tbody = table ? table.querySelector("tbody") : null;
+    let thead = table ? table.querySelector("thead") : null;
+    let bar = document.getElementById("stickyHScroll");
+    let inner = document.getElementById("stickyHScrollInner");
+    let stickyHeader = document.getElementById("stickyTableHeader");
+    if (!tableContainer || !table || !bar || !inner || !stickyHeader || !thead) return;
+
+    let stickyHeaderTable = null;
+
+    let rafId = 0;
+    let syncing = null;
+
+    let requestUpdate = function () {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(function () {
+        rafId = 0;
+        update();
+      });
+    };
+
+    let hasRows = function () {
+      return !!(tbody && tbody.children && tbody.children.length > 0);
+    };
+
+    let needsXScroll = function () {
+      return table.scrollWidth > tableContainer.clientWidth + 1;
+    };
+
+    let isVisible = function () {
+      let r = tableContainer.getBoundingClientRect();
+      return r.bottom > 0 && r.top < window.innerHeight;
+    };
+
+    let syncWidths = function () {
+      inner.style.width = table.scrollWidth + "px";
+    };
+
+    let ensureStickyHeader = function () {
+      if (stickyHeaderTable) return;
+      stickyHeaderTable = document.createElement("table");
+      stickyHeaderTable.className = "review-table review-table--sticky";
+      stickyHeaderTable.appendChild(thead.cloneNode(true));
+      stickyHeader.appendChild(stickyHeaderTable);
+    };
+
+    let syncHeaderColumnWidths = function () {
+      if (!stickyHeaderTable) return;
+      let srcThs = thead.querySelectorAll("th");
+      let dstThs = stickyHeaderTable.querySelectorAll("th");
+      if (!srcThs.length || srcThs.length !== dstThs.length) return;
+      for (let i = 0; i < srcThs.length; i++) {
+        let w = srcThs[i].offsetWidth;
+        dstThs[i].style.width = w + "px";
+      }
+    };
+
+    let updateStickyHeader = function () {
+      ensureStickyHeader();
+
+      if (!hasRows() || !isVisible()) {
+        stickyHeader.style.display = "none";
+        return;
+      }
+
+      let r = tableContainer.getBoundingClientRect();
+        let cs = window.getComputedStyle(tableContainer);
+        let borderLeft = parseFloat(cs.borderLeftWidth) || 0;
+        let borderRight = parseFloat(cs.borderRightWidth) || 0;
+        let scrollbarWidth = Math.max(0, tableContainer.offsetWidth - tableContainer.clientWidth - borderLeft - borderRight);
+      let headRect = thead.getBoundingClientRect();
+      let headHeight = headRect.height || 0;
+      let visibleTop = Math.max(0, r.top);
+      let visibleBottom = Math.min(window.innerHeight, r.bottom);
+      let containerHasVisibleArea = visibleBottom > visibleTop + 1;
+      let headerNotVisible = headRect.bottom <= visibleTop + 0.5;
+      let stillHasContentBelowHeader = r.bottom > visibleTop + headHeight + 0.5;
+      let shouldShow = containerHasVisibleArea && headerNotVisible && stillHasContentBelowHeader;
+
+      if (!shouldShow) {
+        stickyHeader.style.display = "none";
+        return;
+      }
+
+      stickyHeader.style.display = "block";
+      stickyHeader.style.left = r.left + "px";
+      stickyHeader.style.top = visibleTop + "px";
+      stickyHeader.style.width = r.width + "px";
+        stickyHeader.style.paddingRight = scrollbarWidth + "px";
+
+      stickyHeaderTable.style.width = table.scrollWidth + "px";
+      stickyHeaderTable.style.transform = "translateX(" + (-tableContainer.scrollLeft) + "px)";
+      syncHeaderColumnWidths();
+    };
+
+    let update = function () {
+      syncWidths();
+
+      if (!hasRows() || !needsXScroll() || !isVisible()) {
+        bar.style.display = "none";
+        updateStickyHeader();
+        return;
+      }
+
+      bar.style.display = "block";
+
+      let r = tableContainer.getBoundingClientRect();
+
+      bar.style.width = r.width + "px";
+      bar.style.position = "fixed";
+      bar.style.left = r.left + "px";
+      bar.style.top = "auto";
+      bar.style.bottom = Math.max(0, window.innerHeight - r.bottom) + "px";
+
+      if (syncing !== "bar") {
+        bar.scrollLeft = tableContainer.scrollLeft;
+      }
+
+      updateStickyHeader();
+    };
+
+    tableContainer.addEventListener("scroll", function () {
+      if (syncing === "bar") return;
+      syncing = "container";
+      bar.scrollLeft = tableContainer.scrollLeft;
+      syncing = null;
+      requestUpdate();
+    }, { passive: true });
+
+    bar.addEventListener("scroll", function () {
+      if (syncing === "container") return;
+      syncing = "bar";
+      tableContainer.scrollLeft = bar.scrollLeft;
+      syncing = null;
+    }, { passive: true });
+
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    if (window.ResizeObserver) {
+      let ro = new ResizeObserver(requestUpdate);
+      ro.observe(tableContainer);
+      ro.observe(table);
+    }
+
+    if (tbody && window.MutationObserver) {
+      let mo = new MutationObserver(requestUpdate);
+      mo.observe(tbody, { childList: true });
+    }
+
+    requestUpdate();
+  }
+
   async function loadAllAssignMap() {
     const res = await axios.get("materialCategoryAssign/getAllAssignMap");
     assignMap = res.data || {};
@@ -938,6 +1207,10 @@
     await loadAllUsers();
     selectAppForm();
   };
+
+  window.addEventListener("load", function () {
+    initStickyTableScrollbar();
+  });
 
   function selectAppForm() {
     axios.post("productExamine/selectAllData").then(resp => {
@@ -1060,6 +1333,9 @@
 
           let tr = document.createElement("tr");
           tr.innerHTML = `
+            <td class="col-view">
+              <button class="action-btn view-btn" onclick="openModals(${JSON.stringify(item).replace(/"/g, '&quot;')})">查看</button>
+            </td>
             <td>${item.id}</td>
             <td>${item.appName}</td>
             <td>${item.name}</td>
@@ -1068,10 +1344,6 @@
             <td><span class="status ${statusClass}">${statusText}</span></td>
             <td>${item.app_time.replace('T', ' ')}</td>
             <td><span class="assignee-label ${assigneeClass}">${showName || '未设置'}</span></td>
-            <td>
-              <button class="action-btn view-btn" onclick="openModals(${JSON.stringify(item).replace(/"/g, '&quot;')})">查看</button>
-              <input type="hidden" id="currentItemId" value="${item.id}">
-            </td>
           `;
           tbody.appendChild(tr);
         });

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>发票审核</title>
+    <link href="css/product.css" rel="stylesheet" />
+    <link href="css/window.css" rel="stylesheet">
+    <script src="js/axios-0.18.0.js"></script>
+</head>
+<style>
+    html{
+        font-family: 宋体,serif;
+
+    }
+    thead tr{
+        background-color: #9eb6d8;
+    }
+    thead th{
+        outline: white solid 1px;
+        font-size: 14px;
+    }
+    thead{
+        position: sticky;
+        top: 32px;
+        display: table-header-group;
+    }
+    tbody td{
+        outline: #9eb6d8 solid 1px;
+        font-size: 12px;
+    }
+    td b{
+        font-weight: 600;
+    }
+    table{
+        page-break-inside: avoid;
+        page-break-after: avoid;
+        page-break-before: avoid;
+
+
+    }
+
+    #yj button{
+        width: 80px;
+        height: 30px;
+
+    }
+    #qz button{
+        width: 100px;
+        height: calc(10vh);
+    }
+    .checkP{
+        cursor: pointer;
+        color: #0070bb;
+    }
+    .checkP:hover{
+        color: #85CFEE;
+    }
+    #content b{
+        font-size: clamp(0.75rem, 0.659rem + 0.45vw, 1rem);
+        font-weight: normal;
+        align-self: center;
+        margin: auto 0;
+    }
+    .taked{
+        width:  20px;
+        height: 20px;
+    }
+    .pickUp{
+        white-space: nowrap
+    }
+    .pailie{
+        display: flex;
+    }
+    .pailie b{
+        margin: auto 0;
+    }
+    .goqz{
+        color: red;
+        white-space: nowrap;
+    }
+    b a{
+        white-space: nowrap;
+        display: inline-block;
+        margin: 0 5px;
+    }
+    .myAppNumber{
+        width: 40%;
+    }
+    .backNumber{
+        width: 40%;
+        margin-left: 10px;
+    }
+
+
+    .ylPic img {
+        margin: 5px;
+        border: 1px solid #ccc;
+        float: left;
+        width: 180px;
+        height: 180px;
+    }
+</style>
+<body>
+<div style="display: flex;width: 100%;height: auto">
+    <div class="right" style="display: block;margin: auto;width: 90%">
+        <div class="sticky" style="width: 95%;">
+            <div style="width: 100%;height: auto;padding: 1px;border: #9eb6d8 solid 1px">
+                <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px">
+                    <div style="width:100%;background-color:#9eb6d8;margin: auto  ;height: 25px;"><b>发票审核列表</b></div>
+
+                </div>
+
+
+
+                <div style="width: 99%;height: auto;margin: auto;display: flex;flex-wrap: wrap">
+                    <div style="width: auto;height: auto;max-width: 30%;min-width:fit-content; margin: auto"> <div>开始日期：</div><input id="between" type="date" value=""><label
+                            for="between"> </label></div>
+                    <div style="width: auto;height: auto;max-width: 30%;min-width:fit-content; margin: auto"> <div>结束日期：</div><input id="and" type="date" value=""></div>
+
+                    <div style="width:auto;height: auto;max-width: 20%;margin: auto;min-width: fit-content"> <div>状态：</div><select id="completeId" type="date" value="">
+                        <option class="sxComplete" value="">全部</option>
+                        <option class="sxComplete" value="0">未审核</option>
+                        <option class="sxComplete" value="1">审核通过</option>
+                        <option class="sxComplete" value="2">审核未通过</option>
+                    </select>
+                    </div>
+
+
+                    <div style="text-align: right;margin: 8px auto;width: auto;min-width: fit-content;">
+                        <label>
+                            <input id="searchValue" type="search" style="width: auto;max-width: 75%" placeholder="请输入单号">
+                        </label>
+                        <button id="search">搜索</button>
+                    </div>
+                </div>
+
+                <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: auto">
+                    <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;">
+                        <div style="width: 35%;  height: auto; background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto">申请单号</b></div>
+                        <div style="width: 35%;  height: auto; background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto">申请日期</b></div>
+                        <div style="width: 15%;height: auto; background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto">审核状态</b></div>
+                        <div style="width: 15%;height: auto; background-color: #9eb6d8  ; border:white solid 1px;display: flex" ><b style="align-self: center;margin: auto">操作</b></div>
+                    </div>
+                    <div id="content" style="width: 100%;height: auto;margin: auto">
+
+
+
+                    </div>
+
+                </div>
+
+                <div id="pageDiv" style="width: 100%;margin: 10px auto auto auto;text-align: center;">
+                    共<span style="margin: auto;color: orange;font-weight: bolder" id="pageSum"></span>页丨
+                    当前页：<span id="currentPage" style="color: red;margin: auto;font-weight: bolder"></span>丨
+                    <button style="margin: auto" id="firstPage">首页</button>
+                    <button style="margin: auto" id="lastPage">上一页</button>
+                    <button style="margin: auto" id="nextPage">下一页</button>
+                    <button style="margin: auto" id="endPage">尾页</button>丨
+                    请输入页码：
+                    <label for="jumpValue"></label><input style="width: 50px;margin: auto" type="text" id="jumpValue">
+                    <button id="jump">跳转</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="window">
+
+    <div class="window-content">
+
+        <div class="window-content-close">×</div>
+        <div id="ckDiv"  class="aa" style=" page-break-after:always;width:80% ;height: auto;max-height: 95%; margin: 2px 10%;background-color: white;position: absolute;overflow-y: auto">
+
+
+            <div style="width:99.9%;height: 29px;background-color: #698CC3;margin:1px auto;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt;position: sticky;top: 1px"><b>申请单详情</b></div>
+            <table border="0" cellspacing="1"  width="100%" id="table" >
+                <!--    标题-->
+                <thead >
+                <tr id="title" bgcolor="white">
+                   <th >物料号</th>
+                   <th ><b>物料名称</b></th>
+                   <th ><b>发票价格</b></th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody id="content1">
+
+
+                </tbody>
+
+            </table>
+            <div id="allPics" style="width: 100%;height: auto;display: flex;flex-wrap: wrap">
+
+            </div>
+            <div id="yj" style="width: 100%;height: auto;text-align: center; margin: 0 auto; background-color: white;position: sticky;bottom:0">
+
+
+                <button id="submit"   style="margin-right: 20px">通过</button>
+                <button id="noSubmit" style="margin-right: 20px">不通过</button>
+
+            </div>
+
+        </div>
+
+
+
+
+
+    </div>
+
+</div>
+</div>
+</body>
+<script>
+
+    // 在用户点击其他地方时，关闭弹窗
+    let wd = document.querySelector(".window");
+    window.onclick = function(event) {
+        if (event.target === wd) {
+            wd.style.display = "none";
+        }
+    }
+    //点击close也可以关闭弹窗
+    document.querySelector(".window-content-close").onclick=function (){
+        wd.style.display="none";
+    }
+    //设置现在的时间
+    function fDate( t1, format = "YYYY-MM-DD HH:II "){
+        let minutes = t1.getMinutes();
+        if (minutes<10){
+            const config = {
+                YYYY:t1.getFullYear(),
+                MM:t1.getMonth()+1,
+                DD:t1.getDate(),
+                HH:t1.getHours(),
+                II:"0"+t1.getMinutes(),
+                // SS:t1.getSeconds(),
+            };
+            for( const key in config){
+
+                format = format.replace(key,config[key])
+
+
+            }
+            return format;
+        }
+        else {
+            const config = {
+                YYYY:t1.getFullYear(),
+                MM:t1.getMonth()+1,
+                DD:t1.getDate(),
+                HH:t1.getHours(),
+                II:t1.getMinutes(),
+                // SS:t1.getSeconds(),
+            };
+            for( const key in config){
+
+                format = format.replace(key,config[key])
+
+
+            }
+            return format;
+        }
+
+
+
+    }
+
+    function height(){
+        if (window.parent.document.getElementById("iframepage")){
+            let iframe = window.parent.document.getElementById("iframepage");
+            iframe.style.height=window.parent.innerHeight+"px";
+        }
+
+    }
+    height();
+    //获取条件
+    let screenData={
+        betweenDate:"",
+        andDate:"",
+        str:""
+    }
+    function screen(datas){
+        axios({
+            method:"post",
+            url:"invoice/selectWsFp",
+            data:datas
+        }).then(function (resp){
+            let formdata="";
+            let data=resp.data;
+            if (data!==undefined && data.length>0){
+
+                for (let i = 0; i < data.length; i++) {
+
+                        formdata+='<div style="display: flex">' +
+                            '<div style="width: 35%;  height: auto;  border:white solid 1px;display: flex" >'+data[i].order_number+'</div>' +
+                            '<div style="width: 35%;  height: auto;  border:white solid 1px;display: flex" >'+fDate(new Date(data[i].date))+'</div>' +
+                            '<div style="width: 15%;  height: auto;  border:white solid 1px;display: flex" >未审核</div>' +
+                            '<div class="checkP" style="width: 15%;  height: auto;  border:white solid 1px;display: flex" >查看</div>' +
+                            '</div>'
+
+
+                }
+
+
+                document.getElementById("content").innerHTML=formdata;
+                height();
+
+            }
+            else {
+                document.getElementById("content").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">暂未查询到结果！</div>';
+                height();
+            }
+
+            //绑定查看需要审核的发票信息
+            let checkp = document.querySelectorAll(".checkP");
+            for (let i = 0; i < checkp.length; i++) {
+                checkp[i].onclick=function (){
+                    //打开窗口
+                    document.querySelector(".window").style.display = "block";
+                    //查询该申请单的申请信息
+                    axios({
+                        method: "post",
+                        url:"formRk/selectNewApp",
+                        data:data[i].id
+                    }).then(function (resp){
+                        let data1=resp.data;
+                        let formdata1=""
+                        if (data1.length>0){
+                            for (let j = 0; j < data1.length; j++) {
+                                formdata1+='<tr><td>'+data1[j].material_number+'</td><td>'+data1[j].name+'</td><td>'+data1[j].actual_price+'</td></tr>'
+                            }
+                            document.getElementById("content1").innerHTML=formdata1;
+                              document.getElementById("submit").disabled=false;
+                            document.getElementById("noSubmit").disabled=false;
+
+                            document.getElementById("submit").onclick=function (){
+                                if (window.confirm("确定要通过吗？")){
+                                    axios({
+                                        method:"post",
+                                        url:"invoice/updatePass",
+                                        data:data[i].id
+                                    }).then(function (resp){
+                                        if (resp.data==="success"){
+                                            alert("已通过该申请！");
+                                            location.reload();
+                                        }
+                                        else {
+                                            alert("修改失败，请联系相关人员！")
+                                        }
+                                    })
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                            document.getElementById("noSubmit").onclick=function (){
+                                if (window.confirm("确定要退回吗吗？")){
+                                    axios({
+                                        method:"post",
+                                        url:"invoice/updateNoPass",
+                                        data:data[i].id
+                                    }).then(function (resp){
+                                        if (resp.data==="success"){
+                                            alert("已退回该申请！");
+                                            location.reload();
+                                        }
+                                        else {
+                                            alert("修改失败，请联系相关人员！")
+                                        }
+                                    })
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                        }
+                        else {
+                            document.getElementById("content1").innerHTML='未查询到数据！';
+                            document.getElementById("submit").disabled=true;
+                            document.getElementById("noSubmit").disabled=true;
+                        }
+
+                    })
+                    //查询是否有发票信息
+                      axios({
+                        method:"post",
+                        url:"invoice/selectFp",
+                        data:data[i].id
+                    }).then(function (resp){
+                        let datas=resp.data;
+                          let pic=''
+                          for (let j = 0; j < datas.length; j++) {
+                              pic+='<div class="responsive">\n' +
+                                  '  <div class="img">\n' +
+                                  '    <a class="ylPic" style="cursor: pointer">\n' +
+                                  '      <img src='+datas[j].invoiceStr+'   title="点击预览发票"   alt="发票">\n' +
+                                  '    </a>\n' +
+                                  '  </div>\n' +
+                                  '</div>'
+
+                          }
+                          document.getElementById("allPics").innerHTML=pic;
+                          let ylPic = document.querySelectorAll(".ylPic");
+                          for (let j = 0; j < ylPic.length; j++) {
+                              ylPic[j].onclick=function (){
+                                  let src = ylPic[j].querySelector("img").src;
+                                  const img = new Image();
+                                  img.src = src;
+                                  const newWin = window.open("", "_blank");
+                                  newWin.document.write(img.outerHTML);
+                                  newWin.document.title = "预览图";
+                                  newWin.document.close();
+
+                              }
+                          }
+                      })
+                }
+            }
+        })
+    }
+
+    screen(screenData);
+    //起始日期
+    document.getElementById("between").onchange=function (){
+        if (document.getElementById("between").value.length>0){
+            screenData.betweenDate=document.getElementById("between").value;
+        }else {
+            screenData.betweenDate="";
+        }
+        screen(screenData);
+    }
+
+    //截止日期
+    document.getElementById("and").onchange=function (){
+        if (document.getElementById("and").value.length>0){
+            screenData.andDate=document.getElementById("and").value + ' 23:59:59';
+        }else {
+            screenData.andDate="";
+        }
+        screen(screenData);
+    }
+    //获取输入框中的数据
+    document.getElementById("searchValue").oninput=function (){
+        let trim = document.getElementById("searchValue").value.trim();
+        if (trim.length>0){
+            screenData.str=trim;
+        }
+        else {
+            screenData.str="";
+        }
+    }
+    //输入搜索
+    document.getElementById("search").onclick=function (){
+        //获取输入框中的数据
+
+            let trim = document.getElementById("searchValue").value.trim();
+            if (trim.length>0){
+                screenData.str=trim;
+            }
+            else {
+                screenData.str="";
+            }
+
+        screen(screenData);
+    }
+
+
+</script>
+</html>

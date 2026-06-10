@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>PCB 批量导入工具</title>
+  <script src="js/axios-0.18.0.js"></script>
+  <script src="js/http_cdn.sheetjs.com_xlsx-0.19.3_package_dist_xlsx.full.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Microsoft YaHei", sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fa;
+      padding: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .box {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    #input {
+      height: 220px;
+    }
+
+    #result {
+      height: 120px;
+      background: #f8f8fa;
+    }
+
+    #jsonResult {
+      height: 180px;
+      background: #f8f9fa;
+    }
+
+    #logArea {
+      height: 180px;
+      background: #fdf6ec;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      min-width: 140px;
+    }
+
+    #convertBtn {
+      background-color: #409eff;
+    }
+
+    #previewBtn {
+      background-color: #926dde;
+    }
+
+    #confirmBtn {
+      background-color: #67c23a;
+      display: none;
+    }
+
+    #clearLogBtn {
+      background-color: #f56c6c;
+      width: 120px;
+    }
+
+    #parseExcelJsonBtn {
+      background-color: #36cbcb;
+    }
+
+    #saveBtn {
+      background-color: #1890ff;
+    }
+
+    #previewBtn:disabled, #saveBtn:disabled {
+      background: #ccc;
+    }
+
+    .tip {
+      font-size: 12px;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    #msg {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #67c23a;
+      text-align: center;
+    }
+
+    .table-box {
+      display: none;
+      margin-top: 10px;
+      max-height: 380px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+    }
+
+    .excel-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    .excel-table th,
+    .excel-table td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .excel-table th {
+      background-color: #f5f7fa;
+      font-weight: bold;
+      color: #333;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .excel-table tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    .excel-table tr:hover {
+      background-color: #f0f7ff;
+    }
+
+    #excelJsonFileInput {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+  <h2>PCB 批量导入（原有功能 + Excel解析JSON功能）</h2>
+
+  <!-- 原有功能区域 -->
+  <div class="box">
+    <label>原始内容（粘贴多行）</label>
+    <textarea id="input" placeholder="粘贴PCB编码..."></textarea>
+  </div>
+
+  <div class="btn-group">
+    <button id="convertBtn" onclick="convert()">转换为 ; 分隔</button>
+    <button id="previewBtn" onclick="showPreview()" disabled>预览待导入数据</button>
+    <button id="confirmBtn" onclick="doRealImport()">确认导入数据库</button>
+    <button id="clearLogBtn" onclick="clearLog()">清空日志</button>
+  </div>
+
+  <div class="box">
+    <label>转换结果</label>
+    <textarea id="result" readonly></textarea>
+    <div class="tip">自动去空行、去空格、去冒号、去重复</div>
+  </div>
+
+  <!-- 新增：解析导出Excel为JSON 功能区域 -->
+  <div style="border-top:1px dashed #ccc; margin:25px 0;"></div>
+  <h3 style="margin-bottom:15px; color:#333;">📂 导出Excel解析为JSON（新增功能）</h3>
+
+  <input type="file" id="excelJsonFileInput" accept=".xlsx,.xls">
+  <div class="btn-group">
+    <button id="parseExcelJsonBtn" onclick="document.getElementById('excelJsonFileInput').click()">上传导出的Excel并解析为JSON</button>
+    <button id="saveBtn" disabled onclick="save()">保存到本地</button>
+  </div>
+
+  <div class="box">
+    <label>Excel解析后的JSON结果</label>
+    <textarea id="jsonResult" readonly placeholder="解析导出的Excel后自动生成JSON..."></textarea>
+  </div>
+
+  <!-- 预览表格（共用） -->
+  <div class="box table-box" id="previewTableBox">
+    <label>✅ 预览数据</label>
+    <table class="excel-table" id="previewTable">
+      <thead id="previewHead">
+      </thead>
+      <tbody id="previewBody"></tbody>
+    </table>
+  </div>
+
+  <div class="box">
+    <label>导入日志</label>
+    <textarea id="logArea" readonly></textarea>
+  </div>
+
+  <div id="msg"></div>
+</div>
+
+<script>
+  // ==================== 原有功能变量 ====================
+  let resultText = "";
+  let hasDuplicate = false;
+
+  // ==================== 新增JSON功能变量 ====================
+  let parsedExcelJson = []; // 页面显示：完整Excel数据
+  let saveData = [];        // 本地保存：只保留指定字段
+
+  // ==================== 1. 原有功能 ====================
+  function convert() {
+    let text = document.getElementById("input").value.trim();
+    if (!text) {
+      alert("请输入内容");
+      return;
+    }
+
+    text = text.replace(/[\r\n]+/g, " ")
+            .replace(/:/g, "")
+            .replace(/\s+/g, " ")
+            .trim();
+
+    let arr = text.split(" ").filter(item => item.trim() !== "");
+    processFinalArray(arr);
+  }
+
+  function processFinalArray(arr) {
+    let uniqueArr = [];
+    let itemMap = {};
+    let duplicates = [];
+    hasDuplicate = false;
+
+    arr.forEach(item => {
+      if (!itemMap[item]) {
+        uniqueArr.push(item);
+        itemMap[item] = true;
+      } else {
+        duplicates.push(item);
+        hasDuplicate = true;
+      }
+    });
+
+    if (hasDuplicate) {
+      let confirmDel = confirm(`检测到重复项：${duplicates.join(" | ")}\n是否自动去重（保留一个）？`);
+      if (confirmDel) {
+        arr = uniqueArr;
+        hasDuplicate = false;
+        showMsg(`✅ 已去重，共 ${arr.length} 条`, "green");
+      } else {
+        showMsg(`❌ 存在重复项，无法继续：${duplicates.join(" | ")}`, "red");
+        resultText = "";
+        document.getElementById("previewBtn").disabled = true;
+        return;
+      }
+    }
+
+    resultText = arr.join(";");
+    document.getElementById("result").value = resultText;
+    document.getElementById("previewBtn").disabled = false;
+    showMsg(`✅ 处理完成，共 ${arr.length} 条，可以预览`, "green");
+  }
+
+  function showPreview() {
+    if (hasDuplicate || !resultText) {
+      showMsg("❌ 数据异常，无法预览", "red");
+      return;
+    }
+
+    showMsg("⏳ 正在加载预览数据...", "green");
+
+    axios.post("addPcb/preview", resultText, {
+      headers: { 'Content-Type': 'text/plain' }
+    }).then(res => {
+      let list = res.data.previewList;
+      renderDbPreview(list);
+      document.getElementById("previewTableBox").style.display = "block";
+      document.getElementById("confirmBtn").style.display = "block";
+      showMsg("✅ 预览完成，请确认数据", "green");
+    }).catch(err => {
+      showMsg("❌ 预览失败", "red");
+    });
+  }
+
+  function doRealImport() {
+    if (hasDuplicate || !resultText) {
+      showMsg("❌ 存在重复项或数据异常，不允许导入！", "red");
+      return;
+    }
+
+    if (!confirm("⚠️ 确认将预览数据导入数据库？")) return;
+    showMsg("⏳ 正在导入数据库...", "green");
+
+    axios.post("addPcb/add", resultText, {
+      headers: { 'Content-Type': 'text/plain' }
+    }).then(res => {
+      showMsg("✅ " + res.data.msg, "green");
+      document.getElementById("confirmBtn").style.display = "none";
+
+      let log = document.getElementById("logArea");
+      let time = new Date().toLocaleString();
+      let logText = "[" + time + "] " + res.data.msg + "\n";
+      if (res.data.msgList) {
+        logText += res.data.msgList.map(m => "  → " + m).join("\n") + "\n";
+      }
+      logText += "----------------------------------------\n";
+      log.value = logText + log.value;
+
+      if (res.data.excelUrl) {
+        let a = document.createElement('a');
+        a.href = res.data.excelUrl;
+        a.download = '';
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    }).catch(err => {
+      showMsg("❌ 导入失败", "red");
+    });
+  }
+
+  // ==================== 2. 导出Excel解析为JSON（纯解析+保存） ====================
+  document.getElementById('excelJsonFileInput').addEventListener('change', function(e) {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    let reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        let data = ev.target.result;
+        let workbook = XLSX.read(data, { type: 'binary' });
+        let sheet = workbook.Sheets[workbook.SheetNames[0]];
+        let jsonArray = XLSX.utils.sheet_to_json(sheet);
+
+        if (!jsonArray || jsonArray.length === 0) {
+          showMsg("❌ Excel无数据", "red");
+          return;
+        }
+
+        // ==============================================
+        // 【1】页面显示：完整保留 Excel 所有原始数据
+        // ==============================================
+        parsedExcelJson = jsonArray.map(item => ({
+          ...item,
+          vault: 0
+        }));
+
+        // ==============================================
+        // 【2】本地保存：只提取你要的 4 个字段
+        // ==============================================
+        saveData = jsonArray.map(item => ({
+          id: item["ID"] || "",
+          number: item["数量"] || 0,
+          price: item["预估价格"] || 0,
+          vault: 0
+        }));
+
+        // 页面展示完整JSON
+        document.getElementById("jsonResult").value = JSON.stringify(parsedExcelJson, null, 2);
+        renderExcelPreview(parsedExcelJson);
+        document.getElementById("previewTableBox").style.display = "block";
+        document.getElementById("saveBtn").disabled = false;
+
+        // 自动保存
+        save();
+        showMsg(`✅ Excel解析JSON完成，已自动保存！共 ${parsedExcelJson.length} 条`, "green");
+
+      } catch (err) {
+        showMsg("❌ 解析失败：" + err.message, "red");
+      }
+    };
+    reader.readAsBinaryString(file);
+  });
+
+  // ==================== 两个独立预览渲染函数 ====================
+  // 1. 数据库导入预览（固定表头）
+  function renderDbPreview(list) {
+    const head = document.getElementById("previewHead");
+    const body = document.getElementById("previewBody");
+
+    head.innerHTML = `
+      <tr>
+        <th>序号</th>
+        <th>PCB名称</th>
+        <th>物料号</th>
+        <th>类型</th>
+        <th>版本</th>
+        <th>状态</th>
+      </tr>
+    `;
+
+    body.innerHTML = "";
+    list.forEach((item, index) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${item.pcbName || ''}</td>
+        <td>${item.materialNumber || ''}</td>
+        <td>${item.type || ''}</td>
+        <td>${item.version || ''}</td>
+        <td style="color: ${item.status === '已存在，跳过' ? '#f56c6c' : '#67c23a'}">
+          ${item.status || ''}
+        </td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  // 2. Excel解析预览（动态显示Excel所有列）
+  function renderExcelPreview(list) {
+    if (!list || list.length === 0) return;
+
+    const head = document.getElementById("previewHead");
+    const body = document.getElementById("previewBody");
+
+    // 动态获取Excel表头
+    const keys = Object.keys(list[0]);
+    let headHtml = "<tr><th>序号</th>";
+    keys.forEach(key => {
+      headHtml += `<th>${key}</th>`;
+    });
+    headHtml += "</tr>";
+    head.innerHTML = headHtml;
+
+    // 动态渲染行
+    body.innerHTML = "";
+    list.forEach((row, idx) => {
+      let tr = `<tr><td>${idx + 1}</td>`;
+      keys.forEach(key => {
+        tr += `<td>${row[key] ?? ''}</td>`;
+      });
+      tr += "</tr>";
+      body.innerHTML += tr;
+    });
+  }
+
+  // ==================== 公共工具 ====================
+  function clearLog() {
+    document.getElementById("logArea").value = "";
+  }
+
+  function showMsg(text, color) {
+    let el = document.getElementById("msg");
+    el.innerText = text;
+    el.style.color = color === "red" ? "#f56c6c" : "#67c23a";
+  }
+
+  // 保存：只存指定字段，页面完全不变
+  function save() {
+    localStorage.my = JSON.stringify(saveData);
+    showMsg("💾 数据已保存到本地（仅保留ID/数量/价格/库位）", "green");
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>物料分类审核人分配</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",Arial,sans-serif}
+        body{padding:30px;background:#f7f8fa}
+        .container{max-width:1100px;margin:0 auto}
+        .page-title{
+            font-size:22px;
+            color:#333;
+            margin-bottom:20px;
+            padding-bottom:10px;
+            border-bottom:1px solid #eee;
+        }
+
+        /* 固定搜索栏 */
+        .filter-bar{
+            display:flex;
+            gap:12px;
+            margin-bottom:20px;
+            align-items:center;
+            flex-wrap:wrap;
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 1100px;
+            width: 95%;
+            background: #f7f8fa;
+            padding: 10px 0;
+            z-index: 99;
+        }
+
+        .search-box{
+            flex:1;
+            min-width:200px;
+            padding:12px 15px;
+            border:1px solid #e4e7ed;
+            border-radius:8px;
+            font-size:14px;
+            transition:all 0.2s;
+        }
+        .search-box:focus{
+            outline:none;
+            border-color:#409eff;
+            box-shadow:0 0 0 3px rgba(64,158,255,0.1);
+        }
+        .filter-btn{
+            padding:8px 16px;
+            border:1px solid #dcdfe6;
+            background:white;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:14px;
+            transition:all 0.2s;
+        }
+        .filter-btn.active{
+            background:#409eff;
+            color:white;
+            border-color:#409eff;
+        }
+
+        .tree{margin-left:20px;margin-top:80px}
+        .node{margin:8px 0}
+        .label{
+            padding:12px 16px;
+            background:#fff;
+            border-radius:8px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border:1px solid #e4e7ed;
+            transition:all 0.2s;
+        }
+        .label:hover{
+            border-color:#409eff;
+            box-shadow:0 2px 6px rgba(0,0,0,0.05);
+        }
+        .cate-name{font-size:14px;color:#333}
+        .highlight{background:#fff185;padding:0 2px;border-radius:2px}
+
+        .users{display:flex;gap:6px;flex-wrap:wrap;margin:0 15px;align-items:center}
+        .user-tag{
+            background:#ecf5ff;
+            color:#409eff;
+            padding:5px 10px;
+            border-radius:20px;
+            font-size:12px;
+            display:flex;
+            align-items:center;
+            gap:4px;
+        }
+        .del-btn{
+            color:#f56c6c;
+            cursor:pointer;
+            font-weight:bold;
+            width:16px;height:16px;
+            display:inline-flex;align-items:center;justify-content:center;
+        }
+        .empty{color:#909399;font-size:13px}
+
+        .btn{
+            padding:7px 14px;
+            background:#409eff;
+            color:white;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:13px;
+            transition:all 0.2s;
+        }
+        .btn:hover{background:#337ecc}
+
+        .modal{
+            position:fixed;top:0;left:0;
+            width:100%;height:100%;
+            background:rgba(0,0,0,0.4);
+            display:none;
+            align-items:center;justify-content:center;z-index:999;
+        }
+        .modal-card{
+            background:white;width:520px;
+            border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);
+            overflow:hidden;
+        }
+        .modal-header{padding:16px 20px;background:#f7f8fa;font-size:16px;font-weight:bold;color:#333}
+        .modal-body{padding:20px}
+        .modal-footer{padding:12px 20px;text-align:right;border-top:1px solid #eee}
+        .user-list{max-height:360px;overflow-y:auto;border:1px solid #e4e7ed;border-radius:6px;padding:10px;margin-top:10px}
+        .user-item{padding:8px 10px;border-radius:4px}
+        .user-item:hover{background:#f5f7fa}
+        .modal-search{width:100%;padding:10px 12px;border:1px solid #e4e7ed;border-radius:6px;font-size:14px}
+        .modal-cancel{padding:6px 14px;border:1px solid #dcdfe6;background:white;border-radius:6px;cursor:pointer;margin-right:8px}
+
+        /* 批量选择样式 */
+        .cate-checkbox{margin-right:10px; width:16px; height:16px; cursor:pointer}
+        .batch-bar{display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="page-title">物料分类审核人分配</h2>
+    <div class="filter-bar">
+        <input class="search-box" id="searchCate" placeholder="搜索分类名称 " oninput="renderTree()">
+        <button class="filter-btn active" onclick="filterChange('all')">全部</button>
+        <button class="filter-btn" onclick="filterChange('assigned')">已分配</button>
+        <button class="filter-btn" onclick="filterChange('unassigned')">未分配</button>
+        <button class="btn" onclick="openBatchAssignModal()" style="background:#67c23a">批量分配选中项</button>
+        <button class="btn" onclick="selectAll()" style="background:#909399">全选当前列表</button>
+    </div>
+    <div id="tree"></div>
+</div>
+
+<div class="modal" id="assignModal">
+    <div class="modal-card">
+        <div class="modal-header">分配审核人</div>
+        <div class="modal-body">
+            <input type="hidden" id="currentCid">
+            <input class="modal-search" id="userSearch" placeholder="搜索姓名/用户ID" oninput="renderUsers()">
+            <div class="user-list" id="userList"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-cancel" onclick="closeModal()">取消</button>
+            <button class="btn" onclick="saveAssign()">保存</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="batchAssignModal">
+    <div class="modal-card">
+        <div class="modal-header">批量分配审核人</div>
+        <div class="modal-body">
+            <div id="batchTip" style="margin-bottom:10px; color:#666"></div>
+            <input class="modal-search" id="batchUserSearch" placeholder="搜索姓名/用户ID" oninput="renderBatchUsers()">
+            <div class="user-list" id="batchUserList"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-cancel" onclick="closeBatchModal()">取消</button>
+            <button class="btn" onclick="saveBatchAssign()" style="background:#67c23a">批量保存</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    function height(){
+        let iframe = window.parent.document.getElementById("iframepage");
+        if (iframe){
+            let num= window.parent.innerHeight;
+            if (Number(num)>Number(60)){
+                let s = Number(num)-Number(60)
+                iframe.style.height=s+"px";
+            }
+        }
+    }
+
+    // ===================== 全局变量 =====================
+    let filterType = 'all';
+    let categories = [];
+    let users = [];
+    let assign = {};
+    let tempSelected = {};
+    let selectedCategories = []; // 多选分类ID集合
+    let batchTempSelected = []; // 批量分配临时选中用户
+
+    // ===================== 页面加载 =====================
+    window.onload = async function () {
+        await getCategoryList();
+        await getUserList();
+        await loadAllAssignedUsers();
+        renderTree();
+        await height();
+    };
+
+    // ===================== 1. 获取分类 =====================
+    async function getCategoryList() {
+        try {
+            const { data } = await axios.get('materialCategoryAssign/selectAllSort');
+            categories = data || [];
+        } catch (e) {
+            console.error('获取分类失败', e);
+        }
+    }
+
+    // ===================== 2. 获取用户 =====================
+    async function getUserList() {
+        try {
+            const { data } = await axios.get('user/selectAllUser');
+            users = data || [];
+        } catch (e) {
+            console.error('获取用户失败', e);
+        }
+    }
+
+    // ===================== 加载所有已分配的用户 =====================
+    async function loadAllAssignedUsers() {
+        try {
+            const { data } = await axios.get('materialCategoryAssign/getAllAssignMap');
+            assign = data || {};
+        } catch (e) {
+            console.error("加载分配数据失败", e);
+        }
+    }
+
+    // ===================== 保存单个分类分配 =====================
+    async function saveAssignToBackend(cid, userIds) {
+        try {
+            let userIdsStr = userIds.join(',');
+            await axios.post("materialCategoryAssign/deleteByCategoryId", null, {
+                params: { categoryId: cid, userIds: userIdsStr }
+            });
+            return true;
+        } catch (e) {
+            console.error('保存失败', e);
+            return false;
+        }
+    }
+
+    // ===================== 筛选 =====================
+    function filterChange(type) {
+        filterType = type;
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderTree();
+    }
+
+    // ===================== 全选当前列表 =====================
+    function selectAll() {
+        const keyword = document.getElementById("searchCate").value.toLowerCase().trim();
+        let list = categories.filter(c => {
+            const match = c.name.toLowerCase().includes(keyword) || String(c.id).includes(keyword);
+            if (!match) return false;
+            if (filterType === 'assigned') return assign[c.id]?.length > 0;
+            if (filterType === 'unassigned') return !assign[c.id] || assign[c.id].length === 0;
+            return true;
+        });
+        selectedCategories = list.map(c => c.id);
+        renderTree();
+    }
+
+    // ===================== 切换单个分类选择 =====================
+    function toggleCategory(cid) {
+        const idx = selectedCategories.indexOf(cid);
+        idx === -1 ? selectedCategories.push(cid) : selectedCategories.splice(idx, 1);
+    }
+
+    // ===================== 渲染分类树（带多选框） =====================
+    function renderTree() {
+        const keyword = document.getElementById("searchCate").value.toLowerCase().trim();
+
+        let filtered = categories.filter(c => {
+            const match = c.name.toLowerCase().includes(keyword) || String(c.id).includes(keyword);
+            if (!match) return false;
+            if (filterType === 'assigned') return assign[c.id]?.length > 0;
+            if (filterType === 'unassigned') return !assign[c.id] || assign[c.id].length === 0;
+            return true;
+        });
+
+        let html = '<div class="tree">';
+        filtered.forEach(c => {
+            const checked = selectedCategories.includes(c.id) ? 'checked' : '';
+            let userTags = assign[c.id]?.map(uid => {
+                const u = users.find(x => x.id === uid);
+                return `<span class="user-tag">${u.name}
+                      <span class="del-btn" onclick="delUser('${c.id}',${uid})">×</span>
+                    </span>`;
+            }).join('') || '<span class="empty">未分配</span>';
+
+            let name = c.name;
+            if (keyword) name = name.replace(new RegExp(`(${keyword})`, 'gi'), '<span class="highlight">$1</span>');
+
+            html += `
+        <div class="node">
+            <div class="label">
+                <div style="display:flex;align-items:center">
+                    <input type="checkbox" class="cate-checkbox" ${checked} onchange="toggleCategory('${c.id}')">
+                    <span class="cate-name">${name}</span>
+                </div>
+                <div class="users">${userTags}</div>
+                <button class="btn" onclick="openAssignModal('${c.id}')">分配</button>
+            </div>
+        </div>`;
+        });
+        html += '</div>';
+        document.getElementById("tree").innerHTML = html;
+        height();
+    }
+
+    // ===================== 单个分配弹窗 =====================
+    function openAssignModal(cid) {
+        document.getElementById("currentCid").value = cid;
+        document.getElementById("userSearch").value = '';
+        tempSelected[cid] = [...(assign[cid] || [])];
+        renderUsers();
+        document.getElementById("assignModal").style.display = 'flex';
+    }
+    function closeModal() {
+        document.getElementById("assignModal").style.display = 'none';
+    }
+    function renderUsers() {
+        const cid = document.getElementById("currentCid").value;
+        const key = document.getElementById("userSearch").value.toLowerCase();
+        const selected = tempSelected[cid] || [];
+        document.getElementById("userList").innerHTML = users
+            .filter(u => u.name.toLowerCase().includes(key) || u.id.toString().includes(key))
+            .map(u => {
+                const checked = selected.includes(u.id) ? 'checked' : '';
+                return `<div class="user-item">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                                <input type="checkbox" value="${u.id}" ${checked} onchange="toggleUser('${cid}',${u.id})">
+                                ${u.name}
+                            </label>
+                        </div>`;
+            }).join('');
+    }
+    function toggleUser(cid, uid) {
+        if (!tempSelected[cid]) tempSelected[cid] = [];
+        const has = tempSelected[cid].includes(uid);
+        has ? tempSelected[cid] = tempSelected[cid].filter(id => id !== uid) : tempSelected[cid].push(uid);
+    }
+    async function saveAssign() {
+        const cid = document.getElementById("currentCid").value;
+        const userIds = tempSelected[cid] || [];
+        const ok = await saveAssignToBackend(cid, userIds);
+        if(!ok){ alert("保存失败"); return; }
+        assign[cid] = userIds;
+        closeModal();
+        renderTree();
+        alert('保存成功！');
+    }
+
+    // ===================== 批量分配弹窗 =====================
+    function openBatchAssignModal() {
+        if (selectedCategories.length === 0) {
+            alert("请先选择要批量分配的分类");
+            return;
+        }
+        batchTempSelected = [];
+        document.getElementById("batchUserSearch").value = '';
+        document.getElementById("batchTip").innerText = `已选择 ${selectedCategories.length} 个分类`;
+        renderBatchUsers();
+        document.getElementById("batchAssignModal").style.display = 'flex';
+    }
+    function closeBatchModal() {
+        document.getElementById("batchAssignModal").style.display = 'none';
+    }
+    function renderBatchUsers() {
+        const key = document.getElementById("batchUserSearch").value.toLowerCase();
+        document.getElementById("batchUserList").innerHTML = users
+            .filter(u => u.name.toLowerCase().includes(key) || u.id.toString().includes(key))
+            .map(u => {
+                const checked = batchTempSelected.includes(u.id) ? 'checked' : '';
+                return `<div class="user-item">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                                <input type="checkbox" value="${u.id}" ${checked} onchange="toggleBatchUser(${u.id})">
+                                ${u.name}
+                            </label>
+                        </div>`;
+            }).join('');
+    }
+    function toggleBatchUser(uid) {
+        const has = batchTempSelected.includes(uid);
+        has ? batchTempSelected = batchTempSelected.filter(id => id !== uid) : batchTempSelected.push(uid);
+    }
+
+    // ===================== 批量保存 =====================
+    async function saveBatchAssign() {
+        if (batchTempSelected.length === 0) {
+            alert("请选择要分配的审核人");
+            return;
+        }
+        let success = 0;
+        let fail = 0;
+
+        for (let cid of selectedCategories) {
+            const ok = await saveAssignToBackend(cid, batchTempSelected);
+            ok ? success++ : fail++;
+            assign[cid] = [...batchTempSelected];
+        }
+
+        closeBatchModal();
+        renderTree();
+        alert(`批量完成！成功：${success} 个，失败：${fail} 个`);
+    }
+
+    // ===================== 删除用户 =====================
+    async function delUser(cid, uid) {
+        if (!confirm("确定要删除该审核人吗？")) return;
+        try {
+            let userIds = assign[cid].filter(id => id !== uid);
+            await saveAssignToBackend(cid, userIds);
+            assign[cid] = userIds;
+            renderTree();
+            alert("删除成功！");
+        } catch (e) {
+            console.error("删除失败", e);
+            alert("删除失败");
+        }
+    }
+</script>
+</body>
+</html>

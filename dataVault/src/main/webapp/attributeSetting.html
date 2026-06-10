@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>焊接BOM表属性显示系统</title>
+  <link rel="stylesheet" href="css/all.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+      color: #333;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 0;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      color: white;
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      color: #a0d2eb;
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .search-container {
+      background: white;
+      border-radius: 50px;
+      padding: 5px 20px;
+      max-width: 600px;
+      margin: 30px auto;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .search-container i {
+      color: #777;
+      font-size: 1.2rem;
+      margin-right: 10px;
+    }
+
+    #searchInput {
+      flex: 1;
+      border: none;
+      padding: 15px 10px;
+      font-size: 1.1rem;
+      outline: none;
+      background: transparent;
+    }
+
+    .content {
+      display: flex;
+      gap: 25px;
+      margin-top: 20px;
+    }
+
+    .tree-container {
+      flex: 1;
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .attributes-container {
+      flex: 2;
+      background: white;
+      border-radius: 15px;
+      padding: 0;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .attributes-tabs {
+      display: flex;
+      background: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 15px 20px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #6c757d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .tab-btn:hover {
+      background: #e9ecef;
+    }
+
+    .tab-btn.active {
+      color: #0d6efd;
+      border-bottom: 3px solid #0d6efd;
+      background: #e7f1ff;
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      height: calc(80vh - 60px);
+      overflow: hidden;
+    }
+
+    .tab-content.active {
+      display: flex;
+      overflow-y: auto;
+    }
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #eee;
+      display: flex;
+      align-items: center;
+    }
+
+    h2 i {
+      margin-right: 10px;
+      color: #3498db;
+    }
+
+    /* 四级树形手风琴样式 - 改进的阶梯状缩进 */
+    .tree-view {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .accordion-item {
+      margin-bottom: 5px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .accordion-header {
+      background-color: #f8f9fa;
+      color: #2c3e50;
+      padding: 10px 15px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+      border-left: 4px solid #3498db;
+    }
+
+    /* 阶梯状左边距 */
+    .accordion-header.level-1 {
+      background-color: #f0f7ff;
+      border-left-color: #1a73e8;
+      margin-left: 0px;
+      padding-left: 10px;
+    }
+
+    .accordion-header.level-2 {
+      background-color: #e8f5e9;
+      border-left-color: #43a047;
+      margin-left: 15px;
+      padding-left: 10px;
+    }
+
+    .accordion-header.level-3 {
+      background-color: #fff3e0;
+      border-left-color: #fb8c00;
+      margin-left: 30px;
+      padding-left: 10px;
+    }
+
+    .accordion-header:hover {
+      background-color: #e9ecef;
+    }
+
+    .accordion-header.active {
+      background-color: #e3f2fd;
+    }
+
+    .accordion-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+    }
+
+    .accordion-header h3 i {
+      margin-right: 8px;
+      transition: transform 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .accordion-header.active h3 i {
+      transform: rotate(90deg);
+    }
+
+    .toggle-icon {
+      font-size: 0.9rem;
+      color: #6c757d;
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-header.active .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background-color: #fff;
+    }
+
+    .accordion-content.open {
+      max-height: 100%;
+      transition: max-height 0.5s ease-in;
+    }
+
+    .category-item {
+      padding: 10px 15px;
+      margin: 4px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      position: relative;
+      border: 1px solid transparent;
+    }
+
+    .category-item:hover {
+      background-color: #f0f7ff;
+      transform: translateX(5px);
+      border-color: #d0e3ff;
+    }
+
+    .category-item.active {
+      background-color: #e3f2fd;
+      color: #1976d2;
+      font-weight: bold;
+      border-left: 4px solid #2196f3;
+    }
+
+    /* 更明显的阶梯状左边距 */
+    .category-item.level-1 {
+      margin-left: 0px;
+      padding-left: 10px;
+      border-left: 4px solid #1a73e8;
+    }
+
+    .category-item.level-2 {
+      margin-left: 15px;
+      padding-left: 10px;
+      border-left: 4px solid #43a047;
+    }
+
+    .category-item.level-3 {
+      margin-left: 30px;
+      padding-left: 10px;
+      border-left: 4px solid #fb8c00;
+    }
+
+    .category-item.level-4 {
+      margin-left: 45px;
+      padding-left: 10px;
+      border-left: 4px solid #8e24aa;
+    }
+
+    .category-item i {
+      margin-right: 10px;
+      color: #64b5f6;
+      font-size: 0.9rem;
+    }
+
+    .no-results, .no-selection, .no-saved-data {
+      text-align: center;
+      padding: 40px;
+      color: #78909c;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .no-results i, .no-selection i, .no-saved-data i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      color: #cfd8dc;
+    }
+
+    .stats {
+      display: none;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .attributes-table, .saved-attributes-table, .global-saved-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .attributes-table th, .saved-attributes-table th, .global-saved-table th {
+      background-color: #f5f7fa;
+      padding: 15px;
+      text-align: left;
+      color: #2c3e50;
+      font-weight: 600;
+      border-bottom: 2px solid #e0e6ed;
+    }
+
+    .attributes-table td, .saved-attributes-table td, .global-saved-table td {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .attributes-table tr:hover td, .saved-attributes-table tr:hover td, .global-saved-table tr:hover td {
+      background-color: #f9fbfd;
+    }
+
+    .attributes-table tr:last-child td, .saved-attributes-table tr:last-child td, .global-saved-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .attribute-count {
+      background: #3498db;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      margin-left: 8px;
+    }
+
+    .current-category, .saved-category-info, .category-section {
+      background: #e3f2fd;
+      padding: 15px 25px;
+      border-radius: 8px;
+      margin: 20px 25px 0 25px;
+      border-left: 4px solid #2196f3;
+    }
+
+    .current-category h3, .saved-category-info h3, .category-section h3 {
+      color: #1565c0;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .current-category h3 i, .saved-category-info h3 i, .category-section h3 i {
+      margin-right: 10px;
+    }
+
+    .current-category p, .saved-category-info p, .category-section p {
+      color: #546e7a;
+      font-size: 0.9rem;
+    }
+
+    .toggle-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      min-width: 60px;
+    }
+
+    .toggle-btn.visible {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .toggle-btn.visible:hover {
+      background-color: #45a049;
+    }
+
+    .toggle-btn.hidden {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .toggle-btn.hidden:hover {
+      background-color: #d32f2f;
+    }
+
+    .attribute-status {
+      font-size: 0.85rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .status-visible {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .status-hidden {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    @media (max-width: 900px) {
+      .content {
+        flex-direction: column;
+      }
+
+      .tree-container, .attributes-container {
+        max-height: none;
+      }
+    }
+
+    .table-container {
+      overflow-x: auto;
+      max-height: calc(100% - 100px);
+      margin: 10px 25px 25px 25px;
+    }
+
+    .public-application {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .public-true {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .public-false {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    .visibility-cell {
+      width: 120px;
+      text-align: center;
+    }
+
+    .save-container {
+      margin: 20px 25px;
+      padding: 20px;
+      border-top: 2px solid #eee;
+      text-align: center;
+    }
+
+    .save-btn {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.3s;
+    }
+
+    .save-btn:hover {
+      background: #0b7dda;
+    }
+
+    .save-btn i {
+      margin-right: 8px;
+    }
+
+    .save-info {
+      margin-top: 10px;
+      color: #546e7a;
+      font-size: 0.9rem;
+    }
+
+    .saved-attribute-count {
+      background: #4CAF50;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      margin-left: 8px;
+    }
+
+    .saved-time {
+      font-size: 0.8rem;
+      color: #78909c;
+      margin-left: 10px;
+    }
+
+    .global-saved-summary {
+      background: #e8f5e9;
+      padding: 15px 25px;
+      border-radius: 8px;
+      margin: 20px 25px 0 25px;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .global-saved-summary h3 {
+      color: #2e7d32;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .global-saved-summary h3 i {
+      margin-right: 10px;
+    }
+
+    .global-saved-summary p {
+      color: #546e7a;
+      font-size: 0.9rem;
+    }
+
+    .category-divider {
+      height: 2px;
+      background: linear-gradient(to right, transparent, #ddd, transparent);
+      margin: 20px 25px;
+    }
+
+    .category-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .level-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    .level-0-badge { background-color: #f0f0f0; color: #666; }
+    .level-1-badge { background-color: #e3f2fd; color: #1565c0; }
+    .level-2-badge { background-color: #e8f5e9; color: #2e7d32; }
+    .level-3-badge { background-color: #fff3e0; color: #f57c00; }
+    .level-4-badge { background-color: #f3e5f5; color: #7b1fa2; }
+
+    /* 树形连接线样式 */
+    .tree-connector {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 15px;
+      pointer-events: none;
+    }
+
+    .connector-line {
+      position: absolute;
+      background-color: #ddd;
+    }
+
+    .connector-line.vertical {
+      width: 2px;
+      left: 7px;
+      top: 0;
+      height: 100%;
+    }
+
+    .connector-line.horizontal {
+      height: 2px;
+      width: 8px;
+      left: 7px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* 展开图标样式 */
+    .accordion-expand-icon {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      color: #6c757d;
+      width: 20px;
+      text-align: center;
+    }
+
+    /*.accordion-header.active .accordion-expand-icon {*/
+    /*  transform: rotate(90deg);*/
+    /*  color: #0d6efd;*/
+    /*}*/
+
+    /* 手风琴头部样式 */
+    .accordion-header.category-item {
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+      border-left: 4px solid #3498db;
+      margin-left: 0;
+      padding: 10px 15px;
+    }
+
+    /* 阶梯状左边距 */
+    .accordion-header.level-1.category-item {
+      background-color: #f0f7ff;
+      border-left-color: #1a73e8;
+
+      margin-left: 0px;
+    }
+
+    .accordion-header.level-2.category-item {
+      background-color: #e8f5e9;
+      border-left-color: #43a047;
+
+      margin-left: 15px;
+    }
+
+    .accordion-header.level-3.category-item {
+      background-color: #fff3e0;
+      border-left-color: #fb8c00;
+
+      margin-left: 30px;
+    }
+
+    .category-item.level-4 {
+      margin-left: 45px;
+      padding-left: 10px;
+      border-left: 4px solid #8e24aa;
+    }
+
+    /* 分类层级路径样式 */
+    .category-hierarchy {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      border-left: 3px solid #3498db;
+    }
+
+    .category-hierarchy .level-badge {
+      margin: 0 5px;
+    }
+
+
+
+    .public-badge {
+      background-color: #4CAF50;
+      color: white;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-left: 5px;
+      font-size: 0.8em;
+    }
+
+
+
+    /* 来源分类样式 */
+    .source-category {
+      display: inline-block;
+      padding: 3px 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    .public-badge {
+      background-color: #4CAF50;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      margin-left: 5px;
+      display: none;
+    }
+
+    /* 表格样式优化 */
+    .global-saved-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .global-saved-table th,
+    .global-saved-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .global-saved-table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+    }
+
+    .global-saved-table tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    /* 属性所属分类样式 */
+    .attr-category {
+      display: inline-block;
+      padding: 3px 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    /* 公共应用样式 */
+    .public-application {
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    .public-true {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .public-false {
+      background-color: #f44336;
+      color: white;
+    }
+
+    /* 开关样式 */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+    }
+
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* 圆形滑块 */
+    .slider.round {
+      border-radius: 24px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header STYLE="display: none">
+    <h1><i class="fas fa-microchip"></i> 焊接BOM表属性显示系统</h1>
+  </header>
+
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-value" id="totalCategories">0</div>
+      <div class="stat-label">总分类数</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="totalAttributes">0</div>
+      <div class="stat-label">总属性数</div>
+    </div>
+    <div class="stat-item" style="display: none">
+      <div class="stat-value" id="visibleCount">0</div>
+      <div class="stat-label">可见属性</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="savedCount">0</div>
+      <div class="stat-label">已保存显示的属性</div>
+    </div>
+  </div>
+
+  <div class="search-container">
+    <i class="fas fa-search"></i>
+    <input type="text" id="searchInput" placeholder="输入分类名称、ID或代码进行搜索...">
+  </div>
+
+  <div class="content">
+    <div class="tree-container">
+      <h2><i class="fas fa-sitemap"></i> 分类树形结构</h2>
+      <div id="treeView" class="tree-view"></div>
+    </div>
+
+    <div class="attributes-container">
+      <!-- 修改标签按钮部分 -->
+      <div class="attributes-tabs">
+        <button class="tab-btn active" data-tab="attributes">
+          <i class="fas fa-list"></i> 属性管理
+        </button>
+        <button class="tab-btn" data-tab="saved">
+          <i class="fas fa-save"></i> 已保存属性
+        </button>
+      </div>
+
+      <div id="attributesTab" class="tab-content active">
+        <div id="attributesArea">
+          <div class="no-selection">
+            <i class="fas fa-mouse-pointer"></i>
+            <h3>请选择左侧分类查看属性</h3>
+            <p>点击左侧树形结构中的任意分类项，这里将显示该分类的所有属性信息</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="savedTab" class="tab-content">
+        <div id="savedArea">
+          <div class="no-saved-data">
+            <i class="fas fa-database"></i>
+            <h3>暂无已保存的属性信息</h3>
+            <p>请在属性管理页面设置属性显示状态并保存到数据库</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+  function height(){
+
+    let iframe = window.parent.document.getElementById("iframepage");
+    if (iframe){
+      let num= window.parent.innerHeight;
+      if (Number(num)>Number(60)){
+        let s = Number(num)-Number(60)
+        iframe.style.height=s+"px";
+      }
+
+    }
+
+
+  }
+  height();
+  // 分类数据
+  let categoryRecords;
+  // 属性数据
+  let attributeRecords;
+
+  // 查询所有分类
+  async function allSort() {
+    let a;
+    await axios({
+      method: "post",
+      url: "sort/selectAll"
+    }).then(function (resp) {
+      a = resp.data;
+    });
+    return a;
+  }
+
+  // 查询所有属性
+  async function allAttribute() {
+    let a;
+    await axios({
+      method: "post",
+      url: "attribute/selectAll"
+    }).then(function (resp) {
+      a = resp.data;
+    });
+    return a;
+  }
+
+  // 查询所有保存的属性
+  async function selectSaveAttribute() {
+    let a;
+    await axios({
+      method: "post",
+      url: "bomAttributeSetting/selectAll"
+    }).then(function (resp) {
+      a = resp.data;
+    });
+    return a;
+  }
+
+  // 添加保存
+  function saveAttribute(id) {
+    axios({
+      method: "post",
+      url: "bomAttributeSetting/addAttributeSetting",
+      data: id
+    }).then(function (resp) {
+      if (resp.data === "success") {
+        alert("显示成功！");
+      } else {
+        alert("修改失败，请联系相关人员！");
+      }
+    });
+  }
+
+  // 删除保存
+  function deleteAttribute(id) {
+    axios({
+      method: "post",
+      url: "bomAttributeSetting/deleteAttributeSetting",
+      data: id
+    }).then(function (resp) {
+      if (resp.data === "success") {
+        alert("取消显示成功！");
+      } else {
+        alert("修改失败，请联系相关人员！");
+      }
+    });
+  }
+
+  async function allSortDisplay() {
+    categoryRecords = await allSort();
+    attributeRecords = await allAttribute();
+
+    console.log("分类数据:", categoryRecords);
+    console.log("属性数据:", attributeRecords);
+
+    // 当前选中的分类
+    let currentCategory = null;
+    // 属性显示状态
+    let attributeVisibility = {};
+    // 已保存的属性数据 - 使用您指定的数组格式
+    let savedAttributes = [];
+    // 手风琴展开状态
+    let accordionState = {};
+
+    // 初始化页面
+    function complete() {
+      renderTreeView();
+      updateStats();
+
+      // 搜索功能
+      document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        if (searchTerm === '') {
+          renderTreeView();
+          clearAttributesArea();
+          return;
+        }
+
+        const filteredRecords = categoryRecords.filter(record =>
+                record.name.toLowerCase().includes(searchTerm) ||
+                record.id.toString().includes(searchTerm) ||
+                record.code.includes(searchTerm)
+        );
+
+        renderTreeView(filteredRecords);
+        clearAttributesArea();
+      });
+
+      // 添加一些测试数据
+      addTestSavedData();
+
+      // 默认选中第一个分类
+      setTimeout(() => {
+        const firstItem = document.querySelector('.category-item');
+        if (firstItem) {
+          firstItem.click();
+        }
+      }, 100);
+
+      bindTabEvents();
+      height();
+    }
+
+    // 添加测试保存数据
+    async function addTestSavedData() {
+      savedAttributes = await selectSaveAttribute();
+      console.log("已保存属性:", savedAttributes);
+
+      // 更新树形视图中的已保存计数
+      renderTreeView();
+      updateStats();
+    }
+
+    // 获取分类的所有上级分类（包括自己）
+    function getCategoryHierarchy(categoryId) {
+      const hierarchy = [];
+      let current = categoryRecords.find(cat => Number(cat.id) === Number(categoryId));
+
+      while (current) {
+        hierarchy.unshift(current);
+        current = categoryRecords.find(cat => Number(cat.id) === Number(current.parentId));
+      }
+
+      return hierarchy;
+    }
+
+    // 新增绑定标签事件函数
+    function bindTabEvents() {
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const tabName = this.getAttribute('data-tab');
+          switchTab(tabName);
+        });
+      });
+    }
+
+    // 修改后的切换标签页函数
+    function switchTab(tabName) {
+      // 移除所有标签的active类
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // 隐藏所有标签内容
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+
+      // 激活当前标签
+      if (tabName === 'attributes') {
+        document.querySelector('.tab-btn[data-tab="attributes"]').classList.add('active');
+        document.getElementById('attributesTab').classList.add('active');
+      } else if (tabName === 'saved') {
+        document.querySelector('.tab-btn[data-tab="saved"]').classList.add('active');
+        document.getElementById('savedTab').classList.add('active');
+
+        // 显示全局已保存属性
+        showAllSavedAttributes();
+      }
+    }
+
+    // 渲染树形视图（四级分类手风琴样式）
+    function renderTreeView(data = categoryRecords) {
+      const treeContainer = document.getElementById('treeView');
+      treeContainer.innerHTML = '';
+
+      if (data.length === 0) {
+        treeContainer.innerHTML = `
+          <div class="no-results">
+            <i class="fas fa-search"></i>
+            <h3>未找到匹配的分类</h3>
+            <p>请尝试其他搜索关键词</p>
+          </div>
+        `;
+        return;
+      }
+
+      // 构建树形结构
+      const tree = buildTree(data);
+
+      // 渲染树形结构（从level 1开始，跳过根节点）
+      const html = renderTreeLevel(tree, 1);
+      treeContainer.innerHTML = html;
+
+      // 绑定分类项点击事件
+      bindCategoryItemEvents();
+    }
+
+    // 构建树形结构
+    function buildTree(records) {
+      const tree = {};
+
+      // 首先，将所有记录按ID存储
+      const recordMap = {};
+      records.forEach(record => {
+        recordMap[record.id] = { ...record, children: [] };
+      });
+
+      // 构建树形结构
+      const root = [];
+      records.forEach(record => {
+        const node = recordMap[record.id];
+        if (record.parentId === "0" || !recordMap[record.parentId]) {
+          root.push(node);
+        } else {
+          if (recordMap[record.parentId]) {
+            recordMap[record.parentId].children.push(node);
+          }
+        }
+      });
+
+      return root;
+    }
+// 修改1：在renderTreeLevel函数中，为已保存计数元素添加data-category-id属性
+    // 在树形视图的渲染函数中添加data-category-id属性，以便后续更新
+    function renderTreeLevel(nodes, level) {
+      if (!nodes || nodes.length === 0) return '';
+
+      let html = '';
+
+      nodes.forEach(node => {
+        const nodeLevel = parseInt(node.level);
+        const isLeaf = node.children.length === 0;
+
+        // 计算该分类有多少属性
+        const attributeCount = attributeRecords.filter(attr => attr.parentId === node.id).length;
+
+        // 计算该分类已保存的属性数量
+        const savedCount = savedAttributes.filter(attr =>
+                attributeRecords.find(a => Number(a.id) === Number(attr.id))?.parentId === node.id
+        ).length;
+
+        if (!isLeaf && nodeLevel < 4) {
+          // 非叶子节点（level 1-3），渲染为手风琴
+          html += `
+          <div class="accordion-item">
+            <div class="accordion-header level-${nodeLevel} category-item" data-id="${node.id}" data-name="${node.name}" data-level="${nodeLevel}">
+              <div style="display: flex; align-items: center; flex: 1;">
+                <i class="fas fa-chevron-right accordion-expand-icon"></i>
+                <span style="margin: 0 0 0 10px;">
+                  ${node.name}
+                  <span class="level-badge level-${nodeLevel}-badge">L${nodeLevel}</span>
+                </span>
+              </div>
+              <div class="category-info">
+                ${savedCount > 0 ? `<span class="saved-attribute-count" data-category-id="${node.id}" title="已保存属性">${savedCount}</span>` : ''}
+                ${attributeCount > 0 ? `<span class="attribute-count" title="总属性数">${attributeCount}</span>` : ''}
+
+              </div>
+            </div>
+            <div class="accordion-content" id="content-${node.id}">
+              ${renderTreeLevel(node.children, level + 1)}
+            </div>
+          </div>
+        `;
+        } else {
+          // 叶子节点（level 4）或没有子节点的节点，渲染为普通分类项
+          html += `
+          <div class="category-item level-${nodeLevel}"
+                data-id="${node.id}" data-name="${node.name}" data-level="${nodeLevel}">
+            <i class="fas fa-${nodeLevel === 4 ? 'cube' : 'folder'}"></i>
+            <span class="category-name">${node.name}</span>
+            <span style="margin-left:auto; display: flex; align-items: center; gap: 5px;">
+              ${savedCount > 0 ? `<span class="saved-attribute-count" data-category-id="${node.id}" title="已保存属性">${savedCount}</span>` : ''}
+              ${attributeCount > 0 ? `<span class="attribute-count" title="总属性数">${attributeCount}</span>` : ''}
+
+              <span class="level-badge level-${nodeLevel}-badge">L${nodeLevel}</span>
+            </span>
+          </div>
+        `;
+        }
+      });
+
+      return html;
+    }
+
+    // 修改2：添加updateCategorySavedCount函数，用于更新特定分类的已保存数量
+    // 这个函数只更新数量，不重新渲染整个树形视图
+    function updateCategorySavedCount(categoryId) {
+      // 计算该分类已保存的属性数量
+      const savedCount = savedAttributes.filter(attr =>
+              attributeRecords.find(a => Number(a.id) === Number(attr.id))?.parentId === categoryId
+      ).length;
+
+      // 找到树形视图中对应分类的已保存计数元素
+      const savedCountElement = document.querySelector(`.saved-attribute-count[data-category-id="${categoryId}"]`);
+
+      if (savedCount > 0) {
+        if (savedCountElement) {
+          // 更新现有的已保存计数元素
+          savedCountElement.textContent = savedCount;
+        } else {
+          // 找到分类项，添加已保存计数元素
+          const categoryItem = document.querySelector(`.category-item[data-id="${categoryId}"]`);
+          if (categoryItem) {
+            // 找到分类项中的category-info或类似容器
+            const categoryInfo = categoryItem.querySelector('.category-info') ||
+                    categoryItem.querySelector('[style*="margin-left:auto"]') ||
+                    categoryItem.lastElementChild;
+
+            if (categoryInfo) {
+              // 创建并插入已保存计数元素
+              const savedSpan = document.createElement('span');
+              savedSpan.className = 'saved-attribute-count';
+              savedSpan.setAttribute('data-category-id', categoryId);
+              savedSpan.setAttribute('title', '已保存属性');
+              savedSpan.textContent = savedCount;
+
+              // 插入到适当位置
+              if (categoryInfo.classList.contains('category-info')) {
+                // 手风琴头部的情况
+                categoryInfo.insertBefore(savedSpan, categoryInfo.querySelector('.attribute-count') || categoryInfo.firstChild);
+              } else {
+                // 叶子节点的情况
+                categoryInfo.insertBefore(savedSpan, categoryInfo.querySelector('.attribute-count') || categoryInfo.firstChild);
+              }
+            }
+          }
+        }
+      } else {
+        // 如果没有已保存的属性，移除计数元素
+        if (savedCountElement) {
+          savedCountElement.remove();
+        }
+      }
+    }
+
+    // 绑定分类项点击事件
+    function bindCategoryItemEvents() {
+      // 绑定展开图标点击事件（只展开/折叠）
+      document.querySelectorAll('.accordion-expand-icon').forEach(icon => {
+        icon.addEventListener('click', function(e) {
+          e.stopPropagation();
+
+          const header = this.closest('.accordion-header');
+          const content = header.nextElementSibling;
+          const isOpen = content.classList.contains('open');
+
+          // 切换展开状态
+          if (!isOpen) {
+            content.classList.add('open');
+            // header.classList.add('active');
+            this.classList.remove('fa-chevron-right');
+            this.classList.add('fa-chevron-down');
+          } else {
+            content.classList.remove('open');
+            // header.classList.remove('active');
+            this.classList.remove('fa-chevron-down');
+            this.classList.add('fa-chevron-right');
+          }
+
+          // 保存状态
+          const categoryId = header.dataset.id;
+          accordionState[categoryId] = !isOpen;
+        });
+      });
+
+      // 绑定分类项点击事件（显示属性）
+      document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          // 如果点击的是展开图标，则不处理
+          if (e.target.classList.contains('accordion-expand-icon') ||
+                  e.target.closest('.accordion-expand-icon')) {
+            return;
+          }
+
+          // 移除所有active类
+          document.querySelectorAll('.category-item').forEach(el => {
+            el.classList.remove('active');
+          });
+
+          // 为当前项添加active类
+          this.classList.add('active');
+
+          // 设置当前选中的分类
+          const categoryId = this.dataset.id;
+          const category = categoryRecords.find(cat => Number(cat.id) === Number(categoryId));
+
+          if (category) {
+            currentCategory = category;
+
+            // 初始化当前分类的属性显示状态
+            initAttributeVisibility(category.id);
+
+            // 查询分类属性
+            queryCategoryAttributes(category.id);
+
+            // 切换到属性管理标签页
+            switchTab('attributes');
+          }
+        });
+      });
+    }
+
+    // 初始化属性显示状态
+    function initAttributeVisibility(categoryId) {
+      const catId = Number(categoryId);
+
+      // 获取当前分类及其上级和公共属性
+      const categoryHierarchy = getCategoryHierarchy(catId);
+      const categoryIds = categoryHierarchy.map(cat => cat.id);
+      const attributes = attributeRecords.filter(attr =>
+              categoryIds.includes(attr.parentId) || attr.parentId === "0"
+      );
+
+      // 重置相关属性为隐藏状态
+      attributes.forEach(attr => {
+        attributeVisibility[Number(attr.id)] = false;
+      });
+
+      // 如果有保存的状态，加载保存的状态
+      savedAttributes.forEach(savedAttr => {
+        attributeVisibility[Number(savedAttr.id)] = true;
+      });
+    }
+
+    // 查询分类属性
+    function queryCategoryAttributes(categoryId) {
+      if (!categoryId) return;
+
+      // 获取当前分类
+      const currentCategory = categoryRecords.find(cat => cat.id === categoryId);
+      if (!currentCategory) return;
+
+      // 获取分类层级路径
+      const categoryHierarchy = getCategoryHierarchy(categoryId);
+      const categoryIds = categoryHierarchy.map(cat => cat.id);
+
+      // 查询属性：属于这些分类之一，或者是公共属性
+      const attributes = attributeRecords.filter(attr =>
+              categoryIds.includes(attr.parentId) || Number(attr.parentId) === Number(0)
+      );
+
+      // 初始化当前分类的属性显示状态
+      initAttributeVisibility(categoryId);
+
+      // 显示属性
+      showCategoryAttributes(currentCategory, attributes);
+    }
+
+    // 显示分类属性
+    function showCategoryAttributes(category, attributes) {
+      const attributesArea = document.getElementById('attributesArea');
+      const catId = Number(category.id);
+
+      // 计算当前分类已保存的属性数量
+      const savedCount = savedAttributes.filter(attr =>
+              attributeRecords.find(a => Number(a.id) === Number(attr.id))?.parentId === catId
+      ).length;
+
+      let attributesTableHtml = '';
+      if (attributes.length > 0) {
+        // 显示分类层级路径
+        const hierarchyPath = getCategoryHierarchy(catId)
+                .map(cat => `<span class="level-badge level-${cat.level}-badge">${cat.name}</span>`)
+                .join(' → ');
+
+        attributesTableHtml = `
+          <div class="current-category">
+            <h3><i class="fas fa-folder-tree"></i> 属性层级</h3>
+            <div class="category-hierarchy">${hierarchyPath}</div>
+
+            <h3><i class="fas fa-folder-open"></i> ${category.name}
+
+              <span class="level-badge level-${category.level}-badge" style="margin-left:10px;">L${category.level}</span>
+              ${savedCount > 0 ? `<span style="font-size:0.9rem; color:#4CAF50; margin-left:10px;"><i class="fas fa-save"></i> 已保存 ${savedCount} 个属性</span>` : ''}
+            </h3>
+            <p>属性总数: ${attributes.length}</p>
+          </div>
+          <div class="table-container">
+            <table class="attributes-table">
+              <thead>
+                <tr>
+                  <th>属性名称</th>
+                  <th>所属分类</th>
+                  <th>单位</th>
+                  <th>显示</th>
+                </tr>
+              </thead>
+              <tbody id="attributesTableBody">
+        `;
+
+        attributes.forEach(attr => {
+          const unitDisplay = attr.unit ? `${attr.unit}` : '-';
+          const isSaved = savedAttributes.some(saved => Number(saved.id) === Number(attr.id));
+          const isVisible = isSaved;
+
+          // 查找属性所属分类
+          let categoryName = "未知分类";
+          if (Number(attr.parentId) === 0) {
+            categoryName = "公共属性";
+          } else {
+            const attrCategory = categoryRecords.find(cat => Number(cat.id) === Number(attr.parentId));
+            if (attrCategory) {
+              categoryName = attrCategory.name;
+            }
+          }
+
+          attributesTableHtml += `
+            <tr id="attr-row-${attr.id}">
+
+              <td>${attr.name} ${isSaved ? '<span style="color:#4CAF50; font-size:0.8rem; margin-left:5px;"><i class="fas fa-save"></i></span>' : ''}</td>
+              <td>
+                <span class="attr-category" title="${categoryName}">
+                  ${categoryName}
+                  ${Number(attr.parentId) === 0 ? '<span class="public-badge">公共</span>' : ''}
+                </span>
+              </td>
+              <td>${unitDisplay}</td>
+
+
+              <td>
+                <label class="switch">
+                  <input type="checkbox" class="visibility-toggle" data-attr-id="${attr.id}" ${isVisible ? 'checked' : ''}>
+                  <span class="slider round"></span>
+                </label>
+              </td>
+            </tr>
+          `;
+        });
+
+        attributesTableHtml += `
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      attributesArea.innerHTML = `
+        ${attributes.length > 0 ? attributesTableHtml :
+              '<div class="no-results" style="margin-top: 20px; padding: 20px;"><i class="fas fa-exclamation-circle"></i><h4>该分类及其上级分类暂无属性信息</h4></div>'
+      }
+      `;
+
+      // 绑定事件处理程序
+      if (attributes.length > 0) {
+        // 绑定切换按钮事件
+        const toggleInputs = document.querySelectorAll('.visibility-toggle');
+        toggleInputs.forEach(input => {
+          input.addEventListener('change', function() {
+            const attrId = Number(this.getAttribute('data-attr-id'));
+            const isVisible = this.checked;
+
+            // 更新本地状态
+            if (isVisible) {
+              // 添加到保存数组
+              const attr = attributeRecords.find(a => Number(a.id) === attrId);
+              if (attr) {
+                // 检查是否已存在
+                const exists = savedAttributes.some(a => Number(a.id) === attrId);
+                if (!exists) {
+                  // 使用指定格式添加属性
+                  savedAttributes.push({
+                    id: attr.id,
+                    name: attr.name,
+                    length: attr.length,
+                    parentId: attr.parentId,
+                    publicApplication: attr.publicApplication,
+                    unit: attr.unit
+                  });
+                }
+                attributeVisibility[attrId] = true;
+              }
+            } else {
+              // 从保存数组中移除
+              savedAttributes = savedAttributes.filter(a => Number(a.id) !== attrId);
+              attributeVisibility[attrId] = false;
+            }
+
+            // 调用API保存或删除
+            if (isVisible) {
+              saveAttribute(attrId);
+            } else {
+              deleteAttribute(attrId);
+            }
+
+            // 更新UI
+            // 修改后：只更新对应分类的数量
+            if (currentCategory) {
+              // 获取属性所属的分类ID
+              const attr = attributeRecords.find(a => Number(a.id) === attrId);
+              if (attr) {
+                const attrCategoryId = attr.parentId;
+                // 更新树形视图中对应分类的已保存数量
+                updateCategorySavedCount(attrCategoryId);
+              }
+            }
+
+            updateStats();
+
+            // 重新加载当前分类属性，以更新开关状态
+            if (currentCategory) {
+              queryCategoryAttributes(currentCategory.id);
+            }
+
+          });
+        });
+      }
+    }
+
+    // 显示全局已保存属性
+    function showAllSavedAttributes() {
+      const savedArea = document.getElementById('savedArea');
+
+      if (savedAttributes.length === 0) {
+        savedArea.innerHTML = `
+          <div class="no-saved-data">
+            <i class="fas fa-database"></i>
+            <h3>暂无已保存的属性信息</h3>
+            <p>请在属性管理页面设置属性显示状态并保存到数据库</p>
+          </div>
+        `;
+        return;
+      }
+
+      let savedContent = `
+        <div class="global-saved-summary">
+          <h3><i class="fas fa-globe"></i> 全局已保存属性总览</h3>
+          <p>已保存属性总数: <strong>${savedAttributes.length}</strong></p>
+        </div>
+
+        <div class="table-container">
+          <table class="global-saved-table">
+            <thead>
+              <tr>
+
+                <th>属性名称</th>
+                <th>单位</th>
+
+                <th>来源分类</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      // 显示所有保存的属性
+      savedAttributes.forEach(attr => {
+        const unitDisplay = attr.unit ? `${attr.unit}` : '-';
+        const isPublic = Number(attr.parentId) === 0;
+
+        // 确定来源分类显示名称
+        let sourceDisplay = "公共属性";
+        if (!isPublic) {
+          const attrCategory = categoryRecords.find(cat => Number(cat.id) === Number(attr.parentId));
+          sourceDisplay = attrCategory ? attrCategory.name : `分类ID: ${attr.parentId}`;
+        }
+
+        savedContent += `
+          <tr>
+            <td>${attr.name}</td>
+            <td>${unitDisplay}</td>
+            <td>
+              <span class="source-category" title="${sourceDisplay}">
+                ${sourceDisplay}
+                ${isPublic ? '<span class="public-badge">公共</span>' : ''}
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+
+      savedContent += `
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      savedArea.innerHTML = savedContent;
+    }
+
+    // 更新统计信息
+    function updateStats() {
+      // 总分类数
+      const totalCats = categoryRecords.filter(cat => cat.id !== "0").length;
+      document.getElementById('totalCategories').textContent = totalCats;
+
+      // 总属性数
+      document.getElementById('totalAttributes').textContent = attributeRecords.length;
+
+      // 已保存属性数
+      document.getElementById('savedCount').textContent = savedAttributes.length;
+    }
+
+    // 清空属性区域
+    function clearAttributesArea() {
+      const attributesArea = document.getElementById('attributesArea');
+      attributesArea.innerHTML = `
+        <div class="no-selection">
+          <i class="fas fa-mouse-pointer"></i>
+          <h3>请选择左侧分类查看属性</h3>
+          <p>点击左侧树形结构中的任意分类项，这里将显示该分类的所有属性信息</p>
+        </div>
+      `;
+      currentCategory = null;
+    }
+
+    complete();
+  }
+
+  allSortDisplay();
+</script>
+</body>
+</html>

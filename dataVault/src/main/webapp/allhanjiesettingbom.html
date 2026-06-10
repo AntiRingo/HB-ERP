@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>BOM表信息浏览</title>
+    <link href="css/product.css" rel="stylesheet" />
+    <script src="js/axios-0.18.0.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+
+</head>
+<style>
+    html{
+        font-family: 宋体,serif;
+        box-sizing: border-box;
+    }
+    #content div:hover{
+        background-color: #999a9c;
+    }
+    #content div:hover a{
+        color: black;
+    }
+    #content div{
+        cursor: pointer;
+    }
+    html{
+        background-color: #f0f8ff;
+    }
+    button,select{
+        cursor: pointer;
+    }
+</style>
+<body>
+<div style="display: flex;width: 100%;height: auto;margin: auto">
+
+    <div class="right" style="margin: auto" >
+        <div style="margin: 20px auto;width: 100%;height: auto">
+            <div style="width: 100%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;">
+                <div style="width: 98%;height: auto;text-align: right;margin-top: 10px;">
+                    <label>
+                        <select id="selectType" style="height: 22px;"><option value="1" >查询BOM表</option><option value="2">查询物料</option></select>
+                    </label><input id="searchContent" style="margin-right: 5px" type="search" placeholder="请输入想要搜索的内容" oninput="value=value.replace(/\s+/g,'')"><button title="可选择下拉框来搜索不同的类型" id="search">搜索</button>
+                </div>
+                <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin:10px auto;max-height: 70vh;overflow: auto;">
+                    <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;position: sticky;top: 0">
+                        <div style="width: 24.5%;margin: auto;background-color: #9eb6d8; border:white solid 1px" ><b>标题</b></div>
+                        <div style="width: 50%;margin: auto  ;background-color: #9eb6d8; border:white solid 1px" ><b>描述</b></div>
+                        <div style="width: 25%;margin: auto;background-color: #9eb6d8  ; border:white solid 1px"    ><b>操作</b></div>
+                    </div>
+                    <div id="content" style="width: 100%;height: auto;margin: auto">
+                        <!--                                                    <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+                        <!--                                                        <div style="width: 24.5%;margin: auto; border: white solid 1px"><b>物料名称</b></div>-->
+                        <!--                                                        <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>物料号</b></div>-->
+                        <!--                                                        <div style="width: 25%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+                        <!--                                                    </div>-->
+
+                        <!--                                                    <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+                        <!--                                                        <div style="width: 24.5%;margin: auto; border: white solid 1px"><b>物料名称</b></div>-->
+                        <!--                                                        <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>物料号</b></div>-->
+                        <!--                                                        <div style="width: 25%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+                        <!--                                                    </div>-->
+                    </div>
+                </div>
+                <!--点击分类的分页-->
+                <div id="pageDiv1" style="width: 100%;margin: 10px auto auto auto;text-align: center;">
+                    共<span style="margin: auto;color: orange;font-weight: bolder" id="pageSum1"></span>页丨
+                    当前页：<span id="currentPage1" style="color: red;margin: auto;font-weight: bolder"></span>丨
+                    <button style="margin: auto" id="firstPage1">首页</button>
+                    <button style="margin: auto" id="lastPage1">上一页</button>
+                    <button style="margin: auto" id="nextPage1">下一页</button>
+                    <button style="margin: auto" id="endPage1">尾页</button>丨
+                    请输入页码：
+                    <label for="jumpValue1"></label><input style="width: 50px;margin: auto" type="text" id="jumpValue1">
+                    <button id="jump1">跳转</button>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+</div>
+<div class="window">
+
+    <div class="window-content">
+
+        <div class="window-content-close">×</div>
+
+
+
+        <div id="updateBlock" class="aa" style="width:750px ;max-height:90%;overflow-y: auto;overflow-x: hidden;  margin:20px auto auto;background-color: white;padding-bottom: 5px;display: none">
+            <div style="text-align: center">
+                <h3>修改BOM表信息</h3>
+            </div>
+            <div style="margin:auto;width: fit-content">
+                <div style="width:738px ;height: 38px;display: flex;margin-top: 5px">
+                    <div  style="width: 100px;height: 38px;border: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName">产品</div>
+                    </div>
+                    <div class="qwe"  style="width:638px ;height: 38px;border-top: 1px solid #d6e0ef;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+
+                        &nbsp;<input   style="width: 90%;height: 20px;" type="text" name="" id="updateName" value="" disabled> &nbsp;<b>*</b>
+                    </div>
+                </div>
+                <div style="width:738px ;height: 38px;display: flex;">
+                    <div  style="width: 100px;height: 38px;border: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName">标题</div>
+                    </div>
+                    <div class="qwe"  style="width:638px ;height: 38px;border-top: 1px solid #d6e0ef;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+
+                        &nbsp;<input   style="width: 90%;height: 20px;" type="text" name="" id="updateTitle" value="" > &nbsp;<b>*</b>
+                    </div>
+                </div>
+                <div style="width:738px ;height: auto;display: flex;">
+                    <div  style="width: 100px;height: auto; border: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName">描述</div>
+                    </div>
+                    <div class="qwe"  style="width:638px ;height:150px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+
+                        &nbsp;<textarea id="updateDescription" style="width:90%;height: auto" value=""></textarea> &nbsp;<b>*</b>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+</body>
+<script type="text/javascript" src="js/axios-0.18.0.js"></script>
+<script>
+
+    function height(){
+
+        let iframe = window.parent.document.getElementById("iframepage");
+        if (iframe){
+            let num= window.parent.innerHeight;
+            if (Number(num)>Number(60)){
+                let s = Number(num)-Number(60)
+                iframe.style.height=s+"px";
+            }
+
+        }
+
+
+    }
+    height();
+    //接收上个页面传来的数据
+
+    // 接收前端传来的parentId
+    function getHref(){
+        var url = decodeURI(location.search);
+        var theRequest = new Object();
+        if (url.indexOf("?") !== -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for(var i = 0; i < strs.length; i ++) {
+                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+    let userId=parent.document.getElementById("userId").value;
+
+    //查询权限
+    async function userFunction(userId){
+        let data;
+        await axios({
+            method:"post",
+            url:"userFunction/selectUserFunctionTwoByUserId",
+            data:userId
+        }).then(function (resp){
+            data= resp.data;
+        })
+        return data;
+    }
+
+    //增改BOM表权限
+    async function addAndUpdateBomQx(){
+        let promise = userFunction(userId);
+        let promiseBoolean=false;
+        await promise.then( async function (resp) {
+
+            for (let j = 0; j < resp.length; j++) {
+                if (resp[j].function_two_id === 58 && resp[j].open_status === 1) {
+                    promiseBoolean = true;
+
+                    break;
+                }
+            }
+
+        })
+        return promiseBoolean;
+    }
+
+
+
+
+    function page(re,value){
+        //下一页
+        document.getElementById("nextPage1").onclick=function (){
+            //获取当前页
+            let currentPage = document.getElementById("currentPage1").innerText;
+            //获取总页数
+            let pageSum = document.getElementById("pageSum1").innerText;
+            //比较当前页是否为最后一页
+            if (0<Number(currentPage)&&Number(currentPage)<Number(pageSum)){
+                let nextPage=Number(currentPage)+1;
+                //调用方法
+                if (re===true){
+                    search(nextPage,value);
+                }
+                else if (re===false){
+                    search1(nextPage,value);
+                }
+                else {
+                    selectAll(nextPage);
+                }
+
+            }else if (Number(currentPage)===Number(pageSum)){
+                alert("这已经是最后一页了！")
+            }else {
+                alert("系统错误,请联系相关人员！")
+            }
+
+
+        }
+        //尾页
+        document.getElementById("endPage1").onclick=function (){
+            //获取当前页
+            let currentPage = document.getElementById("currentPage1").innerText;
+            //获取总页数
+            let pageSum = document.getElementById("pageSum1").innerText;
+            if (0<Number(currentPage)&&Number(currentPage)<Number(pageSum)){
+                //调用方法
+                if (re===true){
+                    search(pageSum,value);
+                }
+                else if (re===false){
+                    search1(pageSum,value);
+                }
+                else {
+                    selectAll(pageSum)
+                }
+
+            }else if (Number(currentPage)===Number(pageSum)){
+                alert("这已经是最后一页了！")
+            }else {
+                alert("系统错误,请联系相关人员！")
+            }
+        }
+        //上一页
+        document.getElementById("lastPage1").onclick=function (){
+            //获取当前页
+            let currentPage = document.getElementById("currentPage1").innerText;
+            //获取总页数
+            let pageSum = document.getElementById("pageSum1").innerText;
+            if (Number(currentPage)>1&& Number(currentPage)<=Number(pageSum)){
+                let lastPage=currentPage-1;
+
+                //调用方法
+                if (re===true){
+                    search(lastPage,value);
+                }
+                else if (re===false){
+                    search1(lastPage,value);
+                }
+                else {
+                    selectAll(lastPage)
+                }
+            }else if (Number(currentPage)===1){
+                alert("这已经是第一页了！")
+            }else{
+                alert("系统错误,请联系相关人员！")
+            }
+
+
+        }
+
+        //首页
+        document.getElementById("firstPage1").onclick=function (){
+            //获取当前页
+            let currentPage = document.getElementById("currentPage1").innerText;
+            if (Number(currentPage)>0&&Number(currentPage)!==1){
+                //调用方法
+                if (re===true){
+                    search(1,value);
+                }
+                else if (re===false){
+                    search1(1,value);
+                }
+                else {
+                    selectAll(1);
+                }
+            }else if (Number(currentPage)===1){
+                alert("这已经是第一页了！")
+            }else {
+                alert("系统错误,请联系相关人员！")
+            }
+        }
+
+        //输入页码跳转
+        document.getElementById("jump1").onclick=function (){
+            //获取用户输入的数据
+            let jump = document.getElementById("jumpValue1").value;
+            //获取当前页码
+            let currentPage = document.getElementById("currentPage1").innerText;
+            //获取总页数
+            let pageSum = document.getElementById("pageSum1").innerText;
+            if (Number(jump)>0&&Number(jump)<=Number(pageSum)&&Number(jump)!==Number(currentPage)){
+                //调用方法
+                if (re===true){
+                    search(jump,value);
+                }
+                else if (re===false){
+                    search1(jump,value);
+                }
+                else {
+                    selectAll(jump);
+                }
+            }else if (Number(jump)===Number(currentPage)){
+                alert("您已经在当前页了！")
+            }else if (Number(jump)<=0||Number(jump)>Number(pageSum)){
+                alert("您输入的数据不合法！")
+            }
+        }
+    }
+
+
+
+    //查询已有的BOM表版本列表
+    function selectAll(currentPage){
+        axios({
+            method:"post",
+            url:"finBomTitle/selectAllBomTitle?currentPage="+currentPage+"",
+        }).then(function (resp){
+            let datas=resp.data.rows;
+            let totalCounts = resp.data.totalCount;
+            if (datas.length>0){
+                let formdata="";
+                for (let i = 0; i < datas.length; i++) {
+                    formdata+='<div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                        '                                                        <div style="width: 24.5%;margin: auto; border: white solid 1px"><b>'+datas[i].title+'</b></div>\n' +
+                        '                                                        <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>'+datas[i].description+'</b></div>\n' +
+                        '                                                        <div style="width: 25%;margin: auto;   border: white solid 1px"><a class="bomContent"  href="javascript:void(0)">BOM表</a></div>\n' +
+                        '                                                    </div>';
+                }
+                document.getElementById("content").innerHTML=formdata;
+                document.getElementById("currentPage1").innerText=currentPage;
+                document.getElementById("pageSum1").innerText=Math.ceil(Number(totalCounts)/20);
+                height();
+
+
+                //跳转到BOM表内容
+                //打开BOM表相关信息
+                let boms = document.querySelectorAll(".bomContent");
+                for (let i = 0; i < boms.length; i++) {
+                    boms[i].onclick=async function () {
+                        // //查询是否有权限
+                        // let b = await addAndUpdateBomQx();
+                        // if (b===false){
+                        //     alert("您暂未获得操作BOM表的权限！")
+                        // }
+                        // else {
+                            window.open("producebomtestsetting.html?finId=" + datas[i].finProductId + "&vault=" + 1 + "&bomTitleId=" + datas[i].id + "&myBrather="+userId+"");
+                        // }
+
+                    }
+
+                }
+
+
+
+            }
+            else {
+                document.getElementById("currentPage1").innerText=0;
+                document.getElementById("pageSum1").innerText=0;
+                document.getElementById("content").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red;">暂未添加BOM表信息！</div>';
+            }
+
+
+
+        })
+    }
+
+    //当前页
+    selectAll(1);
+    let re=null;
+    page(re);
+
+    function search(currentPage,value){
+        axios({
+            method:"post",
+            url:"finBomTitle/search?currentPage="+currentPage+"",
+            data:value
+        }).then(function (resp){
+            let datas=resp.data.rows;
+            let totalCounts = resp.data.totalCount;
+            if (datas.length>0){
+                let formdata="";
+                for (let i = 0; i < datas.length; i++) {
+                    formdata+='<div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                        '                                                        <div style="width: 24.5%;margin: auto; border: white solid 1px"><b>'+datas[i].title+'</b></div>\n' +
+                        '                                                        <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>'+datas[i].description+'</b></div>\n' +
+                        '                                                        <div style="width: 25%;margin: auto;   border: white solid 1px"><a class="bomContent"  href="javascript:void(0)">BOM表</a></div>\n' +
+                        '                                                    </div>';
+                }
+                document.getElementById("content").innerHTML=formdata;
+                document.getElementById("currentPage1").innerText=currentPage;
+                document.getElementById("pageSum1").innerText=Math.ceil(Number(totalCounts)/20);
+                height();
+
+
+
+                //跳转到BOM表内容
+                //打开BOM表相关信息
+                let boms = document.querySelectorAll(".bomContent");
+                for (let i = 0; i < boms.length; i++) {
+                    boms[i].onclick=async function () {
+                        //查询是否有权限
+                        // let b = await addAndUpdateBomQx();
+                        // if (b===false){
+                        //     alert("您暂未获得操作BOM表的权限！")
+                        // }
+                        // else {
+                        window.open("producebomtestsetting.html?finId=" + datas[i].finProductId + "&vault=" + 1 + "&bomTitleId=" + datas[i].id + "&myBrather="+userId+"");
+                        // }
+
+                    }
+
+                }
+
+
+
+            }
+            else {
+                document.getElementById("currentPage1").innerText=0;
+                document.getElementById("pageSum1").innerText=0;
+                document.getElementById("content").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red;">暂未添加BOM表信息！</div>';
+            }
+
+        })
+    }
+
+    function search1(currentPage,value){
+        axios({
+            method:"post",
+            url:"finBomTitle/selectAllByProductName?currentPage="+currentPage+"",
+            data:value
+        }).then(function (resp){
+            let datas=resp.data.rows;
+            let totalCounts = resp.data.totalCount;
+            if (datas.length>0){
+                let formdata="";
+                for (let i = 0; i < datas.length; i++) {
+                    formdata+='<div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                        '                                                        <div style="width: 24.5%;margin: auto; border: white solid 1px"><b>'+datas[i].title+'</b></div>\n' +
+                        '                                                        <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>'+datas[i].description+'</b></div>\n' +
+                        '                                                        <div style="width: 25%;margin: auto;   border: white solid 1px"><a class="bomContent"  href="javascript:void(0)">BOM表</a></div>\n' +
+                        '                                                    </div>';
+                }
+                document.getElementById("content").innerHTML=formdata;
+                document.getElementById("currentPage1").innerText=currentPage;
+                document.getElementById("pageSum1").innerText=Math.ceil(Number(totalCounts)/20);
+                height();
+
+
+
+                //跳转到BOM表内容
+                //打开BOM表相关信息
+                let boms = document.querySelectorAll(".bomContent");
+                for (let i = 0; i < boms.length; i++) {
+                    boms[i].onclick=async function () {
+                        //查询是否有权限
+                        // let b = await addAndUpdateBomQx();
+                        // if (b===false){
+                        //     alert("您暂未获得操作BOM表的权限！")
+                        // }
+                        // else {
+                        window.open("producebomtestsetting.html?finId=" + datas[i].finProductId + "&vault=" + 1 + "&bomTitleId=" + datas[i].id + "&myBrather="+userId+"");
+                        // }
+
+                    }
+
+                }
+
+
+
+            }
+            else {
+                document.getElementById("currentPage1").innerText=0;
+                document.getElementById("pageSum1").innerText=0;
+                document.getElementById("content").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red;">暂未添加BOM表信息！</div>';
+            }
+
+        })
+    }
+
+
+
+
+
+
+    //搜索功能
+    document.getElementById("search").onclick=function (){
+        //获取筛选框的内容
+        let select = document.getElementById("selectType");
+        let Index = select.selectedIndex;
+        let selectValue = select.options[Index].value;
+        let re;
+
+        if (Number(selectValue)===Number(1)){
+            //搜索BOM表内容
+            re = true;
+        }
+        else if (Number(selectValue)===Number(2)){
+            //搜索BOM表中的物料信息内容
+            re=false;
+
+        }
+        page(re,selectValue);
+
+
+
+
+
+
+
+        let value = document.getElementById("searchContent").value;
+        if (value.length>0){
+            if (re===true){
+                search(1,value);
+            }
+            else if (re===false){
+                search1(1,value);
+            }
+
+
+        }
+        else {
+            alert("请输入搜索内容！")
+        }
+    }
+
+
+
+    document.getElementById("searchContent").oninput=function (){
+        //获取数据
+        let value = document.getElementById("searchContent").value;
+        if (value.length===0){
+            location.reload();
+        }
+    }
+
+
+
+
+
+    //关闭窗口
+    document.querySelector(".window-content-close").onclick=function (){
+        document.querySelector(".window").style.display="none";
+    }
+
+
+</script>
+
+
+
+</html>

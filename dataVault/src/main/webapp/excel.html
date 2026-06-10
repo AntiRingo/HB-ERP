@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>离线导出Excel</title>
+  <!-- 引入本地库 -->
+  <script src="js/xlsx.full.min.js"></script>
+</head>
+<body>
+<button onclick="exportToExcel()">导出Excel</button>
+
+<script>
+  function exportToExcel() {
+    // 1. 准备数据（示例）
+    const data = [
+      { 姓名: "张三", 年龄: 25, 城市: "北京" },
+      { 姓名: "李四", 年龄: 30, 城市: "上海" }
+    ];
+
+    // 2. 创建工作簿和工作表
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    // 3. 触发下载（浏览器自动生成文件）
+    XLSX.writeFile(workbook, "用户列表.xlsx");
+  }
+</script>
+</body>
+</html>

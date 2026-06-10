@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>出库记录</title>
+    <link rel="stylesheet" href="css/window.css">
+</head>
+<style>
+    html{
+        font-family: 宋体,serif;
+    }
+    table{
+        width: 100%;
+        margin: auto;
+    }
+    th{
+        outline:#9eb6d8 solid 1px;
+
+    }
+    td{
+        outline:#9eb6d8 solid 1px;
+
+    }
+    thead{
+        position: sticky;
+        top: 32px;
+    }
+    .checkP{
+        cursor: pointer;
+    }
+    .checkP:hover{
+        color: #85CFEE;
+    }
+</style>
+<body>
+<div style="width: 90%;margin-left: 5%; outline: #9eb6d8 solid 1px;position:absolute;max-height: 80%;overflow-y: auto;padding-right: 1px;padding-left: 1px">
+    <div style="width:100%;height: 29px;background-color:#9eb6d8;
+     line-height: 29px;text-align: center;color: white;position: sticky;top: 1px;z-index: 22222"><b>出库记录</b>
+    </div>
+    <div style="width: 99%;height: auto;margin: auto;display: flex;flex-wrap: wrap">
+        <div style="width: auto;height: auto;margin: auto"> <div>操作人：</div><select id="applicationUserId" type="date" value="">
+            <option class="sxUserId" value="">全部</option>
+        </select>
+        </div>
+        <div style="width: auto;height: auto;max-width: 16%;margin: auto"> <div>开始日期：</div><input id="between" type="date" value=""> </div>
+        <div style="width: auto;height: auto;max-width: 16%;margin: auto"> <div>结束日期：</div><input id="and" type="date" value=""></div>
+
+        <div style="width: auto;height: auto;max-width: 16%;margin: auto"> <div>仓库：</div><select id="vault" type="date" value="">
+            <option class="vaultId" value="">全部</option>
+            <option class="vaultId" value="0">零件库</option>
+            <option class="vaultId" value="1">产品库</option>
+        </select>
+        </div>
+
+        <div style="width: auto;height: auto;max-width: 16%;margin: auto"> <div>分类：</div><select id="sortTwo" type="date" value="">
+<!--            <option class="sortTwo" value="">全部</option>-->
+<!--            <option class="sortTwo" value="0">普通出库</option>-->
+<!--            <option class="sortTwo" value="1">生产出库</option>-->
+<!--            <option class="sortTwo" value="3">退货出库</option>-->
+        </select>
+        </div>
+        <div style="text-align: right;margin: 8px auto;width: auto;">
+            <label>
+                <input id="searchValue" type="search" style="width: auto;max-width: 75%" placeholder="单号/物料号/物料名称">
+            </label>
+            <button id="search">搜索</button>
+        </div>
+    </div>
+    <table border="0" cellspacing="1"   >
+        <thead >
+        <tr  bgcolor="white">
+            <th class="applicationSticky">操作日期</th>
+            <th class="applicationSticky">领料人</th>
+            <th class="applicationSticky">物料名称</th>
+            <th class="applicationSticky">物料号</th>
+            <th class="applicationSticky">操作人</th>
+            <th class="applicationSticky">操作单号</th>
+            <th class="applicationSticky">操作数量</th>
+            <th class="applicationSticky">仓库</th>
+
+
+        </tr>
+
+        </thead>
+
+        <tbody id="recordsBody">
+
+
+        </tbody>
+
+    </table>
+    <div id="pageDiv" style="width: 100%;margin: 10px auto auto;padding-bottom: 10px; text-align: center;position: sticky;bottom: 0px;background-color: #f0f8ff">
+        共<span style="margin: auto;color: orange;font-weight: bolder" id="pageSum"></span>页丨
+        当前页：<span id="currentPage" style="color: red;margin: auto;font-weight: bolder"></span>丨
+        <button style="margin: auto" id="firstPage">首页</button>
+        <button style="margin: auto" id="lastPage">上一页</button>
+        <button style="margin: auto" id="nextPage">下一页</button>
+        <button style="margin: auto" id="endPage">尾页</button>丨
+        请输入页码：
+        <label for="jumpValue"></label><input style="width: 50px;margin: auto" type="text" id="jumpValue">
+        <button id="jump">跳转</button>
+    </div>
+</div>
+<div class="window-small">
+
+    <div class="window-small-content">
+        <div style="width: 100%;height: 63px;background-color: white; border-bottom:  #e6eaf0 solid 1px; border-top-left-radius: 20px;
+        border-top-right-radius: 20px;">
+
+            <div class="window-small-close"><button class="window-small-content-close">×</button></div>
+
+            <div style="width: auto;height: 64px;display: flex">
+                <div class="window-title" style="font-size: 16px">详细信息</div>
+            </div>
+
+        </div>
+        <div id="PAll" style="width: 100%;height: calc(100% - 63px);color: #121315;font-size: 14px;overflow-y: auto" >
+            <div class="PN">物料名称</div>
+            <div class="PNI"><label>
+                <input id="pName" value="" disabled>
+            </label></div>
+            <div  class="PN">物料编号</div>
+            <div CLASS="PNI"><label>
+                <input id="pMaterialNumber" value="" disabled>
+            </label></div>
+            <div id="PAttContent" style="width: 100%;height: auto">
+
+            </div>
+        </div>
+
+
+
+
+
+
+    </div>
+
+</div>
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+    let wdSmall = document.querySelector(".window-small");
+    //点击显示物料的详细信息
+    function productAttribute(datas){
+
+
+        let checkP = document.querySelectorAll(".checkP");
+
+        for (let i = 0; i < datas.length; i++) {
+            checkP[i].onclick=function (){
+
+                let thId;
+                if (datas[i].product_id){
+                    thId = datas[i].product_id
+                }
+                else {
+                    thId = datas[i].id
+                }
+                wdSmall.style.display="block";
+                //根据物料id和仓库来查询该物料的详细信息
+                axios({
+                    method:"post",
+                    url:"product/selectProductWhenAddBom?id="+thId+"&vault="+datas[i].vault+""
+                }).then(function (resp){
+                    let productAttribute=resp.data;
+                    if (productAttribute.length>0){
+                        let formdata="";
+
+                        for (let j = 0; j < productAttribute.length; j++) {
+                            formdata+='<div  class="PN">'+productAttribute[j].attributeName+'</div>\n' +
+                                '            <div CLASS="PNI"><label>\n' +
+                                '                <input disabled value= '+productAttribute[j].content+' >\n' +
+                                '            </label></div>'
+                        }
+                        document.getElementById("PAttContent").innerHTML=formdata;
+                        document.getElementById("pName").value=productAttribute[0].name;
+                        document.getElementById("pMaterialNumber").value=productAttribute[0].material_number;
+                    }
+                    else {
+                        alert("未查询到数据请联系相关人员！")
+                    }
+                })
+
+            }
+
+        }
+    }
+    //点击close也可以关闭弹窗
+    document.querySelector(".window-small-content-close").onclick=function (){
+        wdSmall.style.display="none";
+    }
+    function fDate( t1, format = "YYYY-MM-DD HH:II "){
+        let minutes = t1.getMinutes();
+        if (minutes<10){
+            const config = {
+                YYYY:t1.getFullYear(),
+                MM:t1.getMonth()+1,
+                DD:t1.getDate(),
+                HH:t1.getHours(),
+                II:"0"+t1.getMinutes(),
+                // SS:t1.getSeconds(),
+            };
+            for( const key in config){
+
+                format = format.replace(key,config[key])
+
+
+            }
+            return format;
+        }
+        else {
+            const config = {
+                YYYY:t1.getFullYear(),
+                MM:t1.getMonth()+1,
+                DD:t1.getDate(),
+                HH:t1.getHours(),
+                II:t1.getMinutes(),
+                // SS:t1.getSeconds(),
+            };
+            for( const key in config){
+
+                format = format.replace(key,config[key])
+
+
+            }
+            return format;
+        }
+
+
+
+    }
+    function height(){
+    //设置iframe高度
+    let scrollHeight = document.body.clientHeight;
+    let parent = window.parent;
+    let clientHeight = parent.document.body.clientHeight;
+    if (Number(clientHeight)>Number(scrollHeight)){
+        let iframe = window.parent.document.getElementById("iframepage");
+        iframe.style.height=""+Number(clientHeight)+"px";
+    }else {
+        let iframe = window.parent.document.getElementById("iframepage");
+        iframe.style.height=""+Number(scrollHeight)+"px";
+    }
+
+}
+height();
+
+    //1.查看操作人都有哪些
+    axios({
+        method: "post",
+        url:"log/selectManagerCK"
+    }).then(function (resp){
+        let manager=resp.data;
+        let formdata="";
+        for (let i = 0; i < manager.length; i++) {
+            formdata+='<option value="'+manager[i].id+'">'+manager[i].username+'</option>'
+        }
+        document.getElementById("applicationUserId").innerHTML+=formdata;
+
+    })
+
+    //查询出库类型
+    axios({
+        method:"post",
+        url:"outBoundType/selectOutBound"
+    }).then(function (resp){
+        let types=resp.data;
+        let formdata='<option class="sortTwo" value="">全部</option>';
+        for (let i = 0; i < types.length; i++) {
+            formdata+='<option class="sortTwo" value='+types[i].id+'>'+types[i].type+'</option>'
+        }
+        document.getElementById("sortTwo").innerHTML=formdata;
+    })
+    function pages(page){
+        //获取入库日志标题
+        axios({
+            method:"post",
+            url:"log/outboundRecordTitle",
+            data:page
+        }).then(function (resp){
+            let title=resp.data.rows;
+            let totalCount=resp.data.totalCount;
+            let formdata="";
+            //改变当前页页码
+            document.getElementById("currentPage").innerHTML=page;
+            //计算共有多少页
+            document.getElementById("pageSum").innerHTML=Math.ceil(Number(totalCount)/50);
+            if (title.length>0){
+                for (let i = 0; i < title.length; i++) {
+                    if (Number(title[i].vault)===0){
+                        formdata+='<tr>' +
+                            '<td>'+fDate(new Date(title[i].date))+'</td>' +
+                            '<td><a title="点击查看签字" class="qzimg" href="javascript:void(0)">'+title[i].appUserName+'</a></td>' +
+                            '<td>'+title[i].name+'</td>' +
+                            '<td class="checkP">'+title[i].material_number+'</td>' +
+                            '<td>'+title[i].userName+'</td>' +
+                            '<td>'+title[i].order_number+'</td>' +
+                            '<td>'+title[i].log_number+'</td>' +
+                            '<td>零件库</td>' +
+                            '</tr>'
+                    }
+                    else if (Number(title[i].vault)===1){
+                        formdata+='<tr>' +
+                            '<td>'+fDate(new Date(title[i].date))+'</td>' +
+                            '<td><a title="点击查看签字" class="qzimg" href="javascript:void(0)">'+title[i].appUserName+'</a></td>' +
+                            '<td>'+title[i].name+'</td>' +
+                            '<td class="checkP">'+title[i].material_number+'</td>' +
+                            '<td>'+title[i].userName+'</td>' +
+                            '<td>'+title[i].order_number+'</td>' +
+                            '<td>'+title[i].log_number+'</td>' +
+                            '<td>产品库</td>' +
+                            '</tr>'
+                    }
+                }
+
+
+                document.getElementById("recordsBody").innerHTML=formdata;
+                productAttribute(title);
+                let qzimg = document.querySelectorAll(".qzimg");
+                for (let i = 0; i < qzimg.length; i++) {
+                    qzimg[i].onclick=function (){
+                        var iframe = "<iframe width='100%' height='100%' src='" + title[i].url + "'></iframe>"
+                        var x = window.open()
+                        x.document.open()
+                        x.document.write(iframe)
+                    }
+                }
+
+
+
+                //筛选功能
+                let screenData={
+                    betweenDate:"",
+                    andDate:"",
+                    userId:"",
+                    vault:"",
+                    sort:1,
+                    sortTwo:""
+                }
+
+                function screen(data,page){
+                    axios({
+                        method:"post",
+                        url:"log/screen?currentPage="+page+"",
+                        data:data
+                    }).then(function (resp){
+                        let totalCount=resp.data.totalCount;
+                        let data=resp.data.rows;
+                        //改变当前页页码
+                        document.getElementById("currentPage").innerHTML=page;
+                        //计算共有多少页
+                        document.getElementById("pageSum").innerHTML=Math.ceil(Number(totalCount)/50);
+                        let formdata="";
+                        if (data!==undefined && data.length>0){
+
+                            for (let i = 0; i < data.length; i++) {
+                                if (Number(data[i].vault)===0){
+                                    formdata+='<tr>' +
+                                        '<td>'+fDate(new Date(data[i].date))+'</td>' +
+                                        '<td><a title="点击查看签字" class="qzimg" href="javascript:void(0)">'+data[i].appUserName+'</a></td>' +
+                                        '<td>'+data[i].name+'</td>' +
+                                        '<td class="checkP">'+data[i].material_number+'</td>' +
+                                        '<td>'+data[i].userName+'</td>' +
+                                        '<td>'+data[i].order_number+'</td>' +
+                                        '<td>'+data[i].log_number+'</td>' +
+                                        '<td>零件库</td>' +
+                                        '</tr>'
+                                }
+                                else if (Number(data[i].vault)===1){
+                                    formdata+='<tr>' +
+                                        '<td>'+fDate(new Date(data[i].date))+'</td>' +
+                                        '<td><a title="点击查看签字" class="qzimg" href="javascript:void(0)">'+data[i].appUserName+'</a></td>' +
+                                        '<td>'+data[i].name+'</td>' +
+                                        '<td class="checkP">'+data[i].material_number+'</td>' +
+                                        '<td>'+data[i].userName+'</td>' +
+                                        '<td>'+data[i].order_number+'</td>' +
+                                        '<td>'+data[i].log_number+'</td>' +
+                                        '<td>产品库</td>' +
+                                        '</tr>'
+                                }
+                            }
+
+
+                            document.getElementById("recordsBody").innerHTML=formdata;
+                            productAttribute(data);
+                            height();
+                            let qzimg = document.querySelectorAll(".qzimg");
+                            for (let i = 0; i < qzimg.length; i++) {
+                                qzimg[i].onclick=function (){
+                                    var iframe = "<iframe width='100%' height='100%' src='" + data[i].url + "'></iframe>"
+                                    var x = window.open()
+                                    x.document.open()
+                                    x.document.write(iframe)
+                                }
+                            }
+
+                        }
+                        else {
+                            document.getElementById("recordsBody").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">暂未查询到结果！</div>';
+
+                        }
+
+
+                    })
+
+
+
+
+                }
+
+                function sxPage(data){
+                    //首页
+                    document.getElementById("firstPage").onclick=function (){
+                        //获取当前页
+                        let innerHTML = document.getElementById("currentPage").innerHTML;
+                        if (Number(innerHTML)===Number(1)){
+                            alert("这已经是第一页了！")
+                        }else if (Number(innerHTML)===Number(0)){
+                            alert("还未添加任何信息！")
+                        } else {
+                            screen(data,1)
+                        }
+
+                    }
+                    //尾页
+                    document.getElementById("endPage").onclick=function (){
+                        //获取共有几页
+                        let innerHTML = document.getElementById("pageSum").innerHTML;
+                        //获取当前页
+                        let innerHTML1 = document.getElementById("currentPage").innerHTML;
+                        if (Number(innerHTML1)===Number(innerHTML)&&Number(innerHTML)!==Number(0)){
+                            alert("这已经是最后一页了！")
+                        }else if (Number(innerHTML1)===Number(0)){
+                            alert("还未添加任何信息！")
+                        }
+                        else {
+                            screen(data,innerHTML);
+                        }
+
+                    }
+                    //上一页
+                    document.getElementById("lastPage").onclick=function (){
+                        //获取当前页
+                        let innerHTML = document.getElementById("currentPage").innerHTML;
+                        if (Number(innerHTML)>0 && Number(innerHTML)!==1){
+                            screen(data,Number(innerHTML)-1)
+                        }else if (Number(innerHTML)===Number(1)){
+                            alert("这已经是首页了!")
+                        }else if (Number(innerHTML)===Number(0)){
+                            alert("还未添加任何信息！")
+                        }
+                        else {
+                            alert("系统错误，请寻找相关人员！")
+                        }
+
+
+                    }
+                    //下一页
+                    document.getElementById("nextPage").onclick=function (){
+                        //获取总页数和当前页
+                        let innerHTML = document.getElementById("currentPage").innerHTML;
+                        let innerHTML2 = document.getElementById("pageSum").innerHTML;
+                        if (Number(innerHTML)>0 && Number(innerHTML)<Number(innerHTML2)){
+                            screen(data,Number(innerHTML)+Number(1))
+                        }else if(Number(innerHTML)===Number(innerHTML2)&&Number(innerHTML2)!==Number(0) ) {
+                            alert("这已经是最后一页了！")
+                        }else if (Number(innerHTML)===Number(0)){
+                            alert("还未添加任何信息！")
+                        }
+                        else {
+                            alert("系统错误，请联系相关人员！")
+                        }
+                    }
+
+                    //输入的页码
+                    document.getElementById("jump").onclick=function (){
+                        //获取输入的页码
+                        let value = document.getElementById("jumpValue").value;
+                        //获取当前页码
+                        let innerHTML = document.getElementById("currentPage").innerHTML;
+                        //获取总页码
+                        let innerHTML1 = document.getElementById("pageSum").innerHTML;
+                        //判断value是否为正整数
+                        var pattern = /^[1-9]\d*$/;
+
+                        let b = pattern.test(value);
+                        if (b){
+                            //如果是真的，那就符合正整数，然后再比较是否与当前页相同，是否大于总页数
+                            if (Number(value)>Number(innerHTML1)){
+                                alert("您输入的数据不符合规则！")
+                            }else if (Number(value)===Number(innerHTML)){
+                                alert("您已经处在当前页面了！")
+                            }else if (Number(innerHTML)===Number(0)){
+                                alert("还未添加任何信息！")
+                            }
+                            else {
+                                screen(data,value);
+                            }
+
+                        }else {
+                            alert("您输入的数据不符合页码规则！")
+                        }
+
+
+                    }
+                }
+
+                //申请人筛选框
+                document.getElementById("applicationUserId").onchange=function (){
+                    let mySelect = document.getElementById("applicationUserId");
+                    let index = mySelect.selectedIndex;
+                    if (mySelect.options[index].value.length>0){
+                        screenData.userId=mySelect.options[index].value;
+                    }else {
+                        screenData.userId="";
+                    }
+
+                    screen(screenData,1);
+                    sxPage(screenData);
+                    //搜索框置空
+                    document.getElementById("searchValue").value="";
+                }
+
+                //仓库筛选框
+                document.getElementById("vault").onchange=function (){
+                    let mySelect = document.getElementById("vault");
+                    let index = mySelect.selectedIndex;
+                    if (mySelect.options[index].value.length>0){
+                        screenData.vault=mySelect.options[index].value;
+                    }else {
+                        screenData.vault="";
+                    }
+
+                    screen(screenData,1);
+                    sxPage(screenData);
+                    //搜索框置空
+                    document.getElementById("searchValue").value="";
+                }
+
+                //起始日期筛选框
+                document.getElementById("between").onchange=function (){
+                    if (document.getElementById("between").value.length>0){
+                        screenData.betweenDate=document.getElementById("between").value;
+                    }else {
+                        screenData.betweenDate="";
+                    }
+
+                    screen(screenData,1);
+                    sxPage(screenData);
+                    //搜索框置空
+                    document.getElementById("searchValue").value="";
+                }
+
+                //截止日期筛选框
+                document.getElementById("and").onchange=function (){
+                    if (document.getElementById("and").value.length>0){
+                        screenData.andDate=document.getElementById("and").value + ' 23:59:59';
+                    }else {
+                        screenData.andDate="";
+                    }
+
+                    screen(screenData,1);
+                    sxPage(screenData);
+                    //搜索框置空
+                    document.getElementById("searchValue").value="";
+                }
+
+                //出库种类筛选
+                document.getElementById("sortTwo").onchange=function (){
+                    let mySelect = document.getElementById("sortTwo");
+                    let index = mySelect.selectedIndex;
+                    if (mySelect.options[index].value.length>0){
+                        screenData.sortTwo=mySelect.options[index].value;
+                    }else {
+                        screenData.sortTwo="";
+                    }
+
+                    screen(screenData,1);
+                    sxPage(screenData);
+                    //搜索框置空
+                    document.getElementById("searchValue").value="";
+                }
+                height();
+
+
+            }
+            else {
+                document.getElementById("recordsBody").innerHTML='暂未有任何入库记录！';
+                height();
+            }
+        })
+
+
+        //搜索功能
+        document.getElementById("search").onclick=function (){
+            document.getElementById("searchValue").oninput=function (){
+                let trim = document.getElementById("searchValue").value.trim();
+                if (trim.length===0){
+                    location.reload();
+                }
+            }
+            //获取搜索框的内容
+            let str = document.getElementById("searchValue").value.trim();
+
+            if (str.length>0 && str!==""){
+                //筛选框置空
+                document.getElementById("and").value="";
+                document.getElementById("between").value="";
+                let mySelect = document.getElementById("vault");
+                mySelect.selectedIndex=0;
+                let selelct = document.getElementById("applicationUserId");
+                selelct.selectedIndex=0;
+                document.getElementById("sortTwo").selectedIndex=0;
+
+
+
+                function search(str,sort,page){
+                    axios({
+                        method:"post",
+                        url:"log/search?sort="+sort+"&currentPage="+page+"",
+                        data:str
+                    }).then(function (resp){
+                        let formdata="";
+                        let data=resp.data.rows;
+                        if (data!==undefined && data.length>0){
+                            let totalCount=resp.data.totalCount;
+                            //改变当前页页码
+                            document.getElementById("currentPage").innerHTML=page;
+                            //计算共有多少页
+                            document.getElementById("pageSum").innerHTML=Math.ceil(Number(totalCount)/50);
+                            for (let i = 0; i < data.length; i++) {
+                                if (Number(data[i].vault)===0){
+                                    formdata+='<tr>' +
+                                        '<td>'+fDate(new Date(data[i].date))+'</td>' +
+                                        '<td><a title="点击查看签字" class="qzimg" href="javascript:void(0)">'+data[i].appUserName+'</a></td>' +
+                                        '<td>'+data[i].name+'</td>' +
+                                        '<td class="checkP">'+data[i].material_number+'</td>' +
+                                        '<td>'+data[i].userName+'</td>' +
+                                        '<td>'+data[i].order_number+'</td>' +
+                                        '<td>'+data[i].log_number+'</td>' +
+                                        '<td>零件库</td>' +
+                                        '</tr>'
+                                }
+                                else if (Number(data[i].vault)===1){
+                                    formdata+='<tr>' +
+                                        '<td>'+fDate(new Date(data[i].date))+'</td>' +
+                                        '<td><a title="点击查看签字" class="qzimg" href="javascript:void(0)">'+data[i].appUserName+'</a></td>' +
+                                        '<td>'+data[i].name+'</td>' +
+                                        '<td class="checkP">'+data[i].material_number+'</td>' +
+                                        '<td>'+data[i].userName+'</td>' +
+                                        '<td>'+data[i].order_number+'</td>' +
+                                        '<td>'+data[i].log_number+'</td>' +
+                                        '<td>产品库</td>' +
+                                        '</tr>'
+                                }
+                            }
+                            document.getElementById("recordsBody").innerHTML=formdata;
+                            productAttribute(data);
+                            let qzimg = document.querySelectorAll(".qzimg");
+                            for (let i = 0; i < qzimg.length; i++) {
+                                qzimg[i].onclick=function (){
+                                    var iframe = "<iframe width='100%' height='100%' src='" + data[i].url + "'></iframe>"
+                                    var x = window.open()
+                                    x.document.open()
+                                    x.document.write(iframe)
+                                }
+                            }
+
+
+                            //首页
+                            document.getElementById("firstPage").onclick=function (){
+                                //获取当前页
+                                let innerHTML = document.getElementById("currentPage").innerHTML;
+                                if (Number(innerHTML)===Number(1)){
+                                    alert("这已经是第一页了！")
+                                }else if (Number(innerHTML)===Number(0)){
+                                    alert("还未添加任何信息！")
+                                } else {
+                                    search(str,sort,1)
+                                }
+
+                            }
+                            //尾页
+                            document.getElementById("endPage").onclick=function (){
+                                //获取共有几页
+                                let innerHTML = document.getElementById("pageSum").innerHTML;
+                                //获取当前页
+                                let innerHTML1 = document.getElementById("currentPage").innerHTML;
+                                if (Number(innerHTML1)===Number(innerHTML)&&Number(innerHTML)!==Number(0)){
+                                    alert("这已经是最后一页了！")
+                                }else if (Number(innerHTML1)===Number(0)){
+                                    alert("还未添加任何信息！")
+                                }
+                                else {
+                                    search(str,sort,innerHTML)
+                                }
+
+                            }
+                            //上一页
+                            document.getElementById("lastPage").onclick=function (){
+                                //获取当前页
+                                let innerHTML = document.getElementById("currentPage").innerHTML;
+                                if (Number(innerHTML)>0 && Number(innerHTML)!==1){
+                                    search(str,sort,Number(innerHTML)-1);
+                                }else if (Number(innerHTML)===Number(1)){
+                                    alert("这已经是首页了!")
+                                }else if (Number(innerHTML)===Number(0)){
+                                    alert("还未添加任何信息！")
+                                }
+                                else {
+                                    alert("系统错误，请寻找相关人员！")
+                                }
+
+
+                            }
+                            //下一页
+                            document.getElementById("nextPage").onclick=function (){
+                                //获取总页数和当前页
+                                let innerHTML = document.getElementById("currentPage").innerHTML;
+                                let innerHTML2 = document.getElementById("pageSum").innerHTML;
+                                if (Number(innerHTML)>0 && Number(innerHTML)<Number(innerHTML2)){
+                                    search(str,sort,Number(innerHTML)+Number(1))
+                                }else if(Number(innerHTML)===Number(innerHTML2)&&Number(innerHTML2)!==Number(0) ) {
+                                    alert("这已经是最后一页了！")
+                                }else if (Number(innerHTML)===Number(0)){
+                                    alert("还未添加任何信息！")
+                                }
+                                else {
+                                    alert("系统错误，请联系相关人员！")
+                                }
+                            }
+
+                            //输入的页码
+                            document.getElementById("jump").onclick=function (){
+                                //获取输入的页码
+                                let value = document.getElementById("jumpValue").value;
+                                //获取当前页码
+                                let innerHTML = document.getElementById("currentPage").innerHTML;
+                                //获取总页码
+                                let innerHTML1 = document.getElementById("pageSum").innerHTML;
+                                //判断value是否为正整数
+                                var pattern = /^[1-9]\d*$/;
+
+                                let b = pattern.test(value);
+                                if (b){
+                                    //如果是真的，那就符合正整数，然后再比较是否与当前页相同，是否大于总页数
+                                    if (Number(value)>Number(innerHTML1)){
+                                        alert("您输入的数据不符合规则！")
+                                    }else if (Number(value)===Number(innerHTML)){
+                                        alert("您已经处在当前页面了！")
+                                    }else if (Number(innerHTML)===Number(0)){
+                                        alert("还未添加任何信息！")
+                                    }
+                                    else {
+                                        search(str,sort,value);
+                                    }
+
+                                }else {
+                                    alert("您输入的数据不符合页码规则！")
+                                }
+
+
+                            }
+
+
+                        }
+                        else {
+                            document.getElementById("recordsBody").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">暂未查询到结果！</div>';
+                        }
+                    })
+                }
+                //第一页
+                search(str,1,1);
+
+            }
+            else {
+                alert("请先填写要搜索的内容！")
+            }
+        }
+
+    }
+
+    //当前页
+    pages(1);
+
+    //首页
+    document.getElementById("firstPage").onclick=function (){
+        //获取当前页
+        let innerHTML = document.getElementById("currentPage").innerHTML;
+        if (Number(innerHTML)===Number(1)){
+            alert("这已经是第一页了！")
+        }else if (Number(innerHTML)===Number(0)){
+            alert("还未添加任何信息！")
+        } else {
+            pages(1);
+        }
+
+    }
+    //尾页
+    document.getElementById("endPage").onclick=function (){
+        //获取共有几页
+        let innerHTML = document.getElementById("pageSum").innerHTML;
+        //获取当前页
+        let innerHTML1 = document.getElementById("currentPage").innerHTML;
+        if (Number(innerHTML1)===Number(innerHTML)&&Number(innerHTML)!==Number(0)){
+            alert("这已经是最后一页了！")
+        }else if (Number(innerHTML1)===Number(0)){
+            alert("还未添加任何信息！")
+        }
+        else {
+            pages(innerHTML);
+        }
+
+    }
+    //上一页
+    document.getElementById("lastPage").onclick=function (){
+        //获取当前页
+        let innerHTML = document.getElementById("currentPage").innerHTML;
+        if (Number(innerHTML)>0 && Number(innerHTML)!==1){
+            pages(Number(innerHTML)-1)
+        }else if (Number(innerHTML)===Number(1)){
+            alert("这已经是首页了!")
+        }else if (Number(innerHTML)===Number(0)){
+            alert("还未添加任何信息！")
+        }
+        else {
+            alert("系统错误，请寻找相关人员！")
+        }
+
+
+    }
+    //下一页
+    document.getElementById("nextPage").onclick=function (){
+        //获取总页数和当前页
+        let innerHTML = document.getElementById("currentPage").innerHTML;
+        let innerHTML2 = document.getElementById("pageSum").innerHTML;
+        if (Number(innerHTML)>0 && Number(innerHTML)<Number(innerHTML2)){
+            pages(Number(innerHTML)+Number(1))
+        }else if(Number(innerHTML)===Number(innerHTML2)&&Number(innerHTML2)!==Number(0) ) {
+            alert("这已经是最后一页了！")
+        }else if (Number(innerHTML)===Number(0)){
+            alert("还未添加任何信息！")
+        }
+        else {
+            alert("系统错误，请联系相关人员！")
+        }
+    }
+
+    //输入的页码
+    document.getElementById("jump").onclick=function (){
+        //获取输入的页码
+        let value = document.getElementById("jumpValue").value;
+        //获取当前页码
+        let innerHTML = document.getElementById("currentPage").innerHTML;
+        //获取总页码
+        let innerHTML1 = document.getElementById("pageSum").innerHTML;
+        //判断value是否为正整数
+        var pattern = /^[1-9]\d*$/;
+
+        let b = pattern.test(value);
+        if (b){
+            //如果是真的，那就符合正整数，然后再比较是否与当前页相同，是否大于总页数
+            if (Number(value)>Number(innerHTML1)){
+                alert("您输入的数据不符合规则！")
+            }else if (Number(value)===Number(innerHTML)){
+                alert("您已经处在当前页面了！")
+            }else if (Number(innerHTML)===Number(0)){
+                alert("还未添加任何信息！")
+            }
+            else {
+                pages(value);
+            }
+
+        }else {
+            alert("您输入的数据不符合页码规则！")
+        }
+
+
+    }
+
+</script>
+</html>

@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>属性值</title>
+    <link href="css/product.css" rel="stylesheet" />
+</head>
+<style>
+    html{
+        height: 100%;
+        overflow-y: hidden;
+        font-family: 宋体,serif;
+    }
+    body{
+        height: 100% !important;
+    }
+    pre{
+        font-family: 微软雅黑, serif !important;
+        font-weight: bold;
+    }
+    a{
+        white-space: nowrap;
+        margin: auto 5px;
+    }
+</style>
+<body>
+<div style="width: 80%;margin:20px auto;height: 80%;padding: 1px;border: #9eb6d8 solid 1px">
+    <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;">
+        <div style="width: 75%;background-color:#9eb6d8;height: auto;display: flex"><b id="name" style="align-self: center;margin: auto 0 auto auto"></b><b style="align-self: center;margin: auto auto auto 0" >值</b></div>
+        <div style="width: 24.5%;background-color:#9eb6d8;margin: auto;height:auto;"><button id="addValue">添加</button>   <button id="addLength" >添加编码长度</button>    <button id="range">值/范围</button>   <button onclick="history.back()">返回</button></div>
+    </div>
+
+    <div style="width: 99%;max-height: 80%;padding: 1px;border: #9eb6d8 solid 1px;margin: 25px auto auto;overflow-y: auto">
+        <div style="width: 100%;height:auto;display: flex;text-align: center;color: white;position: sticky;top: 0">
+            <div style="width: 34.5%;margin: auto;background-color: #9eb6d8; border:white solid 1px" ><b>属性值</b></div>
+            <div style="width: 40%;margin: auto  ;background-color: #9eb6d8; border:white solid 1px" ><b>编码</b></div>
+            <div style="width: 25%;margin: auto;background-color: #9eb6d8  ; border:white solid 1px" ><b>操作</b></div>
+        </div>
+        <div id="content" style="width: 100%;max-height: 90%;margin: auto">
+<!--                          <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+<!--                              <div style="width: 34.5%;margin: auto; border: white solid 1px"><b>分类名称</b></div>-->
+<!--                              <div style="width: 40%;margin: auto  ; border: white solid 1px"><b>分类描述</b></div>-->
+<!--                              <div style="width: 15%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+<!--                          </div>-->
+
+            <!--              <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+            <!--                  <div style="width: 34.5%;margin: auto; border: white solid 1px"><b>分类名称</b></div>-->
+            <!--                  <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>分类描述</b></div>-->
+            <!--                  <div style="width: 15%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+            <!--              </div>-->
+        </div>
+
+    </div>
+    <!--点击分类的分页-->
+    <div id="pageDiv1" style="width: 100%;margin: 30px auto auto auto;height:10%;text-align: center;">
+        共<span style="margin: auto;color: orange;font-weight: bolder" id="pageSum1"></span>页丨
+        当前页：<span id="currentPage1" style="color: red;margin: auto;font-weight: bolder"></span>丨
+        <button style="margin: auto" id="firstPage1">首页</button>
+        <button style="margin: auto" id="lastPage1">上一页</button>
+        <button style="margin: auto" id="nextPage1">下一页</button>
+        <button style="margin: auto" id="endPage1">尾页</button>丨
+        请输入页码：
+        <label for="jumpValue1"></label><input style="width: 50px;margin: auto" type="text" id="jumpValue1">
+        <button id="jump1">跳转</button>
+    </div>
+</div>
+
+
+<div class="window">
+
+    <div class="window-content">
+
+        <div class="window-content-close">×</div>
+
+        <div id="addValueW" class="aa" style="width:750px ;height: auto;margin: 5px auto auto;background-color: white;padding-bottom: 5px;display: none">
+
+            <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>属性值添加</b></div>
+            <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+                <div style="width:738px ;height: 38px;display: flex;">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div  style="width: fit-content;height: auto;align-self: center;margin: auto">值</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input  maxlength="20" style="width: 90%;height: 20px;margin-top: 8px;" type="text" name="" id="nameAddWInput" value=""> &nbsp;<b>*</b>
+                    </div>
+                </div>
+
+
+
+
+                <div style="width:738px ;height: 38px;display: flex;">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">编码</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input  style="width: 90%;height: 20px;margin-top: 8px;" type="text" name="" id="addWCodeInput" value=""
+                                     oninput="this.value=this.value.replace(/\s+/g,'')"> &nbsp;<b>*</b>
+                    </div>
+                </div>
+
+
+
+                <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+                    <button id="submit" >确定添加</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="updateValueW" class="aa" style="width:750px ;height: auto;margin: 5px auto auto;background-color: white;padding-bottom: 5px;display: none">
+
+            <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>属性信息修改</b></div>
+            <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+                <div style="width:738px ;height: 38px;display: flex;">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div   style="width: fit-content;height: auto;align-self: center;margin: auto">值</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input maxlength="20" style="width: 90%;height: 20px;margin-top: 8px;" type="text" name="" id="updateValueWInput" value=""> &nbsp;<b>*</b>
+                    </div>
+                </div>
+
+
+
+
+                <div style="width:738px ;height: 38px;display: flex;">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">编码</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input maxlength="20" style="width: 90%;height: 20px;margin-top: 8px;" type="text" name="" id="updateCodeWInput" value=""
+                                     oninput="this.value=this.value.replace(/\s+/g,'')"> &nbsp;<b>*</b>
+                    </div>
+                </div>
+
+
+
+
+                <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+                    <button id="updateSubmit" >确定修改</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="addLengthW" class="aa" style="width:750px ;height: auto;margin: 5px auto auto;background-color: white;padding-bottom: 5px;display: none">
+
+            <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>编码长度设置</b></div>
+            <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+                <div style="width:738px ;height: 38px;display: flex;">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">长度</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input  maxlength="1" style="width: 90%;height: 20px;margin-top: 8px;" type="text" name="" id="addLengthWLength" value="" oninput="if(this.value.length===1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"> &nbsp;<b>*</b>
+                    </div>
+                </div>
+
+
+                <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+                    <button id="submitLength" >确定添加</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="setRange" class="aa" style="width:750px ;height: auto;margin: 5px auto auto;background-color: white;padding-bottom: 5px;display: none">
+
+            <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>属性信息添加</b></div>
+            <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+
+                <div style="width:738px ;height: 38px;display: flex;">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">范围/值</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;line-height: 38px;display: flex">
+                        &nbsp;<div style="width: 45%;height: auto;display: flex"><input class="type" type="radio" name="type" style="zoom: 120%;" >&nbsp;范围</div>
+                        <div style="width: 45%;height: auto;display: flex"><input class="type" type="radio" name="type" style="zoom:120%" >&nbsp;值</div>&nbsp;<b>*</b>
+                    </div>
+                </div>
+                <div id="type3" style="width:738px ;height: 38px;display: flex">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">流水码功能</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;line-height: 38px;display: flex">
+                        &nbsp;<div style="width: 45%;height: auto;display: flex"><input class="type3" type="radio" name="type3" style="zoom: 120%;" >&nbsp;开启</div>
+                        <div style="width: 45%;height: auto;display: flex"><input class="type3" type="radio" name="type3" style="zoom:120%" >&nbsp;关闭</div>&nbsp;<b>*</b>
+                    </div>
+                </div>
+                <div id="type1" style="width:738px ;height: 38px;display: none">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">自动编码功能</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;line-height: 38px;display: flex">
+                        &nbsp;<div style="width: 45%;height: auto;display: flex"><input class="type1" type="radio" name="type1" style="zoom: 120%;" >&nbsp;开启</div>
+                        <div style="width: 45%;height: auto;display: flex"><input class="type1" type="radio" name="type1" style="zoom:120%" >&nbsp;关闭</div>&nbsp;<b>*</b>
+                    </div>
+                </div>
+                <div id="type2" style="width:738px ;height: 38px;display: flex">
+                    <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">功能列表：</div>
+                    </div>
+                    <div  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;line-height: 38px;display: flex">
+                        &nbsp;<div style="width: 45%;height: auto;display: flex"><input class="type2" type="radio" name="type2" style="zoom: 120%;" >&nbsp;值为编码功能</div>
+                        <div style="width: 45%;height: auto;display: flex"><input class="type2" type="radio" name="type2" style="zoom:120%" >&nbsp;顺序编码功能</div>&nbsp;<b>*</b>
+                    </div>
+                </div>
+
+                <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+                    <button id="submitRange" >确定提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+
+
+    //接收上个页面传来的订单id
+    function getHref(){
+        var url = decodeURI(location.search);
+        var theRequest = new Object();
+        var strs;
+        if (url.indexOf("?") !== -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for (var i = 0; i < strs.length; i++) {
+                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+    //用法  var 自己变量名字 = getHref().要获取的参数名字
+    var attNameId=getHref().attNameId;
+    var userIdd=getHref().userId;
+    var sortId = getHref().sortId;//上级的分类id
+    var level = getHref().level;//上级分类的等级
+    var publicNumber = getHref().public;//辨别是否是公共属性点击进来的
+    // var pattern = /^(<|\[)[-]?[0-9]+[.]?[0-9]*[~][-]?[0-9]+[.]?[0-9]*(>|])$/;
+    var pattern = /^(<|\[)[-]?[0-9]+[.]?[0-9]*[fpnum%KMGT]?[~][-]?[0-9]+[.]?[0-9]*[fpnum%KMGT]?(>|])$/;
+    //单位换算
+    function power(str){
+        let number= str.replace(/[fpnum%KMGT]/,'');
+        let power = str.replace(/([-]?[0-9]+[.][0-9]+)|([-]?[0-9]*)/,'');
+
+
+
+
+        if (power.length>0){
+            let num;
+            if (power==="f"){
+                num=0.000000000000001;
+            }else if (power==="p"){
+                num=0.000000000001;
+            }else if (power==="n"){
+                num=0.000000001;
+            }else if (power==="u"){
+                num=0.000001;
+            }else if (power==="m"){
+                num=0.001;
+            }else if (power==="%"){
+                num=0.01;
+            }else if (power==="K"){
+                num=1000;
+            }else if (power==="M"){
+                num=1000000;
+            }else if (power==="G"){
+                num=1000000000;
+            }else if (power==="T"){
+                num=1000000000000;
+            }
+
+            return Number(num)*Number(number);
+        }else {
+            return number
+        }
+
+    }
+    //在符合pattern后，判断范围规定是否符合规定，例如<100~80]就不符合规定
+    function compare (value){
+        //  console.log("范围"+ str)
+        // console.log("传入的值"+value)
+      
+        
+        if (value.length>0){
+            var pattern = /^\[.*\]$/;
+            var patterns= /^\<.*\]$/;
+            var pattern1= /^\<.*\>$/;
+            var patterns1= /^\[.*\>$/;
+            // var patternss=/^\<.*\>$/;
+            if (pattern.test(value)===true){
+                value=value.split("[").join("");
+                value=value.split("]").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = value.split("~");
+                // console.log(strings[0])
+                // console.log(strings[1])
+
+               
+                //将两个数解析是否含有power
+                let power1 = power(strings[0]);
+                let power2 = power(strings[1]);
+                // console.log(power1)
+                // console.log(power2)
+
+                
+                //判断两个数是否正常，第一个数应该小于第二个数
+                if (Number(power1)<Number(power2)){
+                    return true;
+                }else {
+                    return false;
+                }
+                
+                
+                //判断输入的数值是否符合这个范围
+                // if (Number(value)>=Number(strings[0]) && Number(value)<=Number(strings[1])){
+                //     return true;
+                // }else {
+                //     return false;
+                // }
+
+            }
+            else if (patterns.test(value)===true){
+
+                value=value.split("<").join("");
+                value=value.split("]").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = value.split("~");
+
+                //将两个数解析是否含有power
+                let power1 = power(strings[0]);
+                let power2 = power(strings[1]);
+
+                //判断两个数是否正常，第一个数应该小于第二个数
+                if (Number(power1)<Number(power2)){
+                    return true;
+                }else {
+                    return false;
+                }
+
+
+            }
+            else if (pattern1.test(value)===true){
+                value=value.split("<").join("");
+                value=value.split(">").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = value.split("~");
+                //将两个数解析是否含有power
+                let power1 = power(strings[0]);
+                let power2 = power(strings[1]);
+
+                //判断两个数是否正常，第一个数应该小于第二个数
+                if (Number(power1)<Number(power2)){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+            else if (patterns1.test(value)===true){
+                value=value.split("[").join("");
+                value=value.split(">").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = value.split("~");
+                //将两个数解析是否含有power
+                let power1 = power(strings[0]);
+                let power2 = power(strings[1]);
+
+                //判断两个数是否正常，第一个数应该小于第二个数
+                if (Number(power1)<Number(power2)){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+
+
+        }
+
+
+        else {
+            return false;
+        }
+
+
+    }
+    //判断compare后取出数据库中的数据判断是否有重复的，例如，数据库中有<0~10],用户输入0~5，或者8~11等等
+    function compare2(getValue,inputValue){
+        //getValue是从数据库中取得的数据;inputValue是用户输入的数据
+        //1.先解析数据
+        var pattern = /^\[.*\]$/;
+        var patterns= /^\<.*\]$/;
+        var pattern1= /^\<.*\>$/;
+        var patterns1= /^\[.*\>$/;
+        if (pattern.test(getValue)===true){
+            //解析数据库的数据
+            getValue=getValue.split("[").join("");
+            getValue=getValue.split("]").join("");
+            let getValueStrings = getValue.split("~");
+            if(pattern.test(inputValue)===true){
+                inputValue=inputValue.split("[").join("");
+                inputValue=inputValue.split("]").join("");
+                let inputValueStrings = inputValue.split("~");
+
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    return true;
+
+                }else {
+                    return false;
+
+                }
+                
+            }else if (patterns.test(inputValue)===true) {
+                inputValue=inputValue.split("<").join("");
+                inputValue=inputValue.split("]").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+                        return false;
+                }
+
+
+            }else if (pattern1.test(inputValue)===true){
+                inputValue=inputValue.split("<").join("");
+                inputValue=inputValue.split(">").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))||Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+                }
+            }else if (patterns1.test(inputValue)===true){
+                inputValue=inputValue.split("[").join("");
+                inputValue=inputValue.split(">").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+                }
+            }
+
+
+
+        }
+
+        else if (patterns.test(getValue)===true){
+            getValue=getValue.split("<").join("");
+            getValue=getValue.split("]").join("");
+            let getValueStrings = getValue.split("~");
+            if(pattern.test(inputValue)===true){
+                inputValue=inputValue.split("[").join("");
+                inputValue=inputValue.split("]").join("");
+                let inputValueStrings = inputValue.split("~");
+
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+
+                        return false;
+
+
+                }
+            }
+
+            else if (patterns.test(inputValue)===true) {
+                inputValue=inputValue.split("<").join("");
+                inputValue=inputValue.split("]").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))||Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+
+                        return false;
+
+
+                }
+            }
+
+            else if (pattern1.test(inputValue)===true){
+                inputValue=inputValue.split("<").join("");
+                inputValue=inputValue.split(">").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))||Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+
+                    return false;
+
+
+                }
+            }
+
+            else if (patterns1.test(inputValue)===true){
+                inputValue=inputValue.split("[").join("");
+                inputValue=inputValue.split(">").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+
+                    return false;
+
+
+                }
+            }
+        }
+
+        else if (pattern1.test(getValue)===true){
+            //解析数据库的数据
+            getValue=getValue.split("<").join("");
+            getValue=getValue.split(">").join("");
+            let getValueStrings = getValue.split("~");
+            if(pattern.test(inputValue)===true){
+                inputValue=inputValue.split("[").join("");
+                inputValue=inputValue.split("]").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))||Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))){
+                        return false;
+                    }else {
+
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+
+                }
+
+            }
+            else if (patterns.test(inputValue)===true) {
+                inputValue=inputValue.split("<").join("");
+                inputValue=inputValue.split("]").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))||Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+                }
+
+
+            }
+            else if (pattern1.test(inputValue)===true){
+                inputValue=inputValue.split("<").join("");
+                inputValue=inputValue.split(">").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))||Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+                }
+            }
+            else if (patterns1.test(inputValue)===true){
+                inputValue=inputValue.split("[").join("");
+                inputValue=inputValue.split(">").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))||Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+                }
+            }
+        }
+
+        else if (patterns1.test(getValue)===true){
+            //解析数据库的数据
+            getValue=getValue.split("[").join("");
+            getValue=getValue.split(">").join("");
+            let getValueStrings = getValue.split("~");
+            if(pattern.test(inputValue)===true){
+                inputValue=inputValue.split("[").join("");
+                inputValue=inputValue.split("]").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))){
+                        return false;
+                    }else {
+
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+
+                }
+
+            }
+            else if (patterns.test(inputValue)===true) {
+                inputValue=inputValue.split("<").join("");
+                inputValue=inputValue.split("]").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))){
+                        return false;
+                    }else {
+
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+                }
+
+
+            }
+            else if (pattern1.test(inputValue)===true){
+                inputValue=inputValue.split("<").join("");
+                inputValue=inputValue.split(">").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))||Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+                }
+            }else if (patterns1.test(inputValue)===true){
+                inputValue=inputValue.split("[").join("");
+                inputValue=inputValue.split(">").join("");
+                let inputValueStrings = inputValue.split("~");
+                if((Number(power(inputValueStrings[0]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))<=Number(power(getValueStrings[1])))||(Number(power(inputValueStrings[0]))<=Number(power(getValueStrings[0]))&&Number(power(inputValueStrings[1]))>=Number(power(getValueStrings[1])))){
+                    if (Number(power(inputValueStrings[1]))===Number(power(getValueStrings[0]))||Number(power(inputValueStrings[0]))===Number(power(getValueStrings[1]))){
+                        return false;
+                    }else {
+                        return true;
+
+                    }
+
+                }else {
+                    return false;
+                }
+            }
+        }
+    }
+    //判断输入的值是否符合数据库中的范围
+    function compare3 (str,value){
+
+        //  console.log("范围"+ str)
+        // console.log("传入的值"+value)
+        if (value.length>0){
+            var pattern = /^\[.*\]$/;
+            var patterns= /^\<.*\]$/;
+            var pattern1= /^\<.*\>$/;
+            var patterns1= /^\[.*\>$/;
+
+            if (pattern.test(str)===true){
+                str=str.split("[").join("");
+                str=str.split("]").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = str.split("~");
+
+                //判断输入的数值是否符合这个范围
+                if (Number(power(value))>=Number(power(strings[0])) && Number(power(value))<=Number(power(strings[1]))){
+                    return true;
+                }else {
+                    return false;
+                }
+
+            }
+            else if (patterns.test(str)===true){
+
+                str=str.split("<").join("");
+                str=str.split("]").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = str.split("~");
+
+                // console.log("开始"+ strings[0]);
+                // console.log("结束"+strings[1])
+
+                //判断输入的数值是否符合这个范围
+                if (Number(power(value))>Number(power(strings[0])) && Number(power(value))<=Number(power(strings[1]))){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+            else if (pattern1.test(str)===true){
+
+                str=str.split("<").join("");
+                str=str.split(">").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = str.split("~");
+
+                // console.log("开始"+ strings[0]);
+                // console.log("结束"+strings[1])
+
+                //判断输入的数值是否符合这个范围
+                if (Number(power(value))>Number(power(strings[0])) && Number(power(value))<Number(power(strings[1]))){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+            else if (patterns1.test(str)===true){
+
+                str=str.split("[").join("");
+                str=str.split(">").join("");
+                // str=str.replace(/[a-zA-Z]/g, '');
+                let strings = str.split("~");
+
+                // console.log("开始"+ strings[0]);
+                // console.log("结束"+strings[1])
+
+                //判断输入的数值是否符合这个范围
+                if (Number(power(value))>=Number(power(strings[0])) && Number(power(value))<Number(power(strings[1]))){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+
+            else if (pattern.test(str)===false && patterns.test(str)===false && pattern1.test(str)===false && patterns1.test(str)===false) {
+                alert("数据有问题，不符合格式，请联系相关人员！");
+
+            }
+        }else {
+            return false;
+        }
+
+
+    }
+    
+    function height(){
+        let iframe = window.parent.document.getElementById("iframepage");
+        if (iframe){
+            iframe.style.height=window.parent.innerHeight+"px";
+        }
+
+    }
+    height();
+
+
+
+    // 在用户点击其他地方时，关闭弹窗
+    let wd = document.querySelector(".window");
+    window.onclick = function(event) {
+        if (event.target === wd) {
+            wd.style.display = "none";
+        }
+    }
+
+    //点击close也可以关闭弹窗
+    document.querySelector(".window-content-close").onclick=function (){
+        wd.style.display="none";
+    }
+
+
+    function displayAddValue(){
+        document.getElementById("addValueW").style.display="";
+        document.getElementById("updateValueW").style.display="none";
+        document.getElementById("addLengthW").style.display="none";
+        document.getElementById("setRange").style.display="none";
+    }
+
+    function displayAddLength(){
+        document.getElementById("addValueW").style.display="none";
+        document.getElementById("updateValueW").style.display="none";
+        document.getElementById("addLengthW").style.display="";
+        document.getElementById("setRange").style.display="none";
+    }
+
+    function displayUpdateValue(){
+        document.getElementById("addValueW").style.display="none";
+        document.getElementById("updateValueW").style.display="";
+        document.getElementById("addLengthW").style.display="none";
+        document.getElementById("setRange").style.display="none";
+    }
+
+    function displaySetRange(){
+        document.getElementById("addValueW").style.display="none";
+        document.getElementById("updateValueW").style.display="none";
+        document.getElementById("addLengthW").style.display="none";
+        document.getElementById("setRange").style.display="";
+    }
+
+
+    //获取权限信息
+    //查询权限
+    let userId;
+    if(parent.document.getElementById("userId")){
+        userId= parent.document.getElementById("userId").value;
+    }
+    else {
+        userId=userIdd;
+    }
+
+    async function userFunction(userId){
+        let data;
+        await axios({
+            method:"post",
+            url:"userFunction/selectUserFunctionTwoByUserId",
+            data:userId
+        }).then(function (resp){
+            data= resp.data;
+        })
+        return data;
+    }
+    //添加分类属性编码权限
+    async function addAttributeValueQx(){
+        let promise = userFunction(userId);
+        let promiseBoolean=false;
+        await promise.then( async function (resp) {
+
+            for (let j = 0; j < resp.length; j++) {
+                if (resp[j].function_two_id === 13 && resp[j].open_status === 1) {
+                    promiseBoolean = true;
+
+                    break;
+                }
+            }
+
+        })
+        return promiseBoolean;
+    }
+    //修改分类属性编码权限
+    async function updateAttributeValueQx(){
+        let promise = userFunction(userId);
+        let promiseBoolean=false;
+        await promise.then( async function (resp) {
+
+            for (let j = 0; j < resp.length; j++) {
+                if (resp[j].function_two_id === 14 && resp[j].open_status === 1) {
+                    promiseBoolean = true;
+
+                    break;
+                }
+            }
+
+        })
+        return promiseBoolean;
+    }
+    //删除分类属性编码权限
+    async function deleteAttributeValueQx(){
+        let promise = userFunction(userId);
+        let promiseBoolean=false;
+        await promise.then( async function (resp) {
+
+            for (let j = 0; j < resp.length; j++) {
+                if (resp[j].function_two_id === 15 && resp[j].open_status === 1) {
+                    promiseBoolean = true;
+
+                    break;
+                }
+            }
+
+        })
+        return promiseBoolean;
+    }
+
+
+    //点击设置属性值是否是范围
+    document.getElementById("range").onclick=function (){
+        wd.style.display="block";
+        displaySetRange();
+        let type = document.querySelectorAll(".type");//范围还是值
+        let type1 = document.querySelectorAll(".type1");//自动编码功能开关
+        let type2 = document.querySelectorAll(".type2");//值为编码功能和顺序编码功能
+        let type3 = document.querySelectorAll(".type3");//流水码功能
+        // console.log(publicNumber)
+        if (Number(publicNumber)===Number(1)){
+            type3[0].checked=false;
+            type3[1].checked=true;
+            type3[0].disabled=true;
+            type3[1].disabled=true;
+        }
+
+        let type1Style = document.getElementById("type1");
+        let type2Style = document.getElementById("type2");
+        let type3Style = document.getElementById("type3");
+        //查询当前属性下是否添加了属性值
+        axios({
+            method:"post",
+            url:"attributeValue/selectIfCode",
+            data:attNameId
+        }).then(function (resp){
+            if (resp.data===true){
+                //有属性表，屏蔽选择属性或者是值的选择
+                type[0].disabled=true;
+                type[1].disabled=true;
+
+            }
+        })
+        let formdata={
+            id:"",
+            attNameId:attNameId,
+            range:"",
+            autoCode:"",
+            serialCode:""
+        }
+        //查看当前属性名是否设置了是否为范围，然后再进行操作
+        axios({
+            method:"post",
+            url:"attributeFunction/selectByAttNameId",
+            data:attNameId
+        }).then(function (resp){
+            let datas=resp.data;
+            if (datas.length>0){
+                if (datas[0].range===0){
+                    //是值的时候按钮回显
+                    type[1].checked=true;
+
+                    if (datas[0].serialCode===0){
+                        //流水码功能关闭，关闭的时候才能显示自动编码功能
+                        type3[1].checked=true;
+
+                        type3Style.style.display="flex";
+                        type1Style.style.display="none";
+
+                        //自动编码功能显示
+                        if (datas[0].autoCode===0){
+                            //自动编码功能开关显示
+                            type1Style.style.display="flex";
+                            type2Style.style.display="none";
+                            //设置该功能为关闭
+                            type1[1].checked=true;
+                        }else if (datas[0].autoCode===1){
+                            //开启了值作为编码的功能
+                            type1Style.style.display="flex";
+                            //设置该功能为开启
+                            type1[0].checked=true;
+                            //显示具体功能菜单
+                            type2Style.style.display="flex";
+                            type2[0].checked=true;
+                        }else if (datas[0].autoCode===2) {
+                            //开启了顺序编码的功能
+                            type1Style.style.display="flex";
+                            //设置该功能为开启
+                            type1[0].checked=true;
+                            //显示具体功能菜单
+                            type2Style.style.display="flex";
+                            type2[1].checked=true;
+                        }
+
+                    }
+                    else if (datas[0].serialCode===1){
+                        type3[0].checked=true;
+                        //流水码功能开启
+                        type1Style.style.display="none";
+                        type2Style.style.display="none";
+
+                    }
+
+
+                }else if (datas[0].range===1) {
+                    //范围
+                    document.getElementById("type1").style.display="none";
+                    document.getElementById("type2").style.display="none";
+                    document.getElementById("type3").style.display="none";
+                    //范围按钮
+                    type[0].checked=true;
+                    //自动编码功能关闭
+                    type1[1].checked=true;
+                    //流水码功能关闭
+                    type3[1].checked=true;
+                }
+            }
+
+            type[0].onchange=async function () {
+                //判断是否开启流水码功能，以及是否在映射中
+                if (datas[0].serialCode === 1) {
+                    await axios({
+                        method: "post",
+                        url: "mapping/selectLengthIfExist",
+                        data: attNameId
+                    }).then(async function (resp) {
+                        let bo = resp.data;
+                        if (bo === true) {
+                            //是映射属性
+                            //查询是否有物料信息以及属性编码信息，二者有其一就不允许修改；关闭
+                            await axios({
+                                method: "post",
+                                url: "attribute/selectACByParentId",
+                                data: attNameId
+                            }).then(async function (resp) {
+                                //得到所有的content，如果有content就证明有物料信息
+                                let datas = resp.data;
+                                //然后查询是否有编码表
+                                await axios({
+                                    method: "post",
+                                    url: "attributeValue/selectByAttNameId",
+                                    data: attNameId
+                                }).then(function (resp) {
+                                    //得到编码表的数据
+                                    let codeDatas = resp.data;
+                                    if (datas.length > 0 || codeDatas.length > 0) {
+                                        alert("该属性已被使用，流水码功能禁止修改！");
+                                        type3[0].checked = true;
+                                        type3[1].checked = false;
+
+                                    } else if (datas.length === 0 && codeDatas.length === 0) {
+                                        //流水码功能开启
+                                        type1Style.style.display = "none";
+                                        type2Style.style.display = "none";
+                                    }
+
+                                    if (type3[1].checked === true) {
+                                        type1Style.style.display = "flex";
+                                        type1[1].checked = true;
+                                    }
+                                })
+
+                            })
+                        }
+                    })
+                }
+                if (type[0].checked===true){
+                    //是范围,隐藏三个菜单
+                    document.getElementById("type1").style.display = "none";
+                    document.getElementById("type2").style.display = "none";
+                    document.getElementById("type3").style.display = "none";
+                }
+
+
+            }
+
+            type[1].onchange=function (){
+                //是值，开启菜单
+                document.getElementById("type1").style.display="flex";
+                document.getElementById("type3").style.display="flex";
+                    if (type3[0].checked === true){
+                        //开启流水码
+                        document.getElementById("type1").style.display="none";
+                    }
+                    else if (type3[1].checked === true){
+                        //关闭流水码
+                        document.getElementById("type1").style.display="flex";
+                        type1[1].checked=true;
+                    }
+
+
+
+            }
+
+            type1[0].onchange=function (){
+                //开启自动编码功能，显示功能列表
+                document.getElementById("type2").style.display="flex";
+                //查询自动编码属性时开还是关，如果之前是关着的就默认选择值为编码功能打开
+
+                  type2[0].checked=true;
+
+
+            }
+
+            type1[1].onchange=function (){
+                //自动编码功能关闭，隐藏功能列表
+                document.getElementById("type2").style.display="none";
+            }
+
+            type3[0].onchange=async function () {
+                // console.log("开启")
+                //开启
+                await axios({
+                    method: "post",
+                    url: "mapping/selectLengthIfExist",
+                    data: attNameId
+                }).then(async function (resp) {
+                    let bo = resp.data;
+                    if (bo === true) {
+                        //映射属性
+
+                        //查询是否有物料信息以及属性编码信息，二者有其一就不允许修改；开启
+
+                        //开启前还要查询该分类下的一级该分类上的所有属性是否有开启映射流水码功能的，只能有一个存在
+                        let sortList = [];
+                        let attributeNameList = [];
+
+                        async function belong(parentIds, n) {
+
+                            if (n > 0) {
+
+                                await axios({
+                                    method: "post",
+                                    url: "sort/selectOfSort",
+                                    data: parentIds
+                                }).then(function (resp) {
+                                    let datas = resp.data;
+                                    sortList = datas.concat(sortList);
+                                    n--;
+                                    belong(datas[0].parentId, n);
+                                })
+
+                            } else if (n === 0) {
+                                //得到了sortList,即自己以及自己的父级分类,然后查询分类下所有的属性名称
+                                async function attributeName(a, b) {
+
+                                    if (a > 0) {
+                                        //查询属性名称
+                                        await axios({
+                                            method: "post",
+                                            url: "attribute/selectAttributeNameByParentId",
+                                            data: sortList[b].id
+                                        }).then(function (resp) {
+                                            let adatas = resp.data;
+                                            attributeNameList = adatas.concat(attributeNameList);
+                                            b++;
+                                            a--;
+                                            attributeName(a, b);
+                                        })
+
+                                    } else if (a === 0) {
+
+                                        //查询公共属性
+                                        await axios({
+                                            method: "post",
+                                            url: "attribute/selectPublic"
+                                        }).then(async function (resp) {
+                                            let ggdatas = resp.data;
+                                            attributeNameList = ggdatas.concat(attributeNameList);
+
+                                            //查询该分类下面的所有分类
+                                           await axios({
+                                                method: "post",
+                                                url: "sort/selectAllDown",
+                                                data: sortId
+                                            }).then(async function (resp) {
+                                                let allDown = resp.data;
+                                                for (let i = 0; i < allDown.length; i++) {
+                                                    let idList = allDown[i].id_list;
+                                                    //查询该分类下所有的属性信息
+                                                    await axios({
+                                                        method: "post",
+                                                        url: "attribute/selectAttributeNameByParentId",
+                                                        data: idList
+                                                    }).then(function (resp) {
+                                                        let ddatas = resp.data;
+                                                        attributeNameList = ddatas.concat(attributeNameList);
+                                                    })
+
+                                                }
+
+                                                //得到了分类中所有的属性信息,查看除了自己是否还有属性开启了映射流水码功能
+                                                let boolean = true;
+
+
+                                                for (let i = 0; i < attributeNameList.length; i++) {
+                                                    let id = attributeNameList[i].id;
+                                                    if (Number(id) !== Number(attNameId)) {
+                                                        //查询该属性的function信息
+                                                        await axios({
+                                                            method: "post",
+                                                            url: "attributeFunction/selectByAttNameId",
+                                                            data: id
+                                                        }).then(function (resp) {
+                                                            let datas = resp.data;
+                                                            let serialCode = datas[0].serialCode;
+                                                            if (Number(serialCode) === Number(1)) {
+                                                                boolean = false;
+
+                                                            }
+
+                                                        })
+                                                    }
+
+
+                                                }
+
+                                                if (boolean === true) {
+                                                   await axios({
+                                                        method: "post",
+                                                        url: "attribute/selectACByParentId",
+                                                        data: attNameId
+                                                    }).then(async function (resp) {
+                                                       //得到所有的content，如果有content就证明有物料信息
+                                                       let datas = resp.data;
+                                                       //然后查询是否有编码表
+                                                       await axios({
+                                                           method: "post",
+                                                           url: "attributeValue/selectByAttNameId",
+                                                           data: attNameId
+                                                       }).then(function (resp) {
+                                                           //得到编码表的数据
+                                                           let codeDatas = resp.data;
+                                                           // console.log(datas.length)
+                                                           // console.log(codeDatas.length)
+                                                           if (datas.length > 0 || codeDatas.length > 0) {
+                                                               alert("该属性已被使用，流水码功能禁止修改！");
+                                                               type3[0].checked = false;
+                                                               type3[1].checked = true;
+                                                           } else if (datas.length === 0 && codeDatas.length === 0) {
+                                                               //流水码功能开启
+                                                               type1Style.style.display = "none";
+                                                               type2Style.style.display = "none";
+                                                           }
+
+                                                           if (type3[1].checked === true) {
+                                                               type1Style.style.display = "flex";
+                                                           }
+                                                       })
+
+                                                   })
+                                                } else {
+                                                    type3[0].checked = false;
+                                                    type3[1].checked = true;
+                                                    alert("该分类下已存在开启了流水码功能的属性！");
+                                                    type1Style.style.display = "flex";
+                                                    // type2Style.style.display = "flex";
+                                                }
+
+                                            })
+
+
+                                        })
+
+
+                                    }
+
+                                }
+
+                                await attributeName(sortList.length, 0);
+
+                            }
+
+                        }
+
+                        await belong(sortId, level);
+                    }
+                })
+                if (type3[0].checked===true){
+                    type1Style.style.display = "none";
+                    type2Style.style.display = "none";
+                    type1[1].checked = true;
+                    type2[1].checked = true;
+
+                }
+
+
+
+            }
+            type3[1].onchange=async function () {
+                // console.log("关闭")
+                await axios({
+                    method: "post",
+                    url: "mapping/selectLengthIfExist",
+                    data: attNameId
+                }).then(async function (resp)
+                {
+                    let bo = resp.data;
+                    if (bo === true) {
+                        //是映射属性
+                        //查询是否有物料信息以及属性编码信息，二者有其一就不允许修改；关闭
+                        await axios({
+                            method: "post",
+                            url: "attribute/selectACByParentId",
+                            data: attNameId
+                        }).then(async function (resp) {
+                            //得到所有的content，如果有content就证明有物料信息
+                            let datas = resp.data;
+                            //然后查询是否有编码表
+                            await axios({
+                                method: "post",
+                                url: "attributeValue/selectByAttNameId",
+                                data: attNameId
+                            }).then(function (resp) {
+                                //得到编码表的数据
+                                let codeDatas = resp.data;
+                                if (datas.length > 0 || codeDatas.length > 0) {
+                                    alert("该属性已被使用，流水码功能禁止修改！");
+                                    type3[0].checked = true;
+                                    type3[1].checked = false;
+
+                                } else if (datas.length === 0 && codeDatas.length === 0) {
+                                    //流水码功能开启
+                                    type1Style.style.display = "none";
+                                    type2Style.style.display = "none";
+                                }
+
+                                if (type3[1].checked === true) {
+                                    type1Style.style.display = "flex";
+                                    type1[1].checked = true;
+                                }
+                            })
+
+                        })
+                    }
+                })
+                if (type3[1].checked===true){
+
+                    type1Style.style.display="flex";
+                    type1[1].checked=true;
+                }
+
+
+            }
+
+
+        })
+
+
+
+
+
+
+
+
+        document.getElementById("submitRange").onclick=function (){
+            if (confirm("您确定要添加此功能吗？")){
+                //先判断范围/值
+                if (type[0].checked===true){
+                    //范围选中
+                    formdata.range=1;
+
+                    formdata.autoCode=0;
+                    formdata.serialCode=0;
+
+
+
+                }else if (type[1].checked===true){
+                    //值选中
+                    formdata.range=0;
+                    //判断流水码功能是否开启
+                    if (type3[0].checked===true){
+                        //开启流水码功能
+                        formdata.serialCode=1;
+                        formdata.autoCode=0;
+                    }
+                    else if (type3[1].checked===true){
+                        //未开启流水码功能
+                        formdata.serialCode=0;
+                        //判断自动编码功能是否开启
+                        if (type1[0].checked===true){
+                            //开启了自动编码功能,判断开启了哪个功能
+                            if (type2[0].checked===true){
+                                //开启了值作为编码的功能
+                                formdata.autoCode=1;
+                            }else {
+                                //开启了顺序编码的功能
+                                formdata.autoCode=2;
+                            }
+                        }else {
+                            //未开启自动编码功能
+                            formdata.autoCode=0;
+                        }
+                    }
+
+
+                }
+                //判断值为编码的功能是否开启
+                if(formdata.autoCode===1||formdata.autoCode===2){
+                    //功能开启，判断是否设置了长度
+                    axios({
+                        method:"post",
+                        url:"attribute/selectIfLengthExist",
+                        data:attNameId
+                    }).then(function (resp){
+                        let datas=resp.data;
+                        if (datas){
+
+                            //判断是否有设置是编码还是值
+                            axios({
+                                method:"post",
+                                url:"attributeFunction/selectIfExist",
+                                data:attNameId
+                            }).then(function (resp){
+                                if (resp.data===true){
+                                    //存在这个，就更新
+                                    //更新
+                                    axios({
+                                        method:"post",
+                                        url:"attributeFunction/update",
+                                        data:formdata
+                                    }).then(function (resp){
+                                        if (resp.data==="success"){
+                                            alert("更新成功！")
+                                        }else {
+                                            alert("更新失败，请联系相关人员！")
+                                        }
+                                    })
+
+                                }
+                                else {
+                                    //不存在就添加
+                                    axios({
+                                        method:"post",
+                                        url:"attributeFunction/add",
+                                        data:formdata
+                                    }).then(function (resp){
+                                        if (resp.data==="success"){
+                                            alert("添加成功！")
+                                        }else {
+                                            alert("添加失败，请联系相关人员！")
+                                        }
+                                    })
+                                }
+                            })
+
+                        }else {
+                            alert("请先设置编码长度再开启此功能！")
+                        }
+
+                    })
+
+                }
+                else if (formdata.autoCode===0){
+                    //更新
+                    axios({
+                        method:"post",
+                        url:"attributeFunction/update",
+                        data:formdata
+                    }).then(function (resp){
+                        if (resp.data==="success"){
+                            alert("更新成功！")
+                        }else {
+                            alert("更新失败，请联系相关人员！")
+                        }
+                    })
+                }else {
+                    //更新
+                    axios({
+                        method:"post",
+                        url:"attributeFunction/update",
+                        data:formdata
+                    }).then(function (resp){
+                        if (resp.data==="success"){
+                            alert("更新成功！")
+                        }else {
+                            alert("更新失败，请联系相关人员！")
+                        }
+                    })
+                }
+
+                return true;
+            }
+            else {
+                return false;
+            }
+
+        }
+
+    }
+
+
+
+    //点击添加编码长度按钮
+    //查询该属性是否有设置长度
+    axios({
+        method:"post",
+        url:"attribute/selectById",
+        data:attNameId
+    }).then(async function (resp){
+        let datas=resp.data;
+        if (datas[0].length===0) {
+            //没有用到
+            document.getElementById("addLength").disabled = false;
+
+
+        }else {
+            //查询映射中是否有使用到这个属性
+            await  axios({
+                method:"post",
+                url:"mapping/selectLengthIfExist",
+                data:attNameId
+            }).then(async function (resp) {
+                if (resp.data === true) {
+                    //有用到
+                    document.getElementById("addLength").disabled = true;
+                } else if (resp.data === false) {
+                    //没有用到,查看当前属性中是否有属性值
+                 await   axios({
+                        method:"post",
+                        url:"attributeValue/selectIfCode",
+                        data:attNameId
+                    }).then(function (resp){
+                        if(resp.data===true){
+                            //有属性值
+                            document.getElementById("addLength").disabled = true;
+                        }else {
+                            //无属性值
+                            document.getElementById("addLength").disabled = false;
+                            document.getElementById("addLengthWLength").value=datas[0].length;
+                        }
+                 })
+
+
+
+                }
+
+            })
+        }
+    })
+
+    //查询属性名
+    axios({
+        method:"post",
+        url:"attribute/selectAttributeNameById",
+        data:attNameId
+    }).then(function (resp){
+        let datas=resp.data;
+        document.getElementById("name").innerHTML=datas[0].name;
+
+
+    })
+
+
+    //查询该属性下的所有属性值
+    function firstPage(page){
+        axios({
+            method:"post",
+            url:"attributeValue/selectAttributeValueLimit?currentPage="+page+"",
+            data:attNameId
+        }).then( async function (resp){
+            let datas=resp.data.rows;
+            let totalCount = resp.data.totalCount;
+
+            document.getElementById("pageSum1").innerHTML=Math.ceil(Number(totalCount)/200);
+            document.getElementById("currentPage1").innerHTML=page;
+            let number = Math.ceil(Number(totalCount)/200);
+            if (Number(number)===Number(0)){
+                document.getElementById("currentPage1").innerHTML=0;
+            }
+
+            let formdata="";
+            if (datas.length>0){
+                //判断是不是范围
+                await   axios({
+                    method:"post",
+                    url:"attributeFunction/selectByAttNameId",
+                    data:attNameId
+                }).then( async function (resp){
+                    let bdatas=resp.data;
+                    if (bdatas[0].range===0){
+                        //查询是否被使用
+                       await axios({
+                           method:"post",
+                           url:"attribute/selectIfUseBySort",
+                           data:attNameId
+                       }).then(function (resp){
+                            let attDatas = resp.data;
+                           //不是范围
+                           for (let i = 0; i < datas.length; i++){
+                               let a=true;
+                               for (let j = 0; j < attDatas.length; j++) {
+
+                                    if (datas[i].attValue===attDatas[j].content){
+                                        a=false;
+                                        break;
+                                    }
+                               }
+                               if (a===true){
+                                   //没有使用
+                                   formdata+='                 <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                       '                              <div style="width: 34.5%;margin:0 auto; border: white solid 1px"><b><pre>'+datas[i].attValue+'</pre></b></div>\n' +
+                                       '                              <div style="width: 40%;margin:0 auto  ; border: white solid 1px;display: flex"><div style="width: fit-content;height: auto;align-self: center;margin: auto"><b>'+datas[i].code+'</b></div></div>\n' +
+                                       '                              <div style="width: 25%;margin:0 auto;   border: white solid 1px;display: flex"><div style="width: fit-content;height: auto;align-self: center;margin: auto"><a class="updateAttribute" href="javascript:void(0)">修改</a><a  class="deleteAttribute"  href="javascript:void(0)">删除</a></div></div>\n' +
+                                       '                          </div>'
+                               }
+                               else {
+                                   //在物料中被使用
+                                   formdata+='                 <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                       '                              <div style="width: 34.5%;margin: 0 auto; border: white solid 1px"><b><pre>'+datas[i].attValue+'</pre></b></div>\n' +
+                                       '                              <div style="width: 40%;margin: 0 auto  ; border: white solid 1px;display: flex;"><div style="width: fit-content;height: auto;align-self: center;margin: auto"><b>'+datas[i].code+'</b></div></div>\n' +
+                                       '                              <div style="width: 25%;margin: 0 auto;   border: white solid 1px;display: flex"><div style="width: fit-content;height: auto;align-self: center;margin: auto"><a style="pointer-events:none;color: grey" class="updateAttribute" href="javascript:void(0)">修改</a><a style="pointer-events:none;color: grey" class="deleteAttribute"  href="javascript:void(0)">删除</a></div></div>\n' +
+                                       '                          </div>'
+                               }
+                           }
+                       })
+
+                        //不是范围
+                        // for (let i = 0; i < datas.length; i++) {
+                        //     //判断属性值是否被物料使用
+                        //     await  axios({
+                        //         method:"post",
+                        //         url:"attribute/selectIfUse?parentId="+datas[i].attNameId+"",
+                        //         data:datas[i].attValue
+                        //     }).then(function (resp){
+                        //         if (resp.data===true){
+                        //             //在物料中被使用
+                        //             formdata+='                 <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                        //                 '                              <div style="width: 34.5%;margin: 0 auto; border: white solid 1px"><b><pre>'+datas[i].attValue+'</pre></b></div>\n' +
+                        //                 '                              <div style="width: 40%;margin: 0 auto  ; border: white solid 1px;display: flex;"><div style="width: fit-content;height: auto;align-self: center;margin: auto"><b>'+datas[i].code+'</b></div></div>\n' +
+                        //                 '                              <div style="width: 25%;margin: 0 auto;   border: white solid 1px;display: flex"><div style="width: fit-content;height: auto;align-self: center;margin: auto"><a style="pointer-events:none;color: grey" class="updateAttribute" href="javascript:void(0)">修改</a><a style="pointer-events:none;color: grey" class="deleteAttribute"  href="javascript:void(0)">删除</a></div></div>\n' +
+                        //                 '                          </div>'
+                        //         }else {
+                        //             //没有使用
+                        //             formdata+='                 <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                        //                 '                              <div style="width: 34.5%;margin:0 auto; border: white solid 1px"><b><pre>'+datas[i].attValue+'</pre></b></div>\n' +
+                        //                 '                              <div style="width: 40%;margin:0 auto  ; border: white solid 1px;display: flex"><div style="width: fit-content;height: auto;align-self: center;margin: auto"><b>'+datas[i].code+'</b></div></div>\n' +
+                        //                 '                              <div style="width: 25%;margin:0 auto;   border: white solid 1px;display: flex"><div style="width: fit-content;height: auto;align-self: center;margin: auto"><a class="updateAttribute" href="javascript:void(0)">修改</a><a  class="deleteAttribute"  href="javascript:void(0)">删除</a></div></div>\n' +
+                        //                 '                          </div>'
+                        //         }
+                        //     })
+                        //
+                        //
+                        // }
+                        document.getElementById("content").innerHTML=formdata;
+                    }
+                    else if (bdatas[0].range===1){
+                        //是范围,得到attNameId，去已添加的物料信息中寻找parentid等于attNameid的所有信息
+
+                        await  axios({
+                            method:"post",
+                            url:"attribute/selectACByParentId",//查询当前属性中所有被用到的信息
+                            data:attNameId
+                        }).then(function (resp){
+                            //得到了所有的数据,然后比较是否符合范围
+                            let adatas=resp.data;
+                            //所有的范围
+                            for (let i = 0; i < datas.length; i++) {
+
+                                //所有的值
+                                let b3=false;
+                                for (let j = 0; j < adatas.length; j++) {
+                                    b3 = compare3(datas[i].attValue,adatas[j].content);
+                                    if (b3===true){
+                                        break;
+                                    }
+                                }
+
+                                if (b3===true){
+                                    //在物料中被使用
+                                    formdata='                 <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                        '                              <div style="width: 34.5%;margin: auto; border: white solid 1px"><b><pre>'+datas[i].attValue+'</pre></b></div>\n' +
+                                        '                              <div style="width: 40%;margin: auto  ; border: white solid 1px"><b>'+datas[i].code+'</b></div>\n' +
+                                        '                              <div style="width: 25%;margin: auto;   border: white solid 1px"><a style="pointer-events:none;color: grey" class="updateAttribute" href="javascript:void(0)">修改</a><a style="pointer-events:none;color: grey" class="deleteAttribute"  href="javascript:void(0)">删除</a></div>\n' +
+                                        '                          </div>'
+                                }else {
+                                    //没有使用
+                                    formdata='                 <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                        '                              <div style="width: 34.5%;margin: auto; border: white solid 1px"><b><pre>'+datas[i].attValue+'</pre></b></div>\n' +
+                                        '                              <div style="width: 40%;margin: auto  ; border: white solid 1px"><b>'+datas[i].code+'</b></div>\n' +
+                                        '                              <div style="width: 25%;margin: auto;   border: white solid 1px"><a class="updateAttribute" href="javascript:void(0)">修改</a><a  class="deleteAttribute"  href="javascript:void(0)">删除</a></div>\n' +
+                                        '                          </div>'
+                                }
+                                document.getElementById("content").innerHTML+=formdata;
+                            }
+
+
+                        })
+                    }
+
+                })
+
+
+
+                //修改
+                let updates = document.querySelectorAll(".updateAttribute");
+                for (let i = 0; i < updates.length; i++) {
+                    updates[i].onclick=function (){
+                        let booleanPromise = updateAttributeValueQx();
+                        booleanPromise.then(function (resp){
+                            if (resp===true){
+                                wd.style.display="block"
+                                displayUpdateValue();
+                                axios({
+                                    method:"post",
+                                    url:"attributeValue/selectById",
+                                    data:datas[i].id
+                                }).then(function (resp)
+                                {
+                                    let adatas=resp.data;
+                                    document.getElementById("updateValueWInput").value=adatas[0].attValue.trim();
+                                    document.getElementById("updateCodeWInput").value=adatas[0].code;
+
+                                    //根据attNameId查询长度
+                                    axios({
+                                        method:"post",
+                                        url:"attribute/selectAttributeNameById",
+                                        data:attNameId
+                                    }).then(function (resp){
+                                        let bdatas=resp.data;
+                                        document.getElementById("updateCodeWInput").maxLength=""+bdatas[0].length+"";
+                                        document.getElementById("updateCodeWInput").placeholder="编码长度为"+bdatas[0].length+"";
+
+                                        //点击提交更新
+                                        document.getElementById("updateSubmit").onclick=function (){
+
+                                            //首先判断为空
+                                            let value = document.getElementById("updateValueWInput").value.trim();
+                                            let value1 = document.getElementById("updateCodeWInput").value;
+
+                                            function a(){
+                                                if (window.confirm("您确定要执行更新操作吗？")){
+                                                    //判断属性值是否重复。不跟自己判断
+                                                    var formdatas={
+                                                        id:datas[i].id,
+                                                        attNameId:datas[i].attNameId,
+                                                        attValue:value,
+                                                        code:value1,
+                                                    }
+
+                                                    axios({
+                                                        method:"post",
+                                                        url:"attributeValue/selectValueExist",
+                                                        data:formdatas
+                                                    }).then(function (resp){
+                                                        if (resp.data===false){
+                                                            //都不重复，进行更新操作
+                                                            axios({
+                                                                method:"post",
+                                                                url:"attributeValue/update",
+                                                                data:formdatas
+                                                            }).then(function (resp){
+                                                                if (resp.data==="success"){
+                                                                    alert("更新成功！");
+                                                                    location.reload();
+                                                                }else {
+                                                                    alert("更新失败，请联系相关人员！")
+                                                                }
+                                                            })
+
+                                                        }else {
+                                                            alert("属性值重复，请核对后再进行操作！")
+                                                        }
+                                                    })
+                                                    return true;
+                                                }else {
+                                                    return false;
+                                                }
+                                            }
+
+                                            if (value.length===0||value1.length===0){
+                                                alert("填写的信息不能为空！")
+                                            }else if (value1.length!==bdatas[0].length){
+                                                alert("编码长度不符合规定！")
+                                            } else {
+                                                //判断是否符合范围
+                                                axios({
+                                                    method:"post",
+                                                    url:"attribute/selectIfRange",
+                                                    data:attNameId
+                                                }).then(function (resp){
+                                                    if (resp.data===true){
+                                                        let b = pattern.test(value);
+                                                        if (b===true){
+                                                            let b1 = compare(value);
+                                                            if (b1===true){
+                                                                //获取当前属性下的所有属性值
+                                                                axios({
+                                                                    method:"post",
+                                                                    url:"attributeValue/selectByAttNameId",
+                                                                    data:attNameId
+                                                                }).then(function (resp){
+                                                                    let cdatas=resp.data;
+                                                                    if (cdatas.length>0){
+                                                                        let b2
+                                                                        for (let j = 0; j <cdatas.length ; j++) {
+                                                                            if (cdatas[j].id!==datas[i].id){
+                                                                                b2 = compare2(cdatas[j].attValue,value);
+                                                                                if (b2===true){
+                                                                                    alert("范围与"+cdatas[j].attValue+"出现冲突，请核对后再进行操作")
+                                                                                    break;
+                                                                                }
+                                                                            }
+
+                                                                        }
+                                                                        if (b2===false){
+                                                                            //提交
+                                                                            a();
+                                                                        }
+                                                                    }else {
+
+                                                                        a();
+                                                                    }
+
+                                                                })
+
+
+                                                            }
+                                                            else {
+                                                                alert("您输入的数据范围存在问题，请核对后再试！")
+
+                                                            }
+                                                        }else {
+                                                            alert("您输入的数据格式不符合范围格式，请核对后再进行操作！")
+                                                        }
+                                                    }else if (resp.data===false){
+                                                        a();
+
+                                                    }
+
+                                                })
+
+
+
+
+                                            }
+                                        }
+                                    })
+
+
+                                })
+                            }
+                            else {
+                                alert("您暂未获得修改权限！")
+                            }
+                        })
+
+
+                    }
+                }
+
+                //删除
+                let deletes = document.querySelectorAll(".deleteAttribute");
+                for (let i = 0; i < deletes.length; i++) {
+                    deletes[i].onclick=function (){
+                        let booleanPromise = deleteAttributeValueQx();
+                        booleanPromise.then(function (resp){
+                            if (resp===true){
+                                if (window.confirm("您确定要删除这条属性值吗？")){
+                                    axios({
+                                        method:"post",
+                                        url:"attributeValue/delete",
+                                        data:datas[i].id
+                                    }).then(function (resp){
+                                        if (resp.data==="success"){
+                                            alert("删除成功！");
+                                            location.reload();
+                                        }else {
+                                            alert("删除失败，请联系相关人员！")
+                                        }
+                                    })
+                                    return true;
+                                }else {
+                                    return false;
+                                }
+                            }
+                            else {
+                                alert("您暂未获得删除权限！")
+                            }
+                        })
+
+                    }
+                }
+
+            }
+            else {
+                document.getElementById("content").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">暂无属性值信息！</div>'
+            }
+
+
+        })
+    }
+    firstPage(1);
+    //首页
+    document.getElementById("firstPage1").onclick=function (){
+        //获取当前页
+        let innerHTML = document.getElementById("currentPage1").innerHTML;
+        if (Number(innerHTML)===Number(1)){
+           alert("这已经是第一页了！")
+        }else if (Number(innerHTML)===Number(0)){
+            alert("还未添加任何信息！")
+        } else {
+            firstPage(1);
+        }
+
+    }
+    //尾页
+    document.getElementById("endPage1").onclick=function (){
+        //获取共有几页
+        let innerHTML = document.getElementById("pageSum1").innerHTML;
+        //获取当前页
+        let innerHTML1 = document.getElementById("currentPage1").innerHTML;
+        if (Number(innerHTML1)===Number(innerHTML)&&Number(innerHTML)!==Number(0)){
+            alert("这已经是最后一页了！")
+        }else if (Number(innerHTML1)===Number(0)){
+            alert("还未添加任何信息！")
+        }
+        else {
+            firstPage(innerHTML);
+        }
+
+    }
+    //上一页
+    document.getElementById("lastPage1").onclick=function (){
+        //获取当前页
+        let innerHTML = document.getElementById("currentPage1").innerHTML;
+        if (Number(innerHTML)>0 && Number(innerHTML)!==1){
+            firstPage(Number(innerHTML)-1)
+        }else if (Number(innerHTML)===Number(1)){
+            alert("这已经是首页了!")
+        }else if (Number(innerHTML)===Number(0)){
+            alert("还未添加任何信息！")
+        }
+        else {
+            alert("系统错误，请寻找相关人员！")
+        }
+
+
+    }
+    //下一页
+    document.getElementById("nextPage1").onclick=function (){
+        //获取总页数和当前页
+        let innerHTML = document.getElementById("currentPage1").innerHTML;
+        let innerHTML2 = document.getElementById("pageSum1").innerHTML;
+        if (Number(innerHTML)>0 && Number(innerHTML)<Number(innerHTML2)){
+            firstPage(Number(innerHTML)+Number(1))
+        }else if(Number(innerHTML)===Number(innerHTML2)&&Number(innerHTML2)!==Number(0) ) {
+            alert("这已经是最后一页了！")
+        }else if (Number(innerHTML)===Number(0)){
+            alert("还未添加任何信息！")
+        }
+        else {
+            alert("系统错误，请联系相关人员！")
+        }
+    }
+
+    //输入的页码
+    document.getElementById("jump1").onclick=function (){
+        //获取输入的页码
+        let value = document.getElementById("jumpValue1").value;
+        //获取当前页码
+        let innerHTML = document.getElementById("currentPage1").innerHTML;
+        //获取总页码
+        let innerHTML1 = document.getElementById("pageSum1").innerHTML;
+        //判断value是否为正整数
+        var pattern = /^[1-9]\d*$/;
+
+        let b = pattern.test(value);
+        if (b){
+            //如果是真的，那就符合正整数，然后再比较是否与当前页相同，是否大于总页数
+            if (Number(value)>Number(innerHTML1)){
+                alert("您输入的数据不符合规则！")
+            }else if (Number(value)===Number(innerHTML)){
+                alert("您已经处在当前页面了！")
+            }else if (Number(innerHTML)===Number(0)){
+                alert("还未添加任何信息！")
+            }
+            else {
+                firstPage(value);
+            }
+
+        }else {
+            alert("您输入的数据不符合页码规则！")
+        }
+
+
+    }
+
+
+    //点击提交要添加的属性
+    function submitAdd(){
+
+
+
+        axios({
+            method:"post",
+            url:"mapping/selectLength",
+            data:attNameId
+        }).then(function (resp){
+            let datas=resp.data;
+            if (datas.length>0){
+                document.getElementById("submit").onclick=function (){
+                    //判断是否为空
+                    let nameInput = document.getElementById("nameAddWInput");
+                    let codeInput = document.getElementById("addWCodeInput");
+                    function a(){
+                        if (window.confirm("您确定要给这条属性添加值和编码吗？")){
+                            let formdata={
+                                id:"",
+                                attNameId:attNameId,
+                                code:"",
+                                attValue:"",
+
+                            }
+
+                            formdata.code=codeInput.value;
+                            formdata.attValue=nameInput.value.trim();
+
+
+
+                            axios({
+                                method:"post",
+                                url:"attributeValue/selectValueExistAdd",
+                                data:formdata
+                            }).then(function (resp){
+                                if (resp.data===true){
+                                    //重复
+                                    alert("属性值重复，请核对后在进行操作！")
+                                }else {
+
+                                    axios({
+                                        method:"post",
+                                        url:"attributeValue/selectCodeExistAdd",
+                                        data:formdata
+                                    }).then(function (resp){
+                                        if (resp.data===true){
+                                            //重复
+                                            alert("编码值重复，请核对后在进行操作！")
+                                        }else {
+                                            axios({
+                                                method:"post",
+                                                url:"attributeValue/add",
+                                                data:formdata
+                                            }).then(function (resp){
+                                                if (resp.data==="success"){
+                                                    alert("添加属性值和编码成功！");
+                                                    location.reload();
+                                                }else {
+                                                    alert("添加失败，请联系相关人员！")
+                                                }
+                                            })
+
+                                        }
+                                    })
+
+
+                                }
+                            })
+
+
+
+                            return true;
+                        }else {
+                            return false;
+                        }
+                    }
+
+                    if (nameInput.value.length===0 || codeInput.value.length===0  ){
+
+                        alert("填写的信息不能为空！")
+
+
+                    }else if (codeInput.value.length!==datas[0].length){
+                        alert("编码长度不符合规定！")
+                    } else {
+                        //判断该属性是否是范围的
+                        axios({
+                            method:"post",
+                            url:"attribute/selectIfRange",
+                            data:attNameId
+                        }).then(function (resp){
+                            if(resp.data===true){
+                                //判断是否符合规则
+                                let b = pattern.test(nameInput.value);
+                                if (b===true){
+
+                                    let b1 = compare(nameInput.value);
+                                    if (b1===true){
+                                        //获取当前属性下的所有属性值
+                                        axios({
+                                            method:"post",
+                                            url:"attributeValue/selectByAttNameId",
+                                            data:attNameId
+                                        }).then(function (resp){
+                                            let datas=resp.data;
+                                            if (datas.length>0){
+                                                let b2
+                                                for (let j = 0; j <datas.length ; j++) {
+                                                    b2 = compare2(datas[j].attValue,nameInput.value);
+                                                    if (b2===true){
+                                                        alert("范围与"+datas[j].attValue+"出现冲突，请核对后再进行操作")
+                                                        break;
+                                                    }
+                                                }
+                                                if (b2===false){
+                                                    //提交
+                                                    a();
+                                                }
+                                            }else {
+
+                                                a();
+                                            }
+
+                                        })
+
+                                    }
+                                    else {
+                                        alert("您输入的数据范围存在问题，请核对后再试！")
+                                    }
+
+                                }else {
+                                    alert("您输入的数据格式不符合范围格式，请核对后再进行操作！")
+                                }
+
+                            }
+
+                            else {
+                               a();
+
+                            }
+                        })
+
+                    }
+                }
+            }
+            else {
+                //判断是否在attributeName表中有长度
+                axios({
+                    method:"post",
+                    url:"attribute/selectById",
+                    data:attNameId
+                }).then(function (resp){
+                    let datas=resp.data;
+                    if (datas.length>0){
+                        document.getElementById("submit").onclick=function (){
+                            //判断是否为空
+                            let nameInput = document.getElementById("nameAddWInput");
+                            let codeInput = document.getElementById("addWCodeInput");
+                            function a(){
+                                if (window.confirm("您确定要给这条属性添加值和编码吗？")){
+                                    let formdata={
+                                        id:"",
+                                        attNameId:attNameId,
+                                        code:"",
+                                        attValue:"",
+
+                                    }
+
+                                    formdata.code=codeInput.value;
+                                    formdata.attValue=nameInput.value.trim();
+
+
+
+                                    axios({
+                                        method:"post",
+                                        url:"attributeValue/selectValueExistAdd",
+                                        data:formdata
+                                    }).then(function (resp){
+                                        if (resp.data===true){
+                                            //重复
+                                            alert("属性值重复，请核对后在进行操作！")
+                                        }else {
+
+                                            axios({
+                                                method:"post",
+                                                url:"attributeValue/selectCodeExistAdd",
+                                                data:formdata
+                                            }).then(function (resp){
+                                                if (resp.data===true){
+                                                    //重复
+                                                    alert("编码值重复，请核对后在进行操作！")
+                                                }else {
+                                                    axios({
+                                                        method:"post",
+                                                        url:"attributeValue/add",
+                                                        data:formdata
+                                                    }).then(function (resp){
+                                                        if (resp.data==="success"){
+                                                            alert("添加属性值和编码成功！");
+                                                            location.reload();
+                                                        }else {
+                                                            alert("添加失败，请联系相关人员！")
+                                                        }
+                                                    })
+
+                                                }
+                                            })
+
+
+
+
+                                        }
+                                    })
+
+
+
+                                    return true;
+                                }else {
+                                    return false;
+                                }
+                            }
+                            if (nameInput.value.length===0 || codeInput.value.length===0  ){
+
+                                alert("填写的信息不能为空！")
+
+
+                            }else if (codeInput.value.length!==datas[0].length){
+                                alert("编码长度不符合规定！")
+                            } else {
+                                //判断该属性是否是范围的
+                                axios({
+                                    method:"post",
+                                    url:"attribute/selectIfRange",
+                                    data:attNameId
+                                }).then(function (resp){
+                                    if(resp.data===true){
+                                        //判断是否符合规则
+                                        let b = pattern.test(nameInput.value);
+                                        if (b===true){
+                                            let b1 = compare(nameInput.value);
+                                            if (b1===true){
+                                                //获取当前属性下的所有属性值
+                                                axios({
+                                                    method:"post",
+                                                    url:"attributeValue/selectByAttNameId",
+                                                    data:attNameId
+                                                }).then(function (resp){
+                                                    let datas=resp.data;
+                                                    if (datas.length>0){
+                                                        let b2
+                                                        for (let j = 0; j <datas.length; j++) {
+                                                            b2 = compare2(datas[j].attValue,nameInput.value);
+                                                            if (b2===true){
+                                                                alert("范围与"+datas[j].attValue+"出现冲突，请核对后再进行操作")
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (b2===false){
+                                                            //提交
+                                                            a();
+                                                        }
+                                                    }else {
+                                                        a();
+                                                    }
+
+                                                })
+
+                                            }else {
+                                                alert("您输入的数据范围存在问题，请核对后再试！")
+                                            }
+                                        }else {
+                                            alert("您输入的数据格式不符合范围格式，请核对后再进行操作！")
+
+                                        }
+
+                                    }else {
+
+                                            a();
+
+                                    }
+                                })
+
+                            }
+                        }
+                    }else {
+                        alert("系统错误，请联系先关人员！")
+                    }
+                })
+            }
+
+        })
+
+    }
+
+    //点击添加属性值按钮
+    document.getElementById("addValue").onclick=function (){
+        let booleanPromise = addAttributeValueQx();
+        booleanPromise.then(function (resp){
+            if (resp===true){
+                //查看是否开启了流水码功能
+                axios({
+                    method:"post",
+                    url:"attributeFunction/selectByAttNameId",
+                    data:attNameId
+                }).then(function (resp){
+                    let ableCode=resp.data;
+                    let serialCode = ableCode[0].serialCode;
+                    if (serialCode===1){
+                        //开启了流水码功能
+                        alert("流水码不允许添加属性值和编码！")
+                    }
+                    else {
+                        //查看是否存在与映射中
+                        axios({
+                            method:"post",
+                            url:"mapping/selectLengthIfExist",
+                            data:attNameId
+                        }).then(function (resp)
+                        {
+                            let datas=resp.data;
+                            if (datas===true){
+                                //打开添加窗口
+                                wd.style.display="block";
+                                displayAddValue();
+                                //表示存在，设置编码框的最大长度,查询长度，设置编码框长度
+                                axios({
+                                    method:"post",
+                                    url:"mapping/selectLength",
+                                    data:attNameId
+                                }).then(function (resp){
+                                    let datas=resp.data;
+                                    document.getElementById("addWCodeInput").maxLength=""+datas[0].length+"";
+                                    document.getElementById("addWCodeInput").placeholder="编码长度为"+datas[0].length+""
+                                    submitAdd();
+                                })
+
+                            }else {
+                                //映射表中不存在，去判断属性名表里是否存在
+                                axios({
+                                    method:"post",
+                                    url:"attribute/selectIfLengthExist",
+                                    data:attNameId
+                                }).then(function (resp){
+                                    let datas=resp.data;
+                                    if (Number(datas)!==Number(0)){
+                                        //属性名表中存在，设置编码框长度
+                                        //打开添加窗口
+                                        wd.style.display="block";
+                                        document.getElementById("addWCodeInput").maxLength=""+datas+"";
+                                        document.getElementById("addWCodeInput").placeholder="编码长度为"+datas+""
+                                        displayAddValue();
+                                        submitAdd();
+                                    }else {
+                                        //属性名表中也没有，显示设置长度按钮
+                                        alert("请先设置该属性的编码长度！");
+
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+
+
+            }
+            else {
+                alert("您暂未获得添加权限！")
+            }
+        })
+
+
+
+    }
+
+
+    //点击添加编码长度按钮
+    document.getElementById("addLength").onclick=function (){
+        displayAddLength();
+        wd.style.display="block"
+
+        //点击提交
+        document.getElementById("submitLength").onclick=function (){
+            //先判断是否为空
+            let length = document.getElementById("addLengthWLength");
+            if (length.value.length===0){
+                alert("编码长度不能为空！")
+            }else{
+                //更新编码长度，将长度存储到属性名表里面
+                if (window.confirm("您确定要添加这个属性的编码长度吗？")){
+
+                    let formdata={
+                        id:"",
+                        length:""
+                    }
+                    formdata.id=attNameId;
+                    formdata.length=length.value;
+                    axios({
+                        method:"post",
+                        url:"attribute/updateLength",
+                        data:formdata
+                    }).then(function (resp){
+                        let datas=resp.data;
+                        if (datas==="success"){
+                            alert("添加编码长度成功！");
+                            location.reload();
+                        }else {
+                            alert("添加编码长度失败，请联系相关人员！")
+                        }
+                    })
+                    return true;
+                }else {
+                    return false;
+                }
+
+
+            }
+        }
+    }
+
+</script>
+</html>

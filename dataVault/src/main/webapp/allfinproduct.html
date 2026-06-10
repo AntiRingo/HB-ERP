@@ -15,7 +15,7 @@
     /*    height: 100%;*/
     /*}*/
 html{
-    font-family: 宋体,serif;
+    font-family: Arial, sans-serif;
 }
 
 h3{
@@ -69,13 +69,15 @@ h3{
 <div class="sq" style="width: 100%;height: auto;text-align: center;">
     <div id="sw" style="display: flex;margin: auto;width: 90%;">
         <div style="height: auto;display: flex;width: 35%;min-width: 295px;margin: auto">
-            <div style="margin: auto"><img style="min-width: 38px" src="images/HBlogo.png" alt=""></div>
-            <div><img style="min-width: 256px" src="images/logo2.png" alt=""></div>
+            <a href="allproduct.html" style="display: flex;align-items: center;text-decoration: none">
+                <div style="margin: auto"><img style="min-width: 38px" src="images/HBlogo.png" alt=""></div>
+                <div><img style="min-width: 256px" src="images/logo2.png" alt=""></div>
+            </a>
         </div>
         <div style="width: 100%;height: auto;position: relative">
-            <div style="width:100%;min-width: 400px; margin: 8px auto;height: auto;display: flex;">
+            <div class="top-searchbar">
                 <button id="allSort" value="0"><span id="sortName">全部</span><span id="sortVault" style="display:none"></span><i class="allSortBefore">﹀</i></button>
-                <label for="searchContent"></label><input id="searchContent" type="search" style="width: 45%;min-width: 200px; height: 39px;font-size:16px;padding: 0 10px " oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
+                <label for="searchContent"></label><input id="searchContent" type="search" oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
                 <button id="search" value="搜索"><i class="searchBefore"></i></button>
             </div>
             <div id="AllSortDiv" style="opacity: 0;pointer-events: none;">
@@ -114,7 +116,6 @@ h3{
     <div style="width: 90%;height: 50px;margin: auto;display: flex;position: relative">
         <div id="product" style="width: fit-content;height: 50px;line-height: 50px;color: white"><b><a href="allproduct.html">零件库</a></b><span class="productAfter"></span></div>
         <div id="product2" style="width: fit-content;height: 50px;line-height: 50px;color: white;margin-left: 50px"><b><a href="allfinproduct.html">产品库</a></b><span class="productAfter"></span></div>
-        <button id="fontModeToggle" type="button" aria-pressed="false">放大字体</button>
         <button id="login" >登录</button>
     </div>
     <div id="one" style="width: fit-content;height: auto;margin:auto auto auto 5%;display: flex;position: absolute;">

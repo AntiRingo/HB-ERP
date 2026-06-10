@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公告管理系统</title>
+  <link rel="stylesheet" href="css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2c3e50;
+      --accent-color: #e74c3c;
+      --light-color: #ecf0f1;
+      --dark-color: #34495e;
+      --success-color: #27ae60;
+      --warning-color: #f39c12;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f7fa;
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* 侧边栏样式 */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(135deg, var(--secondary-color) 0%, var(--dark-color) 100%);
+      color: white;
+      padding: 20px;
+      box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-icon {
+      background-color: var(--primary-color);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 18px;
+      margin: 8px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-item i {
+      margin-right: 12px;
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .stats {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+
+    /* 主内容区样式 */
+    .main-content {
+      flex: 1;
+      padding: 25px;
+      overflow: auto;
+      position: relative;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .search-box {
+      position: relative;
+      width: 350px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border-radius: 50px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+    }
+
+    .actions {
+      display: flex;
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .btn-new {
+      background: linear-gradient(to right, var(--success-color), #2ecc71);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-filter {
+      background: white;
+      color: var(--dark-color);
+      border: 1px solid #ddd;
+    }
+
+    .btn-filter:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .notification-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+      overflow-y: auto;
+      height: 80vh;
+    }
+
+    .notification-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+      position: relative;
+      min-height: 250px;
+    }
+
+    .notification-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-priority {
+      height: 4px;
+    }
+
+    .priority-high {
+      background-color: var(--accent-color);
+    }
+
+    .priority-medium {
+      background-color: var(--warning-color);
+    }
+
+    .priority-low {
+      background-color: var(--success-color);
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .card-date {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--secondary-color);
+    }
+
+    .card-excerpt {
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: var(--light-color);
+      border-top: 1px solid #eee;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .card-department {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--dark-color);
+      font-weight: 500;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .action-btn {
+      background: white;
+      border: 1px solid #ddd;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* 详情弹窗样式 */
+    .detail-overlay, .create-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .detail-overlay.active, .create-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .detail-container, .create-container {
+      background: white;
+      width: 90%;
+      max-width: 850px;
+      max-height: 90vh;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+      transform: scale(0.9);
+      transition: transform 0.4s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-overlay.active .detail-container,
+    .create-overlay.active .create-container {
+      transform: scale(1);
+    }
+
+    .detail-header {
+      background: linear-gradient(90deg, var(--secondary-color) 0%, var(--dark-color) 100%);
+      color: white;
+      padding: 25px;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+
+    .detail-title {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .detail-subtitle {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+
+    .detail-date, .detail-department {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detail-content {
+      padding: 30px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .detail-text {
+      line-height: 1.8;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .detail-text p {
+      margin-bottom: 20px;
+    }
+
+    .detail-footer {
+      padding: 20px 30px;
+      background-color: var(--light-color);
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-download {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-download:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+    }
+
+    /* 新建公告弹窗样式 */
+    .create-header {
+      background: linear-gradient(90deg, var(--success-color), #2ecc71);
+      color: white;
+      padding: 25px;
+      position: relative;
+    }
+
+    .create-content {
+      padding: 30px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: white;
+    }
+
+    .priority-group {
+      display: flex;
+      gap: 15px;
+    }
+
+    .priority-option {
+      flex: 1;
+      text-align: center;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .priority-option.active {
+      background-color: var(--light-color);
+      border-color: var(--primary-color);
+    }
+
+    .priority-option i {
+      display: block;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .priority-high-option.active i {
+      color: var(--accent-color);
+    }
+
+    .priority-medium-option.active i {
+      color: var(--warning-color);
+    }
+
+    .priority-low-option.active i {
+      color: var(--success-color);
+    }
+
+    textarea.form-input {
+      height: 150px;
+      resize: vertical;
+    }
+
+    /* 文件上传区域 */
+    .upload-container {
+      border: 2px dashed #ddd;
+      border-radius: 10px;
+      padding: 25px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+
+    .upload-text {
+      margin-bottom: 15px;
+    }
+
+    .file-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-list {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .file-icon {
+      font-size: 1.5rem;
+      color: #888;
+    }
+
+    .file-name {
+      font-size: 0.9rem;
+    }
+
+    .file-size {
+      font-size: 0.8rem;
+      color: #777;
+    }
+
+    .file-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .file-delete {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #777;
+      transition: all 0.3s;
+    }
+
+    .file-delete:hover {
+      background: var(--accent-color);
+      color: white;
+    }
+
+    .file-limit {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 10px;
+    }
+
+    .error-message {
+      color: var(--accent-color);
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .form-footer {
+      padding: 20px 30px;
+      background-color: var(--light-color);
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .btn-cancel {
+      background: white;
+      color: var(--dark-color);
+      border: 1px solid #ddd;
+      padding: 12px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-cancel:hover {
+      background: #f8f9fa;
+      border-color: #bbb;
+    }
+
+    .btn-save {
+      background: linear-gradient(to right, var(--success-color), #2ecc71);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-save:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    /* 附件列表样式 */
+    .attachments-container {
+      margin-top: 30px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+      display: none;
+    }
+
+    .attachments-title {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .attachment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .attachment-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .attachment-name {
+      font-size: 0.9rem;
+    }
+
+    .attachment-download {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+    }
+
+    .attachment-download:hover {
+      background: #2980b9;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 992px) {
+      .notification-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+
+      .search-box {
+        width: 280px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 15px;
+      }
+
+      .menu {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+
+      .menu-item {
+        white-space: nowrap;
+      }
+
+      .main-content {
+        padding: 20px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .actions {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- 侧边导航 -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">
+      <i class="fas fa-bullhorn"></i>
+    </div>
+    <div class="logo-text">公告管理系统</div>
+  </div>
+
+  <div class="menu">
+    <div class="menu-item active">
+      <i class="fas fa-home"></i>
+      <span>公告总览</span>
+    </div>
+    <div style="display: none" class="menu-item">
+      <i class="fas fa-edit"></i>
+      <span>新建公告</span>
+    </div>
+    <div style="display: none" class="menu-item">
+      <i class="fas fa-file-alt"></i>
+      <span>公告模板</span>
+    </div>
+    <div style="display: none" class="menu-item">
+      <i class="fas fa-archive"></i>
+      <span>存档管理</span>
+    </div>
+    <div style="display: none" class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+  </div>
+
+  <div class="stats" style="display: none">
+    <div class="stat">
+      <span>已发布公告</span>
+      <span id="publishedCount">128</span>
+    </div>
+    <div class="stat">
+      <span>待审核公告</span>
+      <span>6</span>
+    </div>
+    <div class="stat">
+      <span>本年度公告</span>
+      <span>64</span>
+    </div>
+    <div class="stat">
+      <span>最高优先级</span>
+      <span>8</span>
+    </div>
+  </div>
+</div>
+
+<!-- 主内容区 -->
+<div class="main-content">
+  <div class="header">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="搜索公告标题、内容或部门...">
+    </div>
+    <div class="actions">
+      <button class="btn btn-new" onclick="openCreateModal()">
+        <i class="fas fa-plus"></i>
+        新建公告
+      </button>
+      <button style="display: none" class="btn btn-filter">
+        <i class="fas fa-filter"></i>
+        筛选公告
+      </button>
+    </div>
+  </div>
+
+  <div class="notification-grid">
+    <!-- 公告卡片会在这里动态生成 -->
+  </div>
+</div>
+
+<!-- 公告详情弹窗 -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-container">
+    <div class="detail-header">
+      <div class="close-btn" onclick="closeDetail()">
+        <i class="fas fa-times"></i>
+      </div>
+      <h2 class="detail-title" id="detailTitle">关于2025年中秋节放假安排的通知</h2>
+      <div class="detail-subtitle">
+        <div class="detail-date">
+          <i class="far fa-calendar-alt"></i>
+          <span id="detailDate">2025年8月5日</span>
+        </div>
+        <div class="detail-department">
+          <i class="fas fa-building"></i>
+          <span id="detailDepartment">行政管理部</span>
+        </div>
+      </div>
+    </div>
+    <div class="detail-content">
+      <div class="detail-text" id="detailText">
+<!--        <p>致各部门及全体员工：</p>-->
+
+<!--        <p>根据国务院办公厅通知，结合公司实际情况，现将2025年中秋节放假安排通知如下：</p>-->
+
+<!--        <p><strong>一、放假时间</strong>：2025年9月29日（星期一）至10月3日（星期五）放假，共5天。</p>-->
+
+<!--        <p><strong>二、注意事项</strong>：</p>-->
+<!--        <ol>-->
+<!--          <li>放假前各部门做好安全检查工作，确保消除安全隐患；</li>-->
+<!--          <li>各部门提前安排好值班人员，并于8月20日前将值班安排表交至行政部；</li>-->
+<!--          <li>全体员工放假期间请保持通讯畅通，确保紧急事务得到及时处理；</li>-->
+<!--          <li>节假日期间出行请注意人身财产安全，做好防护措施。</li>-->
+<!--        </ol>-->
+
+<!--        <p><strong>三、特别提示</strong>：9月28日（星期日）正常上班，补休将在2025年第四季度另行安排。</p>-->
+
+<!--        <p>预祝全体员工中秋节快乐，阖家幸福！</p>-->
+
+<!--        <p style="text-align: right; margin-top: 30px;"><strong>行政管理部</strong></p>-->
+<!--        <p style="text-align: right;">2025年8月5日</p>-->
+      </div>
+
+      <!-- 附件列表 -->
+      <div class="attachments-container" id="attachmentsContainer">
+        <div class="attachments-title">
+          <i class="fas fa-paperclip"></i>
+          <span>附件列表</span>
+        </div>
+        <div id="attachmentsList">
+          <!-- 附件会在这里动态生成 -->
+        </div>
+      </div>
+    </div>
+    <div class="detail-footer">
+      <button class="btn-download" onclick="downloadNotice()">
+        <i class="fas fa-download"></i>
+        下载公告文本
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 新建公告弹窗 -->
+<div class="create-overlay" id="createOverlay">
+  <div class="create-container">
+    <div class="create-header">
+      <div class="close-btn" onclick="closeCreateModal()">
+        <i class="fas fa-times"></i>
+      </div>
+      <h2 class="detail-title">新建公告</h2>
+    </div>
+    <div class="create-content">
+      <div class="form-group">
+        <label class="form-label">公告标题</label>
+        <input type="text" class="form-input" id="annTitle" placeholder="请输入公告标题">
+        <div class="error-message" id="titleError">请填写公告标题</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">发布部门</label>
+        <select class="form-select" id="annDepartment">
+          <option value="">请选择发布部门</option>
+          <option>行政管理部</option>
+          <option>人力资源部</option>
+          <option>信息技术部</option>
+          <option>财务部</option>
+          <option>市场部</option>
+          <option>研发部</option>
+          <option>后勤管理部</option>
+        </select>
+        <div class="error-message" id="departmentError">请选择发布部门</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">优先级</label>
+        <div class="priority-group">
+          <div class="priority-option priority-high-option" onclick="selectPriority('high')">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>重要</div>
+          </div>
+          <div class="priority-option priority-medium-option" onclick="selectPriority('medium')">
+            <i class="fas fa-exclamation-circle"></i>
+            <div>一般</div>
+          </div>
+          <div class="priority-option priority-low-option" onclick="selectPriority('low')">
+            <i class="fas fa-info-circle"></i>
+            <div>普通</div>
+          </div>
+        </div>
+        <input type="hidden" id="annPriority" value="">
+        <div class="error-message" id="priorityError">请选择优先级</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">公告内容</label>
+        <textarea class="form-input" id="annContent" placeholder="请输入公告内容..."></textarea>
+        <div class="error-message" id="contentError">请填写公告内容</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">附件上传</label>
+        <div class="upload-container">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <div class="upload-text">
+            拖拽文件到此区域，或<strong>点击上传</strong>
+          </div>
+          <input type="file" class="file-input" id="fileInput" multiple onchange="handleFileSelection()">
+          <div class="file-limit">
+            * 最多3个文件，单个文件不超过2MB
+          </div>
+        </div>
+        <div class="file-list" id="fileList">
+          <!-- 文件列表将在这里动态生成 -->
+        </div>
+        <div class="error-message" id="fileError">您上传的文件过多或过大</div>
+      </div>
+      <!-- 上传状态区域 -->
+      <div class="upload-status" id="uploadStatus">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span id="uploadText">上传中...</span>
+        <div class="progress-bar">
+          <div class="progress" id="uploadProgress"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn-cancel" onclick="closeCreateModal()">取消</button>
+      <button class="btn-save" onclick="saveAnnouncement()">
+        <i class="fas fa-save"></i>
+        保存公告
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script src="js/axios-0.18.0.js"></script>
+<script>
+  // 公告数据
+//   var announcements = [
+//     {
+//       id: 1,
+//       title: "中秋节放假安排通知",
+//       date: "2025年8月5日",
+//       department: "行政管理部",
+//       priority: "high",
+//       content: `致各部门及全体员工：
+//
+// 根据国务院办公厅通知，结合公司实际情况，现将2025年中秋节放假安排通知如下：
+//
+// 一、放假时间：2025年9月29日（星期一）至10月3日（星期五）放假，共5天。
+//
+// 二、注意事项：
+// 1. 放假前各部门做好安全检查工作，确保消除安全隐患；
+// 2. 各部门提前安排好值班人员，并于8月20日前将值班安排表交至行政部；
+// 3. 全体员工放假期间请保持通讯畅通，确保紧急事务得到及时处理；
+// 4. 节假日期间出行请注意人身财产安全，做好防护措施。
+//
+// 三、特别提示：9月28日（星期日）正常上班，补休将在2025年第四季度另行安排。
+//
+// 预祝全体员工中秋节快乐，阖家幸福！
+//
+//                 行政管理部
+//                 2025年8月5日`,
+//       files: [
+//         { id: 1, name: "放假安排表.docx", size: "45KB", type: "word" },
+//         { id: 2, name: "值班表模板.xlsx", size: "28KB", type: "excel" }
+//       ]
+//     },
+//     {
+//       id: 2,
+//       title: "公司网络安全升级通知",
+//       date: "2025年8月3日",
+//       department: "信息技术部",
+//       priority: "medium",
+//       content: `致各部门及全体员工：
+//
+// 为提升公司信息安全防护能力，信息技术部将于8月10日-11日进行网络安全系统升级，现将有关事项通知如下：
+//
+// 一、升级时间：
+// 2025年8月10日（星期六）08:00 - 8月11日（星期日）20:00
+//
+// 二、影响范围：
+// 1. 公司内部网络（含所有分支机构）将中断约4小时（10日08:00-12:00）
+// 2. 公司官网、内部办公系统可能在此期间出现短暂无法访问的情况
+//
+// 三、注意事项：
+// 1. 请各部门提前安排好工作，避免在升级期间进行重要数据操作；
+// 2. 升级后部分软件可能出现兼容性问题，请及时联系信息部支持人员；
+// 3. 升级后所有员工需要重新设置登录密码（密码强度要求至少8位含字母数字符号）。
+//
+// 请各部门做好通知传达，由此带来的不便，敬请谅解。
+//
+//                 信息技术部
+//                 2025年8月3日`,
+//       files: [
+//         { id: 3, name: "网络安全升级说明.pdf", size: "1.2MB", type: "pdf" }
+//       ]
+//     },
+//     {
+//       id: 3,
+//       title: "关于员工食堂营业时间调整",
+//       date: "2025年8月1日",
+//       department: "后勤管理部",
+//       priority: "low",
+//       content: `致全体员工：
+//
+// 由于近期就餐人数变化，后勤管理部经调研决定，自2025年9月1日起对员工食堂营业时间做出如下调整：
+//
+// 早餐：
+// 原时间：7:00-8:30
+// 调整后：7:00-9:00
+//
+// 午餐：
+// 原时间：11:30-13:00
+// 调整后：11:00-13:30
+//
+// 晚餐：
+// 原时间：17:30-19:00
+// 调整后：17:00-20:00
+//
+// 新增服务：
+// 1. 晚餐时段增设风味小吃窗口（麻辣烫、面食等）
+// 2. 晚间营业期间开放西点面包外带服务
+//
+// 温馨提示：
+// 1. 所有餐次均实行错峰就餐，建议非高峰期前往；
+// 2. 调整后的餐次标准保持不变；
+// 3. 新增扫码点餐功能，减少排队等待时间。
+//
+// 如调整后有任何问题，请联系后勤管理部王经理（分机：8806）。
+//
+//                 后勤管理部
+//                 2025年8月1日`,
+//       files: [
+//         { id: 4, name: "食堂时间表.jpg", size: "350KB", type: "image" },
+//         { id: 5, name: "菜单更新说明.docx", size: "56KB", type: "word" }
+//       ]
+//     }
+//   ];
+//
+
+
+async function allData() {
+  let data="";
+  await axios({
+    method: "post",
+    url: "publicNotice/selectAll"
+  }).then(async function (resp){
+    data = resp.data.rows;
+  })
+  return data;
+}
+  var announcements;
+
+
+
+
+
+
+
+
+
+
+
+
+  //获取公告数据
+
+     // 上传的文件列表
+     var uploadedFiles = [];
+
+     // 初始化页面
+     async function initialize() {
+       announcements = await allData(1);
+       renderAnnouncementGrid();
+       setupEventListeners();
+       setupDragAndDrop();
+     }
+
+     // 渲染公告网格
+     function renderAnnouncementGrid() {
+
+       var grid = document.querySelector('.notification-grid');
+       grid.innerHTML = '';
+
+       for (var i = 0; i < announcements.length; i++) {
+         var announcement = announcements[i].publicNotice;
+
+         // 确定优先级颜色
+         var priorityClass = '';
+         var priorityText = '';
+         var priorityLabel = '';
+
+         if (announcement.priority === 'high') {
+           priorityClass = 'priority-high';
+           priorityLabel = '重要';
+         } else if (announcement.priority === 'medium') {
+           priorityClass = 'priority-medium';
+           priorityLabel = '一般';
+         } else {
+           priorityClass = 'priority-low';
+           priorityLabel = '普通';
+         }
+
+         // 创建卡片HTML
+         var card = document.createElement('div');
+         card.className = 'notification-card';
+         card.onclick = (function(idx) {
+           return function() { openDetail(idx); };
+         })(i);
+
+         card.innerHTML = `
+                    <div class="card-priority ${priorityClass}"></div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="card-date">${announcement.date}</div>
+                            <div class="card-status" style="color: ${priorityClass === 'priority-high' ? 'var(--accent-color)' :
+                 priorityClass === 'priority-medium' ? 'var(--warning-color)' : 'var(--success-color)'}">${priorityLabel}</div>
+                        </div>
+                        <div class="card-title">${announcement.title}</div>
+                        <div class="card-excerpt">${getExcerpt(announcement.content)}</div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-department">
+                            <i class="fas fa-building"></i>
+                            <span>${announcement.department}</span>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn" onclick="event.stopPropagation(); downloadAnnouncement(${announcement.id})">
+                                <i class="fas fa-download"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+         grid.appendChild(card);
+       }
+     }
+
+     // 获取内容摘要
+     function getExcerpt(content) {
+       if (content.length > 100) {
+         return content.substring(0, 100) + '...';
+       }
+       return content;
+     }
+
+     // 设置事件监听器
+     function setupEventListeners() {
+       // 搜索功能
+       var searchInput = document.querySelector('.search-box input');
+       searchInput.addEventListener('input', function() {
+         filterAnnouncements(this.value);
+       });
+     }
+
+     // 设置拖拽区域
+     function setupDragAndDrop() {
+       var uploadContainer = document.querySelector('.upload-container');
+
+       // 阻止默认拖拽行为
+       uploadContainer.addEventListener('dragover', function(e) {
+         e.preventDefault();
+         e.stopPropagation();
+         this.style.borderColor = 'var(--primary-color)';
+         this.style.backgroundColor = 'rgba(52, 152, 219, 0.05)';
+       });
+
+       // 拖拽离开
+       uploadContainer.addEventListener('dragleave', function(e) {
+         e.preventDefault();
+         e.stopPropagation();
+         this.style.borderColor = '#ddd';
+         this.style.backgroundColor = '';
+       });
+
+       // 拖放文件
+       uploadContainer.addEventListener('drop', function(e) {
+         e.preventDefault();
+         e.stopPropagation();
+         this.style.borderColor = '#ddd';
+         this.style.backgroundColor = '';
+
+         var files = e.dataTransfer.files;
+         handleFiles(files);
+       });
+     }
+
+     // 过滤公告
+     function filterAnnouncements(searchTerm) {
+       if (!searchTerm) {
+         renderAnnouncementGrid();
+         return;
+       }
+
+       var filtered = [];
+       var term = searchTerm.toLowerCase();
+console.log(announcements.length)
+       for (var i = 0; i < announcements.length; i++) {
+         var announcement1 = announcements[i];
+
+         if (announcement1.publicNotice.title.toLowerCase().includes(term) ||
+                 announcement1.publicNotice.content.toLowerCase().includes(term) ||
+                 announcement1.publicNotice.department.toLowerCase().includes(term)) {
+           filtered.push(announcement1);
+         }
+       }
+
+       // 临时显示过滤后的结果
+       var grid = document.querySelector('.notification-grid');
+       grid.innerHTML = '';
+
+       if (filtered.length === 0) {
+         grid.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search fa-2x"></i>
+                        <p>没有找到符合条件的公告</p>
+                    </div>
+                `;
+         return;
+       }
+
+       for (var j = 0; j < filtered.length; j++) {
+         var announcement = filtered[j].publicNotice;
+
+         var priorityClass = '';
+         var priorityText = '';
+         if (announcement.priority === 'high') {
+           priorityClass = 'priority-high';
+           priorityText = '重要';
+         } else if (announcement.priority === 'medium') {
+           priorityClass = 'priority-medium';
+           priorityText = '一般';
+         } else {
+           priorityClass = 'priority-low';
+           priorityText = '普通';
+         }
+
+         var card = document.createElement('div');
+         card.className = 'notification-card';
+         card.onclick = (function(idx) {
+           return function() { openDetail(filtered.indexOf(announcement)); };
+         })();
+
+         card.innerHTML = `
+                    <div class="card-priority ${priorityClass}"></div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="card-date">${announcement.date}</div>
+                            <div class="card-status" style="color: ${priorityClass === 'priority-high' ? 'var(--accent-color)' :
+                 priorityClass === 'priority-medium' ? 'var(--warning-color)' : 'var(--success-color)'}">${priorityText}</div>
+                        </div>
+                        <div class="card-title">${announcement.title}</div>
+                        <div class="card-excerpt">${getExcerpt(announcement.content)}</div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-department">
+                            <i class="fas fa-building"></i>
+                            <span>${announcement.department}</span>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn" onclick="event.stopPropagation(); downloadAnnouncement(${announcement.id})">
+                                <i class="fas fa-download"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+         grid.appendChild(card);
+       }
+     }
+
+     // 打开详情弹窗
+     function openDetail(index) {
+       var announcement = announcements[index];
+       console.log(announcement)
+       document.getElementById('detailTitle').textContent = announcement.publicNotice.title;
+       document.getElementById('detailDate').textContent = announcement.publicNotice.date;
+       document.getElementById('detailDepartment').textContent = announcement.publicNotice.department;
+       document.getElementById('detailText').textContent = announcement.publicNotice.content;
+
+       // 渲染附件列表（暂时关闭）
+       renderAttachments(announcement.files);
+
+       var overlay = document.getElementById('detailOverlay');
+       overlay.classList.add('active');
+       document.body.style.overflow = 'hidden';
+     }
+  function downloadFile(button) {
+    // 读取并解码存储的数据
+    const encodedFile = button.dataset.file;
+    const fileData = JSON.parse(decodeURIComponent(encodedFile));
+// 已知文件地址（如后端返回的下载 URL）
+    const fileUrl = fileData.url;
+
+// 使用 fetch 获取文件流
+    fetch(fileUrl)
+            .then(response => {
+              // 检查响应是否成功（状态码 200-299）
+              if (!response.ok) {
+                throw new Error(`文件下载失败，状态码：${response.status}`);
+              }
+              // 读取响应的二进制内容（ArrayBuffer）
+              return response.arrayBuffer();
+            })
+            .then(arrayBuffer => {
+              // 将 ArrayBuffer 转换为 Uint8Array（buffer 属性即 ArrayBuffer）
+              const uint8Array = new Uint8Array(arrayBuffer);
+              const contentBuffer = uint8Array.buffer; // 这就是你要的 buffer
+
+              // 验证：打印 buffer 长度（应等于文件大小）
+              console.log('文件内容 buffer 长度：', contentBuffer.byteLength);
+
+              // 后续操作（如生成 Blob 或 File 对象）
+              const blob = new Blob([contentBuffer], { type: 'application/pdf' });
+              const objectUrl = URL.createObjectURL(blob);
+              // ...（触发下载或其他逻辑）
+              const anchor = document.createElement('a');
+              anchor.href = objectUrl;
+              anchor.download = fileData.name;
+              anchor.click();
+              URL.revokeObjectURL(objectUrl);
+            })
+            .catch(error => {
+              console.error('读取文件失败:', error);
+            });
+    // // 将 Uint8Array 数组转回 ArrayBuffer
+    // const contentBuffer = new Uint8Array(fileData.content).buffer;
+    //
+    // // 重新构建 File 对象（关键！）
+    // const restoredFile = new File(
+    //         [contentBuffer], // 二进制内容（Blob parts）
+    //         fileData.name,   // 文件名
+    //         {
+    //           type: fileData.type,        // MIME 类型
+    //           lastModified: fileData.lastModified // 最后修改时间
+    //         }
+    // );
+    //
+    // // 验证是否为有效 File 对象
+    // console.log('恢复后的 File 对象：', restoredFile);
+    // // 应输出类似 File { name: "示例.jpg", size: 1024, type: "image/jpeg", ... }
+    //
+    // // 生成临时 URL 并下载
+    // const objectUrl = URL.createObjectURL(restoredFile);
+
+  }
+     // 渲染附件列表
+     function renderAttachments(files) {
+       var container = document.getElementById('attachmentsList');
+       container.innerHTML = '';
+
+       if (!files || files.length === 0) {
+         document.getElementById('attachmentsContainer').style.display = 'none';
+         return;
+       }
+
+       document.getElementById('attachmentsContainer').style.display = 'block';
+
+       for (var i = 0; i < files.length; i++) {
+         var file = files[i];
+
+         var fileItem = document.createElement('div');
+         fileItem.className = 'attachment-item';
+
+         var fileIcon = '';
+         switch(file.type) {
+           case 'word':
+             fileIcon = 'fa-file-word';
+             break;
+           case 'excel':
+             fileIcon = 'fa-file-excel';
+             break;
+           case 'pdf':
+             fileIcon = 'fa-file-pdf';
+             break;
+           case 'image':
+             fileIcon = 'fa-file-image';
+             break;
+           default:
+             fileIcon = 'fa-file';
+         }
+console.log(file)
+         fileItem.innerHTML = `
+                    <div class="attachment-info">
+                        <i class="fas ${fileIcon}"></i>
+                        <div>
+                            <div class="attachment-name">${file.name}</div>
+                            <div class="file-size">${file.size}kb</div>
+                        </div>
+                    </div>
+                    <button class="attachment-download" onclick="downloadFile(this)"
+          data-file='${encodeURIComponent(JSON.stringify(file))}' >
+                        <i class="fas fa-download"></i>
+                        下载
+                    </button>
+                `;
+
+         container.appendChild(fileItem);
+
+
+
+
+
+       }
+     }
+
+     // 关闭详情弹窗
+     function closeDetail() {
+       var overlay = document.getElementById('detailOverlay');
+       overlay.classList.remove('active');
+       document.body.style.overflow = 'auto';
+     }
+
+     // 打开新建公告弹窗
+     function openCreateModal() {
+       //检测是否是管理员账号
+axios({
+  method:"post",
+  url:"user/ifAdmin"
+}).then(function (resp){
+  if (resp.data===true){
+    // alert("功能正在整改中！")
+    // 重置表单
+    document.getElementById('annTitle').value = '';
+    document.getElementById('annDepartment').selectedIndex = 0;
+    document.getElementById('annContent').value = '';
+    document.getElementById('annPriority').value = '';
+    resetFileUpload();
+
+    // 重置优先级选择
+    var priorities = document.querySelectorAll('.priority-option');
+    for (var i = 0; i < priorities.length; i++) {
+      priorities[i].classList.remove('active');
+    }
+
+    var overlay = document.getElementById('createOverlay');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  else {
+    alert("您不具备发布公告的权限！")
+  }
+})
+
+     }
+
+     // 关闭新建公告弹窗
+     function closeCreateModal() {
+       var overlay = document.getElementById('createOverlay');
+       overlay.classList.remove('active');
+       document.body.style.overflow = 'auto';
+     }
+
+     // 处理文件选择
+     function handleFileSelection() {
+       var files = document.getElementById('fileInput').files;
+       handleFiles(files);
+     }
+
+     // 处理上传的文件
+     function handleFiles(files) {
+       for (var i = 0; i < files.length; i++) {
+         var file = files[i];
+
+         // 检查文件大小 (最大2MB)
+         if (file.size > 2 * 1024 * 1024) {
+           showFileError("文件过大，请上传小于2MB的文件");
+           continue;
+         }
+
+         // 检查文件数量 (最多3个)
+         if (uploadedFiles.length >= 3) {
+           showFileError("最多只能上传3个文件");
+           continue;
+         }
+
+         // 检查文件类型
+         var fileType = getFileType(file);
+         if (!isValidFileType(fileType)) {
+           showFileError("不支持此文件类型");
+           continue;
+         }
+
+         // 将文件添加到上传列表
+         uploadedFiles.push({
+           id: Date.now() + i, // 生成唯一ID
+           name: file.name,
+           size: formatFileSize(file.size),
+           type: fileType,
+           file: file
+         });
+       }
+
+
+       updateFileList();
+     }
+
+     // 格式化文件大小
+     function formatFileSize(bytes) {
+       if (bytes < 1024) {
+         return bytes + 'B';
+       } else if (bytes < 1024 * 1024) {
+         return (bytes / 1024).toFixed(1) + 'KB';
+       } else {
+         return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+       }
+     }
+
+     // 获取文件类型
+     function getFileType(file) {
+       if (file.type.startsWith('image/')) return 'image';
+       if (file.name.endsWith('.pdf')) return 'pdf';
+       if (file.name.endsWith('.doc') || file.name.endsWith('.docx')) return 'word';
+       if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) return 'excel';
+       if (file.name.endsWith('.txt')) return 'text';
+       return 'other';
+     }
+
+     // 验证文件类型是否有效
+     function isValidFileType(type) {
+       return type !== 'other';
+     }
+
+     // 更新文件列表
+     function updateFileList() {
+       var fileList = document.getElementById('fileList');
+       fileList.innerHTML = '';
+
+       if (uploadedFiles.length === 0) {
+         fileList.innerHTML = '<div class="no-files">暂无上传文件</div>';
+         return;
+       }
+
+       // 隐藏文件错误提示
+       document.getElementById('fileError').style.display = 'none';
+
+       for (var i = 0; i < uploadedFiles.length; i++) {
+         var file = uploadedFiles[i];
+
+         var fileItem = document.createElement('div');
+         fileItem.className = 'file-item';
+
+         // 确定文件图标
+         var fileIcon;
+         switch(file.type) {
+           case 'image':
+             fileIcon = 'fa-file-image';
+             break;
+           case 'pdf':
+             fileIcon = 'fa-file-pdf';
+             break;
+           case 'word':
+             fileIcon = 'fa-file-word';
+             break;
+           case 'excel':
+             fileIcon = 'fa-file-excel';
+             break;
+           case 'text':
+             fileIcon = 'fa-file-alt';
+             break;
+           default:
+             fileIcon = 'fa-file';
+         }
+
+         fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">
+                            <i class="fas ${fileIcon}"></i>
+                        </div>
+                        <div>
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${file.size}</div>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <div class="file-delete" onclick="removeFile(${i})">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                `;
+
+         fileList.appendChild(fileItem);
+       }
+     }
+
+     // 移除文件
+     function removeFile(index) {
+       uploadedFiles.splice(index, 1);
+       updateFileList();
+     }
+
+     // 显示文件错误消息
+     function showFileError(message) {
+       var error = document.getElementById('fileError');
+       error.textContent = message;
+       error.style.display = 'block';
+     }
+
+     // 重置文件上传区域
+     function resetFileUpload() {
+       uploadedFiles = [];
+       document.getElementById('fileInput').value = '';
+       updateFileList();
+     }
+
+     // 选择优先级
+     function selectPriority(priority) {
+       // 移除所有激活状态
+       var priorities = document.querySelectorAll('.priority-option');
+       for (var i = 0; i < priorities.length; i++) {
+         priorities[i].classList.remove('active');
+       }
+
+       // 设置选中的优先级
+       if (priority === 'high') {
+         document.querySelector('.priority-high-option').classList.add('active');
+       } else if (priority === 'medium') {
+         document.querySelector('.priority-medium-option').classList.add('active');
+       } else if (priority === 'low') {
+         document.querySelector('.priority-low-option').classList.add('active');
+       }
+
+       // 设置隐藏域的值
+       document.getElementById('annPriority').value = priority;
+     }
+
+     // 保存公告
+     function saveAnnouncement() {
+       // 获取表单值
+       var title = document.getElementById('annTitle').value.trim();
+       var department = document.getElementById('annDepartment').value;
+       var content = document.getElementById('annContent').value.trim();
+       var priority = document.getElementById('annPriority').value;
+
+       // 验证表单
+       var isValid = true;
+
+       if (!title) {
+         document.getElementById('titleError').style.display = 'block';
+         isValid = false;
+       } else {
+         document.getElementById('titleError').style.display = 'none';
+       }
+
+       if (!department) {
+         document.getElementById('departmentError').style.display = 'block';
+         isValid = false;
+       } else {
+         document.getElementById('departmentError').style.display = 'none';
+       }
+
+       if (!content) {
+         document.getElementById('contentError').style.display = 'block';
+         isValid = false;
+       } else {
+         document.getElementById('contentError').style.display = 'none';
+       }
+
+       if (!priority) {
+         document.getElementById('priorityError').style.display = 'block';
+         isValid = false;
+       } else {
+         document.getElementById('priorityError').style.display = 'none';
+       }
+
+       // 验证附件数量是否超过限制
+       if (uploadedFiles.length > 3) {
+         document.getElementById('fileError').textContent = "最多只能上传3个文件";
+         document.getElementById('fileError').style.display = 'block';
+         isValid = false;
+       }
+
+       if (!isValid) {
+         return;
+       }
+
+
+
+
+
+
+
+       // 创建FormData对象
+       var formData = new FormData();
+       formData.append('title', title);
+       formData.append('department',department);
+       formData.append('content', content);
+       formData.append('priority',priority)
+       // 添加文件
+       for (var i = 0; i < uploadedFiles.length; i++) {
+         formData.append('files', uploadedFiles[i].file);
+       }
+
+
+
+       // 使用axios发送POST请求
+       axios({
+         method: "post",
+         url: "publicUploadServlet",
+         data: formData,
+         headers: {
+           'Content-Type': 'multipart/form-data '
+         }
+       }).then(function (resp){
+         if (resp.data==="success"){
+           alert("添加成功！");
+           location.reload();
+         }
+         else {
+           alert("添加失败，请联系相关人员！")
+         }
+       })
+
+     }
+
+     // 下载公告
+     function downloadNotice() {
+       var title = document.getElementById('detailTitle').textContent;
+       var content = document.getElementById('detailText').textContent;
+
+       downloadContent(title, content);
+     }
+
+     // 下载特定公告
+     function downloadAnnouncement(id) {
+       // 防止事件冒泡
+       event.stopPropagation();
+
+       for (var i = 0; i < announcements.length; i++) {
+
+         if (announcements[i].publicNotice.id === id) {
+
+           downloadContent(announcements[i].publicNotice.title, announcements[i].publicNotice.content);
+           return;
+         }
+       }
+     }
+
+
+
+     // 下载内容到文件
+     function downloadContent(title, content) {
+       // 创建 Blob 对象
+       var blob = new Blob([content], { type: 'text/plain' });
+
+       // 创建下载链接
+       var url = window.URL.createObjectURL(blob);
+       var a = document.createElement('a');
+       a.href = url;
+       a.download = title + '.txt';
+
+       // 添加到页面并点击
+       document.body.appendChild(a);
+       a.click();
+
+       // 清理
+       setTimeout(function() {
+         document.body.removeChild(a);
+         window.URL.revokeObjectURL(url);
+       }, 100);
+     }
+
+
+     // 页面加载完成后初始化
+     // document.addEventListener('DOMContentLoaded', await initialize());
+ initialize()
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

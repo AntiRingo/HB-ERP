@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-   <html lang="">
+<html lang="">
 <head>
   <meta charset="utf-8">
   <title>所有产品页面</title>
@@ -9,16 +9,17 @@
 
 </head>
 <style>
-    html{ 
+    html{
         width: 100%;
         height: 100%;
         margin: 0;
         padding:0;
-        font-family: 宋体,serif;
+        font-family: Arial, sans-serif;
     }
     body{
         margin: 0;
         padding:0;
+        color: #222;
     }
 
 
@@ -27,33 +28,45 @@ h3{
 }
 
 .sortTitle2{
-  width: 90%;
-    height: 50px;
-    background:#e0e4e9;
-    border-radius: 10px;
-    margin: 20px auto;
-    padding-left: 20px;
-    color: #007bff;
-    line-height: 50px
+    width: 100%;
+    height: 36px;
+    background: #f2f3f5; 
+    border: 1px solid #d9dde2;
+    border-radius: 3px;
+    margin: 10px 0 0;
+    padding: 0 14px;
+    color: #0070bb;
+    line-height: 36px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
 }
+    .sortTitle2 h3{
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 36px;
+    }
     .sortTitle2 a{
-        color: #007bff;
+        color: #0070bb;
         text-decoration: none;
     }
     .sortTitle3{
-        width: 88%;
-        height: 20px;
-        margin: auto auto auto 6%;
-        border-bottom: #d9d9d9 solid 2px;
-        line-height: 20px;
+        width: 100%;
+        height: auto;
+        margin: 0 0 4px;
+        border-bottom: none;
+        line-height: 1.2;
+        font-weight: 700;
+        font-size: 14px;
     }
 .sortTitle3 a{
-    text-decoration: none;
-    color: #333333;
+    text-decoration: underline dotted;
+    text-underline-offset: 4px;
+    color: #0070bb;
 }
     #levelOne a{
         text-decoration: none;
-        color: #333333;
+        color: #111;
     }
 
 
@@ -62,25 +75,157 @@ h3{
         text-decoration: none;
     }
 
-
-
-
-
-
-
-
+    .content-wrap{
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px 24px;
+        box-sizing: border-box;
+    }
+    .breadcrumb{
+        width: 100%;
+        margin: 10px 0 6px;
+        color: #6b7280;
+        font-size: 13px;
+    }
+    .breadcrumb-sep{
+        margin: 0 6px;
+        color: #a3aab5;
+    }
+    .page-head{
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 4px 0 10px;
+    }
+    .page-title{
+        font-size: 24px;
+        font-weight: 700;
+        color: #111;
+    }
+    .page-count{
+        font-size: 13px;
+        color: #111;
+        font-weight: 700;
+    }
+    .level-one{
+        padding-top: 6px;
+    }
+    .level-one-title{
+        font-size: 22px;
+        font-weight: 700;
+        margin: 8px 0 4px;
+    }
+    .level-one-title a{
+        color: #111;
+        text-decoration: none;
+    }
+    .level-one-title a:hover{
+        text-decoration: none;
+    }
+    .level-one-meta{
+        margin: 0 0 6px;
+        color: #444;
+        font-size: 13px;
+        font-weight: 700;
+    }
+    .level-two-section{
+        margin: 0 0 8px;
+    }
+    .third-grid{
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px 24px;
+        padding: 14px 14px 6px;
+        border-left: 1px solid #e6e8eb;
+        border-right: 1px solid #e6e8eb;
+        border-bottom: 1px solid #e6e8eb;
+        box-sizing: border-box;
+        background: #fff;
+    }
+    @media (max-width: 1100px) {
+        .third-grid{
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    @media (max-width: 720px) {
+        .third-grid{
+            grid-template-columns: 1fr;
+        }
+    }
+    .third-block{
+        min-width: 0;
+    }
+    .third-wrapper{
+        border-left: 1px solid #e6e8eb;
+        border-right: 1px solid #e6e8eb;
+        border-bottom: 1px solid #e6e8eb;
+        padding: 4px 14px 6px;
+        box-sizing: border-box;
+        background: #fff;
+    }
+    .third-section{
+        padding: 6px 0;
+        border-top: 1px solid #e6e8eb;
+    }
+    .third-section:first-child{
+        border-top: none;
+    }
+    .four-columns{
+        margin: 0;
+        padding-left: 16px;
+        list-style: disc;
+        columns: 3;
+        column-gap: 28px;
+    }
+    @media (max-width: 1100px) {
+        .four-columns{
+            columns: 2;
+        }
+    }
+    @media (max-width: 720px) {
+        .four-columns{
+            columns: 1;
+        }
+    }
+    .four-columns .four-item{
+        break-inside: avoid;
+    }
+    .four-list{
+        margin: 0;
+        padding-left: 18px;
+        list-style: disc;
+    }
+    .four-item{
+        margin: 4px 0;
+        font-size: 13px;
+        line-height: 1.25;
+    }
+    .four-item a{
+        color: #0070bb;
+        text-decoration: none;
+        display: inline-block;
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+    .four-item a:hover{
+        background: rgba(0, 112, 187, 0.08);
+        text-decoration: underline;
+    }
 </style>
 <body>
 <div class="sq" style="width: 100%;height: auto;text-align: center;">
     <div id="sw" style="display: flex;margin: auto;width: 90%;">
         <div style="height: auto;display: flex;width: 35%;min-width: 295px;margin: auto">
-            <div style="margin: auto"><img style="min-width: 38px" src="images/HBlogo.png" alt=""></div>
-            <div><img style="min-width: 256px" src="images/logo2.png" alt=""></div>
+            <a href="allproduct.html" style="display: flex;align-items: center;text-decoration: none">
+                <div style="margin: auto"><img style="min-width: 38px" src="images/HBlogo.png" alt=""></div>
+                <div><img style="min-width: 256px" src="images/logo2.png" alt=""></div>
+            </a>
         </div>
         <div style="width: 100%;height: auto;position: relative">
-            <div style="width:100%;min-width: 400px; margin: 8px auto;height: auto;display: flex;">
+            <div class="top-searchbar">
                 <button id="allSort" value="0"><span id="sortName">全部</span><span id="sortVault" style="display:none"></span><i class="allSortBefore">﹀</i></button>
-                <label for="searchContent"></label><input id="searchContent" type="search" style="width: 45%;min-width: 200px; height: 39px;font-size:16px;padding: 0 10px " oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
+                <label for="searchContent"></label><input id="searchContent" type="search" oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
                 <button id="search" value="搜索"><i class="searchBefore"></i></button>
 
             </div>
@@ -120,7 +265,6 @@ h3{
     <div style="width: 90%;height: 50px;margin: auto;display: flex;position: relative">
         <div id="product" style="width: fit-content;height: 50px;line-height: 50px;color: white"><b><a href="allproduct.html">零件库</a></b><span class="productAfter"></span></div>
         <div id="product2" style="width: fit-content;height: 50px;line-height: 50px;color: white;margin-left: 50px"><b><a href="allfinproduct.html">产品库</a></b><span class="productAfter"></span></div>
-            <button id="fontModeToggle" type="button" aria-pressed="false">放大字体</button>
         <button id="login" >登录</button>
     </div>
     <div id="one" style="width: fit-content;height: auto;margin:auto auto auto 5%;display: flex;position: absolute;">
@@ -165,16 +309,11 @@ h3{
 <!--</div>-->
 
 <marquee id="pickUpMessige" direction="up" style="color: #ff6a00; align-self: center;width: 15px;height: 30%;position: fixed;top: 150px;right: 5px"></marquee>
-<div id="allall" style="width: 100%;height: auto;margin: auto;border-bottom: #d9d9d9 solid 2px;padding-bottom: 20px">
-<!--    <div id="levelOne" style="width: 90%;height: auto;margin: auto">-->
-<!--    </div>-->
-<!--    <div style="height: auto;display: flex;width: 90%;margin: auto"><h3>结果总数：</h3><h3 id="number"></h3></div>-->
-<!--    <div style="width: 100%;height: auto;margin: auto" id="allsortName">-->
-
-<!--       -->
-
-
-<!--    </div>-->
+<div class="content-wrap">
+    <div class="breadcrumb">主页<span class="breadcrumb-sep">›</span>产品<span class="breadcrumb-sep">›</span>所有产品</div>
+    <div class="page-head">
+    </div>
+    <div id="allall"></div>
 </div>
 
 
@@ -257,6 +396,7 @@ h3{
 
 
     //查询所有一级分类
+    let totalCount = 0;
     axios({
         method:"post",
         url:"sort/selectOne"
@@ -264,15 +404,10 @@ h3{
         let datas=resp.data;
         let ss1="";
         for (let i = 0; i < datas.length; i++) {
-            ss1+= '    <div id="levelOne'+datas[i].id+'" style="width: 90%;height: auto;margin: auto">\n' +
-                '        <h2><a href="productResult.html?id='+datas[i].id+'&level='+datas[i].level+'">'+datas[i].name+'</a></h2>\n' +
-                '    </div>\n' +
-                '    <div style="height: auto;display: flex;width: 90%;margin: auto"><h3>结果总数：</h3><h3 id="number'+datas[i].id+'"></h3></div>\n' +
-                '    <div style="width: 100%;height: auto;margin: auto" id="allsortName'+datas[i].id+'">\n' +
-                '\n' +
-                '       \n' +
-                '\n' +
-                '\n' +
+            ss1+= '    <div class="level-one" id="levelOne'+datas[i].id+'">\n' +
+                '        <div class="level-one-title"><a href="productResult.html?id='+datas[i].id+'&level='+datas[i].level+'">'+datas[i].name+'</a></div>\n' +
+                '        <div class="level-one-meta">结果总数：<span id="number'+datas[i].id+'"></span></div>\n' +
+                '        <div id="allsortName'+datas[i].id+'"></div>\n' +
                 '    </div>'
 
         }
@@ -287,12 +422,12 @@ h3{
                 let datasTwo = resp.data;
                 let ss="";
               for (let j = 0; j < datasTwo.length; j++) {
-                  ss+=' <div class="sortTitle2">\n' +
+                  ss+=' <div class="level-two-section">\n' +
+                      '    <div class="sortTitle2">\n' +
                       '        <h3><a href="productResult.html?id='+datasTwo[j].id+'&level='+datasTwo[j].level+'">'+datasTwo[j].name+'</a></h3>\n' +
                       '    </div>\n' +
-                      '    <div id="parentIdTwo'+datasTwo[j].id+'" style="width: 100%;height: auto;margin: auto">\n' +
-
-                      '    </div>'
+                      '    <div id="parentIdTwo'+datasTwo[j].id+'" class="third-wrapper"></div>\n' +
+                      '</div>\n'
               }
               document.getElementById("allsortName"+datas[i].id+"").innerHTML=ss;
 
@@ -306,10 +441,10 @@ h3{
                       let dataThree=resp.data;
                       let three="";
                       for (let k = 0; k < dataThree.length; k++) {
-                          three+=' <div class="sortTitle3" ><a href="productResult.html?id='+dataThree[k].id+'&level='+dataThree[k].level+'">'+dataThree[k].name+'</a></div>\n' +
-                              '        <div style="width: 86%;height: auto;margin: auto auto auto 7%;display: flex;flex-wrap:wrap" id="parentIdThree'+dataThree[k].id+'" >\n' +
-
-                              '        </div>'
+                          three+=' <div class="third-section">\n' +
+                              '    <div class="sortTitle3"><a href="productResult.html?id='+dataThree[k].id+'&level='+dataThree[k].level+'">'+dataThree[k].name+'</a></div>\n' +
+                              '    <ul class="four-columns" id="parentIdThree'+dataThree[k].id+'"></ul>\n' +
+                              '</div>\n'
                       }
                       document.getElementById("parentIdTwo"+datasTwo[j].id+"").innerHTML=three;
                       //查询四级分类
@@ -322,7 +457,7 @@ h3{
                               let dataFour=resp.data;
                               let four="";
                               for (let l = 0; l < dataFour.length; l++) {
-                                  four+='<div class="four"><a href="productResult.html?id='+dataFour[l].id+'&level='+dataFour[l].level+'">'+dataFour[l].name+'</a></div>'
+                                  four+='<li class="four-item"><a href="productResult.html?id='+dataFour[l].id+'&level='+dataFour[l].level+'">'+dataFour[l].name+'</a></li>'
                               }
                               document.getElementById("parentIdThree"+dataThree[k].id+"").innerHTML=four;
 
@@ -362,6 +497,9 @@ h3{
                         n=Number(m)+Number(n);
                     })
                     document.getElementById("number"+datas[i].id +"").innerHTML=n;
+                    totalCount = Number(totalCount) + Number(n);
+                    let totalEl = document.getElementById("totalCount");
+                    if (totalEl) totalEl.innerHTML = totalCount;
 
 
 
@@ -372,6 +510,9 @@ h3{
                         data:datas[i].id
                     }).then(function (resp){
                         document.getElementById("number"+datas[i].id +"").innerHTML=resp.data;
+                        totalCount = Number(totalCount) + Number(resp.data);
+                        let totalEl = document.getElementById("totalCount");
+                        if (totalEl) totalEl.innerHTML = totalCount;
                     })
                 }
             })

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>物料到货管理</title>
+  <script src="js/axios-0.18.0.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft YaHei";
+    }
+    body {
+      padding: 20px;
+      background: #f5f7fa;
+    }
+    .bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .user {
+      padding: 6px 12px;
+      background: #eef1f5;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      background: #409eff;
+      color: #fff;
+      cursor: pointer;
+    }
+    .receive {
+      background: #67c23a;
+    }
+    .return {
+      background: #f56c6c;
+    }
+    .check {
+      background: #fa8c16;
+    }
+    .table-box {
+      overflow: auto;
+      max-height: 60vh;
+      background: #fff;
+      border: 1px solid #eee;
+    }
+    table {
+      border-collapse: collapse;
+      width: auto;
+      table-layout: fixed;
+
+    }
+    th, td {
+      border: 1px solid #eee;
+      padding: 6px 4px;
+      font-size: 13px;
+      /*text-align: center;*/
+      position: relative;
+      white-space: nowrap; /* 强制不换行 */
+    }
+    th {
+      background: #eef1f5;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .resizer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 8px;
+      height: 100%;
+      background: transparent;
+      cursor: col-resize;
+      z-index: 10;
+    }
+    .mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .pop {
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      width: 360px;
+      text-align: center;
+    }
+    .log-pop {
+      width: 700px;
+      max-height: 80vh;
+      overflow-y: auto;
+      text-align: left;
+    }
+    input {
+      padding: 6px;
+      width: 100%;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .page-bar {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .no-edit {
+      background: #f8f9fa;
+      color: #666;
+      cursor: not-allowed;
+    }
+    .group-row td{
+      background-color: #f0f7ff;
+    }
+    .group-top td{
+      border-top: 2px solid #409eff !important;
+    }
+    .group-bottom td{
+      border-bottom: 2px solid #409eff !important;
+    }
+
+    .status {
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .status-0 { background: #f0f2f5; color: #666; }
+    .status-1 { background: #e6f7ff; color: #1890ff; }
+    .status-2 { background: #fff7e6; color: #fa8c16; }
+    .status-3 { background: #e6f7ff; color: #1890ff; }
+    .status-4 { background: #f6ffed; color: #52c41a; }
+    .status-5 { background: #ffe6e6; color: #f56c6c; }
+    .status-empty { background: #f0f2f5; color: #666; }
+
+    .log-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 13px;
+    }
+    .log-item span {
+      margin-right: 10px;
+      color: #666;
+    }
+    .log-type {
+      color: #409eff !important;
+      font-weight: bold;
+    }
+
+
+  </style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="user">当前操作人：<span id="loginUser"></span></div>
+  <button onclick="loadData()">🔄 刷新</button>
+  <button class="receive" onclick="openReceive()">✅ 到货</button>
+  <button class="return" onclick="openReturn()">❌ 退货</button>
+  <button class="check" onclick="openCheck()">🔍 送往质检</button>
+  每页条数：
+  <select id="pageSizeSel" onchange="changePageSize()">
+    <option value="20">20</option>
+    <option value="50">50</option>
+    <option value="100" selected>100</option>
+    <option value="200">200</option>
+    <option value="9999">全部</option>
+  </select>
+</div>
+
+<div class="table-box">
+  <table id="dataTable">
+    <thead>
+    <tr>
+      <th width="60">选择<div class="resizer"></div></th>
+      <th width="100">状态<div class="resizer"></div></th>
+      <th width="110">采购日期<div class="resizer"></div></th>
+      <th width="140">产品名称<div class="resizer"></div></th>
+      <th width="100">品牌<div class="resizer"></div></th>
+      <th width="100">封装<div class="resizer"></div></th>
+      <th width="130">规格型号<div class="resizer"></div></th>
+      <th width="70">单位<div class="resizer"></div></th>
+      <th width="80">申请数量<div class="resizer"></div></th>
+      <th width="110">不含税单价<div class="resizer"></div></th>
+      <th width="110">含税单价<div class="resizer"></div></th>
+      <th width="110">货款金额<div class="resizer"></div></th>
+      <th width="80">运费<div class="resizer"></div></th>
+      <th width="120">申请人<div class="resizer"></div></th>
+      <th width="110">付款日<div class="resizer"></div></th>
+      <th width="110">到货日<div class="resizer"></div></th>
+      <th width="110">开票日<div class="resizer"></div></th>
+      <th width="110">质保到期<div class="resizer"></div></th>
+      <th width="160">供方单位<div class="resizer"></div></th>
+      <th width="160">地址<div class="resizer"></div></th>
+      <th width="100">联系人<div class="resizer"></div></th>
+      <th width="110">电话<div class="resizer"></div></th>
+      <th width="130">税号<div class="resizer"></div></th>
+      <th width="140">邮箱<div class="resizer"></div></th>
+      <th width="140">订单号<div class="resizer"></div></th>
+      <th width="120">操作<div class="resizer"></div></th>
+    </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<div class="page-bar">
+  <span>总数量：<span id="totalCount">0</span></span>
+  <button onclick="prevPage()">上一页</button>
+  <span>第 <span id="currentPage">1</span> 页</span>
+  <button onclick="nextPage()">下一页</button>
+</div>
+
+<div class="mask" id="operateMask">
+  <div class="pop">
+    <h4 id="popTitle">操作</h4>
+    <p>可操作数量：<span id="maxNum"></span></p>
+    <input type="number" id="inputQty" placeholder="请输入数量">
+    <button onclick="doOperate()">确认</button>
+    <button onclick="closePop()">取消</button>
+  </div>
+</div>
+
+<!-- 日志弹窗（不动原有代码） -->
+<div class="mask" id="logMask">
+  <div class="pop log-pop">
+    <h4 id="logTitle">操作记录</h4>
+    <div id="logList" style="margin:15px 0;"></div>
+    <button onclick="closeLog()">关闭</button>
+  </div>
+</div>
+
+<script>
+  // ===================== 登录判断（只加这一段，其他完全不动） =====================
+  let loginUserInfo = null;
+
+  // 获取用户名
+  async function getUserName() {
+    try {
+      let res = await axios.post("user/selectName");
+      let result = res.data;
+      if (result && result.id) {
+        loginUserInfo = result;
+        document.getElementById("loginUser").innerText = result.name;
+      } else {
+        loginUserInfo = null;
+        document.getElementById("loginUser").innerText = "";
+      }
+    } catch (e) {
+      loginUserInfo = null;
+      document.getElementById("loginUser").innerText = "";
+    }
+  }
+
+  // 检查是否登录（未登录弹窗）
+  async function checkLogin() {
+    if (!loginUserInfo) {
+      await getUserName();
+    }
+    if (!loginUserInfo) {
+      alert("您还未登录！");
+      return false;
+    }
+    return true;
+  }
+
+  // 页面加载时获取用户名
+  getUserName();
+  // ==============================================================================
+
+
+  let pageNum = 1;
+  let pageSize = 100;
+  let currentId = null;
+  let maxQty = 0;
+  let operateType = "";
+  let saveTimer = null;
+
+  // ==================== 日志功能函数（新增，不影响原有代码） ====================
+  function saveLog(applicationContentId, operationType, operateNum, remark) {
+    let user = document.getElementById("loginUser").innerText;
+    axios.post("operationLog/save", JSON.stringify({
+      applicationContentId: applicationContentId,
+      operationType: operationType,
+      operateUser: user,
+      operateNum: operateNum,
+      remark: remark || ""
+    })).catch(err => console.error("日志保存失败", err));
+  }
+
+  // 查看操作记录
+  function openLog(id) {
+    currentId = id;
+    axios.post("operationLog/list", JSON.stringify({
+      applicationContentId: id
+    })).then(res => {
+      let list = res.data;
+      let html = "";
+      if (list.length === 0) {
+        html = "<div style='text-align:center;padding:20px;'>暂无操作记录</div>";
+      } else {
+        list.forEach(item => {
+          let time = item.operateTime ? formatTime(item.operateTime) : "";
+          html += `
+          <div class="log-item">
+            <span class="log-type">${item.operationType}</span>
+            <span>操作人：${item.operateUser}</span>
+            <span>数量：${item.operateNum}</span>
+            <span>时间：${time}</span>
+            ${item.remark ? `<div>备注：${item.remark}</div>` : ''}
+          </div>
+        `;
+        });
+      }
+      document.getElementById("logList").innerHTML = html;
+      document.getElementById("logMask").style.display = "flex";
+    }).catch(err => {
+      document.getElementById("logList").innerHTML = "<div style='text-align:center;padding:20px;'>获取记录失败</div>";
+    });
+  }
+
+  // 时间格式化工具
+  function formatTime(time) {
+    if (!time) return "";
+    let date = new Date(time);
+    let y = date.getFullYear();
+    let m = (date.getMonth() + 1).toString().padStart(2, '0');
+    let d = date.getDate().toString().padStart(2, '0');
+    let hh = date.getHours().toString().padStart(2, '0');
+    let mm = date.getMinutes().toString().padStart(2, '0');
+    let ss = date.getSeconds().toString().padStart(2, '0');
+    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+  }
+
+  function closeLog() {
+    document.getElementById("logMask").style.display = "none";
+  }
+  // ==================== 日志结束 ====================
+
+  // 状态配置完全按你的要求
+  function getStatusInfo(status){
+    if (status === null || status === undefined || status === '') {
+      return { text: "未处理", cls: "status-empty" };
+    }
+    status = Number(status);
+    const map = {
+      0: { text: "采购中", cls: "status-0" },
+      1: { text: "已到货", cls: "status-1" },
+      2: { text: "质检中", cls: "status-2" },
+      3: { text: "入库中", cls: "status-3" },
+      4: { text: "已完成", cls: "status-4" },
+      5: { text: "退货", cls: "status-5" }
+    };
+    return map[status] || { text: "未处理", cls: "status-empty" };
+  }
+
+  function initAutoSave() {
+    document.addEventListener("input", function (e) {
+      if (e.target.type === "checkbox") return;
+      if (e.target.tagName === "INPUT" || e.target.isContentEditable) {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          saveRowData(e.target);
+          let tr = e.target.closest("tr");
+          if(tr) saveLog(tr.dataset.id, "修改", 0, "编辑物料信息");
+        }, 500);
+      }
+    })
+  }
+
+  function initResize() {
+    const table = document.getElementById('dataTable');
+    const cols = table.querySelectorAll('th');
+    cols.forEach((col) => {
+      const resizer = col.querySelector('.resizer');
+      let startX, startWidth;
+      resizer.addEventListener('mousedown', function(e) {
+        startX = e.pageX;
+        startWidth = col.offsetWidth;
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stop);
+      });
+      function resize(e) {
+        const newWidth = startWidth + (e.pageX - startX);
+        if (newWidth > 30) {
+          col.style.width = newWidth + 'px';
+          col.style.minWidth = newWidth + 'px';
+        }
+      }
+      function stop() {
+        document.removeEventListener('mousemove', resize);
+        document.removeEventListener('mouseup', stop);
+      }
+    });
+  }
+
+  window.onload = function () {
+    loadData();
+    initAutoSave();
+    initResize();
+  }
+
+  // ===================== 所有操作前加登录判断 =====================
+  async function loadData() {
+    if(!await checkLogin()) return; // 登录判断
+    axios.post("applicationContent/selectAppAndDetail", JSON.stringify({
+      currentPage: pageNum,
+      pageSize: pageSize
+    })).then(res => {
+      let bean = res.data;
+      document.getElementById("totalCount").innerText = bean.totalCount;
+      document.getElementById("currentPage").innerText = pageNum;
+      let html = "";
+      let list = bean.rows;
+
+
+      for(let i=0;i<list.length;i++){
+        let item = list[i];
+        let nowFormId = item.application_id;
+        let prevFormId = i>0 ? list[i-1].application_id : null;
+        let nextFormId = i < list.length-1 ? list[i+1].application_id : null;
+
+        let rowClass = "";
+        if(nowFormId === prevFormId || nowFormId === nextFormId){
+          rowClass += " group-row";
+        }
+        if(nowFormId !== prevFormId && nowFormId === nextFormId){
+          rowClass += " group-top";
+        }
+        if(nowFormId === prevFormId && nowFormId !== nextFormId){
+          rowClass += " group-bottom";
+        }
+        if(nowFormId !== prevFormId && nowFormId !== nextFormId){
+          rowClass += " group-top group-bottom group-row";
+        }
+
+        let st = getStatusInfo(item.status);
+        let statusHtml = `<span class="status ${st.cls}">${st.text}</span>`;
+
+        html += `
+        <tr data-id="${item.id}" data-id1="${item.id1}" data-status="${item.status || ''}" class="${rowClass.trim()}">
+          <td><input type="checkbox" class="cbox"></td>
+          <td>${statusHtml}</td>
+          <td><input type="date" value="${item.purchase_date || ''}"></td>
+          <td class="no-edit">${item.productName || ''}</td>
+          <td class="no-edit">${item.brand || ''}</td>
+          <td class="no-edit">${item.package || ''}</td>
+          <td class="no-edit">${item.model || ''}</td>
+          <td class="no-edit">${item.unit || ''}</td>
+          <td class="no-edit qty">${item.app_number || 0}</td>
+          <td contenteditable class="price">${item.app_price || 0}</td>
+          <td contenteditable class="taxPrice">${item.tax_price || 0}</td>
+          <td contenteditable class="amount">${item.goods_amount || 0}</td>
+          <td contenteditable class="freight">${item.freight || 0}</td>
+          <td class="no-edit">${item.applyUserName || ''}</td>
+
+          <td><input type="date" value="${item.pay_date || ''}"></td>
+          <td><input type="date" value="${item.arrive_date || ''}"></td>
+          <td><input type="date" value="${item.invoice_date || ''}"></td>
+          <td><input type="date" value="${item.warranty_date || ''}"></td>
+
+          <td contenteditable>${item.supplier_name || ''}</td>
+          <td contenteditable>${item.supplier_address || ''}</td>
+          <td contenteditable>${item.contact_person || ''}</td>
+          <td contenteditable>${item.contact_tel || ''}</td>
+          <td contenteditable>${item.tax_no || ''}</td>
+          <td contenteditable>${item.email || ''}</td>
+          <td contenteditable${item.order_no || ''}</td>
+          <td><button onclick="openLog(${item.id})">📋 记录</button></td>
+        </tr>`
+      }
+      document.getElementById("tbody").innerHTML = html;
+    })
+  }
+
+  async function saveRowData(el) {
+    if(!await checkLogin()) return;
+    let tr = el.closest("tr");
+    if (!tr) return;
+    let id = tr.dataset.id;
+    let dates = tr.querySelectorAll("input[type='date']");
+
+    let saveObj = {
+      id: id,
+      status: tr.dataset.status || "",
+      app_price: tr.querySelector(".price")?.innerText.trim() || 0,
+      tax_price: tr.querySelector(".taxPrice")?.innerText.trim() || 0,
+      goods_amount: tr.querySelector(".amount")?.innerText.trim() || 0,
+      freight: tr.querySelector(".freight")?.innerText.trim() || 0,
+      purchase_date: dates[0]?.value || "",
+      pay_date: dates[1]?.value || "",
+      arrive_date: dates[2]?.value || "",
+      invoice_date: dates[3]?.value || "",
+      warranty_date: dates[4]?.value || "",
+      supplier_name: tr.cells[18]?.innerText.trim() || "",
+      supplier_address: tr.cells[19]?.innerText.trim() || "",
+      contact_person: tr.cells[20]?.innerText.trim() || "",
+      contact_tel: tr.cells[21]?.innerText.trim() || "",
+      tax_no: tr.cells[22]?.innerText.trim() || "",
+      email: tr.cells[23]?.innerText.trim() || "",
+      order_no: tr.cells[24]?.innerText.trim() || "",
+    };
+
+    axios.post("applicationContent/autoSaveData", JSON.stringify(saveObj))
+            .catch(err => console.error("保存失败", err));
+  }
+
+  async function changePageSize() {
+    if(!await checkLogin()) return;
+    pageSize = document.getElementById("pageSizeSel").value;
+    pageNum = 1;
+    await loadData();
+  }
+  async function prevPage() {
+    if(!await checkLogin()) return;
+    if (pageNum > 1) {
+      pageNum--;
+      await loadData();
+    } else {
+      alert("已经是第一页，无法继续上翻！");
+    }
+  }
+  async function nextPage() {
+    if(!await checkLogin()) return;
+    let total = parseInt(document.getElementById("totalCount").innerText || 0);
+    let maxPage = Math.ceil(total / pageSize);
+    if (pageNum < maxPage) {
+      pageNum++;
+      await loadData();
+    } else {
+      alert("已经是最后一页，无法继续下翻！");
+    }
+  }
+
+  async function checkSelected() {
+    if(!await checkLogin()) return false;
+    let list = document.querySelectorAll(".cbox:checked");
+    if (list.length !== 1) {
+      alert("请选择一行！");
+      return false;
+    }
+    currentId = list[0].closest("tr").dataset.id;
+    return true;
+  }
+
+  async function openReceive() {
+    if (!await checkSelected()) return;
+    let tr = document.querySelector(`tr[data-id="${currentId}"]`);
+    let status = tr.dataset.status;
+    if (status !== null && status !== undefined && status !== "") {
+      alert("只有未处理状态才能执行到货操作！");
+      return;
+    }
+    operateType = "receive";
+    getMaxQty(() => {
+      document.getElementById("popTitle").innerText = "到货";
+      document.getElementById("maxNum").innerText = maxQty;
+      document.getElementById("operateMask").style.display = "flex";
+    });
+  }
+
+  async function openReturn() {
+    if (!await checkSelected()) return;
+    operateType = "return";
+    getMaxQty(() => {
+      document.getElementById("popTitle").innerText = "退货";
+      document.getElementById("maxNum").innerText = maxQty;
+      document.getElementById("operateMask").style.display = "flex";
+    });
+  }
+
+  // async function openCheck() {
+  //   if(!await checkLogin()) return;
+  //   let list = document.querySelectorAll(".cbox:checked");
+  //   if (list.length === 0) {
+  //     alert("请至少选择一行！");
+  //     return;
+  //   }
+  //   for (let box of list) {
+  //     let tr = box.closest("tr");
+  //     let status = tr.dataset.status;
+  //     if (Number(status) !== Number(1)) {
+  //       alert("存在非【已到货】状态的物料，无法送往质检！");
+  //       return;
+  //     }
+  //   }
+  //   if (!confirm("确认将选中的物料全部送往质检？")) return;
+  //   let ids = [];
+  //   let idMap = {};
+  //   for (let box of list) {
+  //     let tr = box.closest("tr");
+  //     let id = tr.dataset.id1;
+  //     let mainId = tr.dataset.id;
+  //     ids.push(id);
+  //     idMap[id] = mainId;
+  //   }
+  //   if (ids.length === 0) {
+  //     alert("请选择需要处理的数据！");
+  //     return;
+  //   }
+  //   axios.post("applicationContent/sendToCheck", JSON.stringify({
+  //     applicationContentIds: ids,
+  //     status: 2
+  //   })).then(() => {
+  //     ids.forEach(id => {
+  //       saveLog(idMap[id], "送往质检", 0, "批量送往质检");
+  //     });
+  //     alert(`✅ 批量送往质检完成！共处理 ${ids.length} 条`);
+  //     loadData();
+  //   }).catch(() => {
+  //     alert("❌ 批量处理失败");
+  //   });
+  // }
+
+
+
+
+
+
+
+
+
+
+  // 【最终版】直接使用页面已加载的 后端完整数据 · 无需新接口
+  // 【最终完整版】获取完整数据 + 组装 all + 提交 all 到后端
+  async function openCheck() {
+    if(!await checkLogin()) return;
+
+    let list = document.querySelectorAll(".cbox:checked");
+    if (list.length === 0) {
+      alert("请至少选择一行！");
+      return;
+    }
+
+    try {
+      // 1. 获取页面完整后端数据
+      let res = await axios.post("applicationContent/selectAppAndDetail", JSON.stringify({
+        currentPage: pageNum,
+        pageSize: pageSize
+      }));
+      let allRows = res.data.rows;
+
+      // 2. 筛选选中的数据
+      let selectedData = [];
+      for (let box of list) {
+        let tr = box.closest("tr");
+        let trId = tr.dataset.id;
+        let status = tr.dataset.status;
+        if (Number(status) !== 1) {
+          alert("存在非【已到货】状态的物料，无法送往质检！");
+          return;
+        }
+        let row = allRows.find(item => Number(item.id) === Number(trId));
+        if (row) selectedData.push(row);
+      }
+
+      // 3. 预览弹窗（不变）
+      let mask = document.createElement('div');
+      mask.style.cssText = `
+      position: fixed; z-index:9999; left:0; top:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;
+    `;
+      let wrap = document.createElement('div');
+      wrap.style.cssText = `background:#fff; padding:20px; border-radius:8px; max-width:95%; max-height:85vh; display:inline-block;`;
+      wrap.innerHTML = `
+      <h3>送往质检预览（${selectedData.length}项）</h3>
+      <div style="overflow:auto;">
+        <table style="border-collapse:collapse; font-size:13px; width:auto; white-space:nowrap;">
+          <tr style="background:#f5f7fa;">
+            <th style="border:1px solid #eee; padding:4px 8px;">序号</th>
+            <th style="border:1px solid #eee; padding:4px 8px;">产品名称</th>
+            <th style="border:1px solid #eee; padding:4px 8px;">品牌</th>
+            <th style="border:1px solid #eee; padding:4px 8px;">封装</th>
+            <th style="border:1px solid #eee; padding:4px 8px;">数量</th>
+          </tr>
+          ${selectedData.map((item,i) => `
+          <tr>
+            <td style="border:1px solid #eee; padding:4px 8px;">${i+1}</td>
+            <td style="border:1px solid #eee; padding:4px 8px;">${item.productName || ''}</td>
+            <td style="border:1px solid #eee; padding:4px 8px;">${item.brand || ''}</td>
+            <td style="border:1px solid #eee; padding:4px 8px;">${item.package || ''}</td>
+            <td style="border:1px solid #eee; padding:4px 8px;">${item.app_number || 0}</td>
+          </tr>`).join('')}
+        </table>
+      </div>
+      <div style="text-align:center; margin-top:15px;">
+        <button id="ok" style="padding:8px 20px;background:#409eff;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-right:8px;">确认送往质检</button>
+        <button id="close" style="padding:8px 20px;background:#999;color:#fff;border:none;border-radius:4px;cursor:pointer;">取消</button>
+      </div>
+    `;
+      mask.appendChild(wrap);
+      document.body.appendChild(mask);
+
+      // ===================== 【核心：组装 all 数据】 =====================
+      let appFormData = {
+        id: "",
+        orderNumber: "",
+        date: "",
+        sort: 0,
+        userId: "",
+        completeStatus: "3",
+        sortTwo: 18, // 质检入库
+        reason: "",
+        circulation: "",
+        notes: "",
+        robot: ""
+      };
+
+      let applicationContent = [];
+      for (let i = 0; i < selectedData.length; i++) {
+        let item = selectedData[i];
+        applicationContent.push({
+          id: item.id,
+          applicationId: item.application_id,
+          productId: item.product_id,
+          appNumber: item.app_number,
+          actualNumber: "",
+          vault: item.vault,
+          appPrice: item.app_price,
+          finProductId: "",
+          finProductNumber: "",
+          lastLevel: item.last_level,
+          bomTitleId: item.bom_title_id
+        });
+      }
+
+      // 最终要提交的 all
+      let all = [appFormData, applicationContent];
+      // =================================================================
+
+      // 取消
+      wrap.querySelector('#close').onclick = () => document.body.removeChild(mask);
+
+      // 确认提交：把 all + ids 一起传给后端
+      wrap.querySelector('#ok').onclick = async () => {
+        try {
+          let ids = selectedData.map(item => item.id1);
+
+          // ===================== 【关键：一起传给后端】 =====================
+          await axios.post("applicationContent/sendToCheck", JSON.stringify({
+            applicationContentIds: ids,
+            status: 2,
+            allData: all  // <-- 这里把 all 传到后端！
+          }));
+
+          // 日志
+          selectedData.forEach(item => {
+            saveLog(item.id, "送往质检", item.app_number, "批量送往质检");
+          });
+
+          document.body.removeChild(mask);
+          alert("✅ 提交成功！");
+          await loadData();
+        } catch (e) {
+          console.error(e);
+          alert("❌ 提交失败");
+        }
+      };
+
+    } catch (e) {
+      console.error(e);
+      alert("❌ 获取数据失败");
+    }
+  }
+
+
+
+
+
+
+  function getMaxQty(callback) {
+    let tr = document.querySelector(`tr[data-id="${currentId}"]`);
+    maxQty = parseInt(tr.querySelector(".qty").innerText) || 0;
+    callback();
+  }
+
+  async function doOperate() {
+    if(!await checkLogin()) return;
+    let num = parseInt(document.getElementById("inputQty").value);
+    if (num <= 0 || num > maxQty) {
+      alert("数量不合法");
+      return;
+    }
+    closePop();
+
+    let tr = document.querySelector(`tr[data-id="${currentId}"]`);
+    let original = parseInt(tr.querySelector(".qty").innerText);
+    let today = new Date().toISOString().split("T")[0];
+    let dates = tr.querySelectorAll("input[type='date']");
+
+    if (operateType === "return") {
+      tr.dataset.status = 5;
+      axios.post("applicationContent/copyRowData", JSON.stringify({
+        id: currentId,
+        app_number: -num,
+        status:5
+      })).then(() => {
+        saveLog(currentId, "退货", num, `退货数量：${num}`);
+        alert("✅ 退货成功！");
+        loadData();
+      })
+    }
+
+    if (operateType === "receive") {
+      tr.dataset.status = 1;
+      if (num === original) {
+        dates[2].value = today;
+        await saveRowData(tr);
+        saveLog(currentId, "全部到货", num, "全部到货完成");
+        alert("✅ 全部到货成功！");
+        await loadData();
+      } else {
+        let remainNum = original - num;
+        let addNum = num;
+        axios.post("applicationContent/updateApplicationNumber", JSON.stringify({
+          id: currentId,
+          remainNum: remainNum,
+          addNum: addNum,
+          status:1,
+          arrive_date: today
+        })).then(() => {
+          saveLog(currentId, "部分到货", num, `部分到货：${num}，剩余：${remainNum}`);
+          alert("✅ 部分到货操作成功！");
+          loadData();
+        });
+      }
+    }
+  }
+
+  function closePop() {
+    document.getElementById("operateMask").style.display = "none";
+    document.getElementById("inputQty").value = "";
+  }
+
+  document.addEventListener("change", async function (e) {
+    if(!await checkLogin()) return;
+    if (e.target.type === "date") {
+      await saveRowData(e.target);
+    }
+  });
+
+
+
+</script>
+</body>
+</html>

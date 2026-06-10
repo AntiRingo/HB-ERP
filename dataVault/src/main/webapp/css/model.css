@@ -56,7 +56,7 @@
     border: 1px solid #BfD6E1;
     border-radius: 5px;
     color: #444;
-    font: 14px 'Microsoft YaHei', '微软雅黑';
+    font: 14px Arial, sans-serif;
     margin: 0 auto;
     width: 388px;
 
@@ -90,7 +90,7 @@
 .loginBox .loginInput {
 
     color: #444;
-    font: 12px 'Microsoft YaHei', '微软雅黑';
+    font: 12px Arial, sans-serif;
     padding: 8px 14px;
     margin-bottom: 8px;
     width: 310px;
@@ -101,7 +101,7 @@
 .loginBox .passwordInput {
 
     color: #444;
-    font: 12px 'Microsoft YaHei', '微软雅黑';
+    font: 12px Arial, sans-serif;
     padding: 8px 0 8px 14px;
     margin-bottom: 8px;
     width:290px;
@@ -207,68 +207,21 @@ input[type="password"]::-o-clear{
 /*登录按钮scc*/
 #login{
     cursor: pointer;
-    height: 25px;
+    height: 50px;
     position: absolute;
-    right: 50px;
-    top: 13px;
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    right: 0;
+    top: 0;
+    padding: 0 16px;
+    border: none;
+    background: transparent;
+    color: white;
+    font-weight: 700;
 }
-
-#fontModeToggle{
-    cursor: pointer;
-    height: 25px;
-    position: absolute;
-    right: 240px;
-    top: 13px;
-    padding: 0 10px;
-    min-width: 64px;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    font-weight: bolder;
+#login:hover{
+    background: rgba(255, 255, 255, 0.12);
 }
-
-#fontModeToggle:hover{
-    background: rgba(255, 255, 255, 0.25);
-}
-
-#fontScalePopup{
-    position: absolute;
-    right: 240px;
-    top: 45px;
-    z-index: 2147483647;
-    width: 240px;
-    border: 1px solid #cfd8e3;
-    border-radius: 10px;
-    background: #ffffff;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
-    padding: 10px 12px;
-    box-sizing: border-box;
-}
-
-#fontScalePopupTitle{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #333333;
-    font-weight: bolder;
-    margin-bottom: 8px;
-}
-
-#fontScalePopupValue{
-    min-width: 52px;
-    text-align: right;
-    color: #0070bb;
-}
-
-#fontScaleSlider{
-    width: 100%;
-    accent-color: #0070bb;
+#login:active{
+    background: rgba(255, 255, 255, 0.2);
 }
 /*申请单按钮css*/
 .application{

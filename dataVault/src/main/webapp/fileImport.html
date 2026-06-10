@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    body{
+        padding: 0;
+        margin: 0;
+    }
+</style>
+<body>
+
+<div style="margin: auto">
+    <div style="width: 100%;text-align: center"><h2>零件库一键导入</h2></div>
+    <div style="text-align: center">
+        <input type="hidden" name="id"  value="">
+        <label for="url0">&nbsp;</label><input style="width:80%;height: 20px;" type="text" name="" id="url0" value="">&nbsp; <input style="width: 223px;height: 24px;display: none" id="file0" type="file" >
+        <button   type="button" class="uploads" >上传分类和映射</button>
+    </div>
+
+    <div style="text-align: center;margin-top: 20px">
+        <input type="hidden" name="id"  value="">
+        <label for="url1">&nbsp;</label><input style="width:80%;height: 20px;" type="text" name="" id="url1" value="">&nbsp; <input style="width: 223px;height: 24px;display: none" id="file1" type="file" >
+        <button   type="button" class="uploads" >上传属性和编码</button>
+    </div>
+
+</div>
+
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+    let uploads = document.querySelectorAll(".uploads");
+
+    for (let i = 0; i < uploads.length; i++) {
+        uploads[i].onclick=function (){
+            document.getElementById('file'+i+'').click();
+        }
+
+
+    }
+
+    //自动上传
+  for (let i = 0; i < uploads.length; i++) {
+    document.getElementById('file'+i+'').onchange=function (){
+      let files = document.getElementById('file'+i+'').files[0];
+      let formdata = new FormData();
+      formdata.append('file'+i+'', files);
+if (i===0){
+    axios({
+        method:"post",
+        url:"fileProductSortAndMappingServlet",
+        data:formdata,
+        headers: {'Content-Type': 'multipart/form-data'},
+    }).then(function (resp){
+        let datas=resp.data;
+        if (datas.length>0){
+            alert(datas);
+            location.reload();
+        }else {
+            alert("系统错误！");
+            location.reload();
+        }
+
+
+    })
+}
+else {
+    axios({
+        method:"post",
+        url:"fileAttributeCodeServlet",
+        data:formdata,
+        headers: {'Content-Type': 'multipart/form-data'},
+    }).then(function (resp){
+        let datas=resp.data;
+        if (datas.length>0){
+            alert(datas);
+            location.reload();
+        }else {
+            alert("系统错误！");
+            location.reload();
+        }
+
+
+    })
+}
+
+    }
+  }
+    function height(){
+
+        let iframe = window.parent.document.getElementById("iframepage");
+        if (iframe){
+            let num= window.parent.innerHeight;
+            if (Number(num)>Number(60)){
+                let s = Number(num)-Number(60)
+                iframe.style.height=s+"px";
+            }
+
+        }
+
+
+    }
+    height();
+
+</script>
+</html>

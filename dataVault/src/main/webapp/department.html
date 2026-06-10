@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>部门操作</title>
+    <link href="css/product.css" rel="stylesheet" />
+    <script src="js/axios-0.18.0.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+<style>
+  html{
+    font-family: 宋体,serif;
+  }
+</style>
+  </head>
+  <body>
+  <div style="display: flex;width: 100%;height: auto;margin: auto">
+        <div style="width: 70%;margin: 20px auto;height: auto;border:  #9eb6d8 solid 1px;padding: 1px">
+          <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px;">
+            <div style="width:70%;background-color:#9eb6d8;height: auto;"><b>部门列表</b></div>
+            <div style="width: 29.5%;background-color:#9eb6d8;margin: auto;height: auto;">
+              <button id="addDepartment" style="padding: 5px 10px">添加部门</button>
+            </div>
+          </div>
+          <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;margin: 10px auto auto auto">
+            <div style="width: 70%;margin: auto;background-color: #9eb6d8; border:white solid 1px" ><b>部门名称</b></div>
+            <div style="width: 30%;margin: auto;background-color: #9eb6d8  ; border:white solid 1px"    ><b>操作</b></div>
+          </div>
+          <div id="content" style="width: 100%;height: auto;margin: auto">
+
+
+
+          </div>
+        </div>
+  </div>
+
+
+  <div class="window">
+
+    <div class="window-content">
+
+      <div class="window-content-close">×</div>
+      <div id="addContent" class="aa" style="width:80% ;height:auto;max-height: 99%;  margin: 5px auto auto;background-color: white;padding-bottom: 5px;display: none">
+
+        <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;">
+          <div style="width: 100%;margin: auto;background-color: #9eb6d8; border:white solid 1px" ><b>添加部门</b></div>
+        </div>
+
+        <div style="width: 100%;height: auto;display: flex;text-align: center;">
+         <div style="width: 99%;height: auto;margin: auto;display: flex">
+           <div style="width: 30%;border: #9eb6d8 solid 1px;line-height: 50px">部门名称</div>
+           <div style="width: 70%;border: #9eb6d8 solid 1px;text-align:left">
+             <input style="width: 99%;height: 50px;font-size: 20px" type="text" id="name">
+           </div>
+
+         </div>
+        </div>
+        <div style="width: 100%;height: auto;text-align: center;margin: 10px auto 5px auto">
+          <button id="add" style="padding: 5px">确定添加</button>
+        </div>
+      </div>
+      <div id="updateContent" class="aa" style="width:80% ;height:auto;max-height: 99%;  margin: 5px auto auto;background-color: white;padding-bottom: 5px;display: none">
+
+        <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;">
+          <div style="width: 100%;margin: auto;background-color: #9eb6d8; border:white solid 1px" ><b>更新部门</b></div>
+        </div>
+
+        <div style="width: 100%;height: auto;display: flex;text-align: center;">
+          <div style="width: 99%;height: auto;margin: auto;display: flex">
+            <div style="width: 30%;border: #9eb6d8 solid 1px;line-height: 50px">部门名称</div>
+            <div style="width: 70%;border: #9eb6d8 solid 1px;text-align:left">
+              <input style="width: 99%;height: 50px;font-size: 20px" type="text" id="updateName">
+            </div>
+
+          </div>
+        </div>
+        <div style="width: 100%;height: auto;text-align: center;margin: 10px auto 5px auto">
+          <button id="update" style="padding: 5px">确定更新</button>
+        </div>
+      </div>
+
+
+
+    </div>
+
+  </div>
+   
+  </body>
+
+  <script type="text/javascript" src="js/department.js"></script>
+</html>

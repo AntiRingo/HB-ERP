@@ -1,0 +1,3344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="js/http_cdn.sheetjs.com_xlsx-0.19.3_package_dist_xlsx.full.min.js"></script>
+  <script src="js/http_cdnjs.cloudflare.com_ajax_libs_pdf.js_3.4.120_pdf.js"></script>
+  <title>高亮功能界面</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    body {
+      padding: 20px;
+      background-color: #f5f7fa;
+    }
+    .container {
+      width: 90%;
+      max-width: 1400px;
+      margin: 20px auto;
+      border: 1px solid #9eb6d8;
+      border-radius: 8px;
+      overflow: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      background: white;
+    }
+    .header-row {
+      display: flex;
+      background-color: #4a6fa5;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-col {
+      padding: 12px 8px;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      cursor: move;
+      user-select: none;
+      transition: all 0.2s ease;
+      border-right: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .header-col:last-child {
+      border-right: none;
+    }
+    .header-col.dragging {
+      background-color: rgba(255, 255, 255, 0.2);
+      opacity: 0.8;
+    }
+    .header-col.over {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    .data-row {
+      border-bottom: 1px solid #e1e5eb;
+      transition: background-color 0.2s;
+    }
+    .data-row:hover {
+      background-color: #f8f9fc;
+    }
+    .row-content {
+      display: flex;
+      min-height: 60px;
+      align-items: center;
+    }
+    .row-col {
+      padding: 10px 8px;
+      border-right: 1px solid #e1e5eb;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-wrap: wrap;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .row-col:last-child {
+      border-right: none;
+    }
+    .attr-content {
+      padding: 10px 15px;
+      color: #5a6268;
+      font-size: 0.9em;
+      line-height: 1.6;
+      background-color: #f9fafc;
+      border-top: 1px solid #e1e5eb;
+    }
+    input[type="text"] {
+      width: 95%;
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      border-radius: 4px;
+      background: #f8f9fa;
+      font-size: 0.95em;
+    }
+    textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      padding: 8px;
+      border-radius: 4px;
+      background: #f8f9fa;
+      resize: vertical;
+      min-height: 60px;
+      font-size: 0.95em;
+    }
+    textarea:focus, input:focus {
+      outline: none;
+      border-color: #4a6fa5;
+      box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+    }
+    .delete-btn {
+      color: #e53e3e;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      font-size: 0.95em;
+    }
+    .delete-btn:hover {
+      background-color: #fef2f2;
+    }
+    .bom-content {
+      max-height: 70vh;
+      /*overflow-y: auto;*/
+    }
+    .drag-handle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: move;
+      color: #718096;
+    }
+    .drag-icon {
+      font-size: 18px;
+    }
+    .row-col.dragging {
+      background-color: rgba(74, 111, 165, 0.05);
+    }
+
+    /* 新增：列拖动占位符样式 */
+    .placeholder-col {
+      background-color: #e0e0e0;
+      border: 2px dashed #999;
+      height: 100%;
+    }
+
+    /* 新增PDF查看器样式 */
+    .pdf-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      display: none;
+    }
+
+    .pdf-viewer-container {
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .pdf-header {
+      background: #2c3e50;
+      color: white;
+      padding: 5px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pdf-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .close-pdf {
+      width: 40px;
+      height: 40px;
+      background: black;
+     border-radius: 10px;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      z-index: 1;
+    }
+
+    .pdf-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .pdf-controls {
+      width: 15%;
+      background: #f8f9fa;
+      border-right: 1px solid #e1e5eb;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .pdf-canvas-container {
+      flex: 1;
+      position: relative;
+      overflow: auto;
+      background: #e9ecef;
+    }
+
+    #pdf-canvas {
+      display: block;
+      /*margin: 20px auto;*/
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+
+    .highlight {
+      background-color: rgba(255, 215, 0, 0.5);
+      position: absolute;
+      border: 2px solid #FFA500;
+      pointer-events: none;
+    }
+
+    .coordinate-list {
+      margin-top: 15px;
+    }
+
+    .coordinate-item {
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #e1e5eb;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .coordinate-item:hover {
+      background: #f0f4f8;
+      border-color: #4a6fa5;
+    }
+
+    .coordinate-item.active {
+      background: #e6f0ff;
+      border-color: #4a6fa5;
+    }
+
+    .coordinate-info {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .pdf-toolbar {
+      padding: 10px 15px;
+      background: #f8f9fa;
+      border-top: 1px solid #e1e5eb;
+      display: flex;
+      gap: 10px;
+    }
+
+    .pdf-btn {
+      padding: 5px 10px;
+      background: #4a6fa5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .material-link {
+      color: #4a6fa5;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .material-link:hover {
+      color: #2c3e50;
+    }
+
+    .pdf-select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+    }
+
+    /* 新增：原点标记样式 */
+    .origin-marker {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+      z-index: 1000;
+      transform: translate(-50%, -50%);
+    }
+
+    /* 新增：选择区域样式 */
+    .selection-area {
+      position: absolute;
+      border: 2px solid #4a6fa5;
+      background-color: rgba(74, 111, 165, 0.2);
+      z-index: 999;
+    }
+
+    /* 新增：原点设置按钮样式 */
+    .origin-btn {
+      padding: 8px 15px;
+      background: #4a6fa5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-left: 10px;
+    }
+
+    /* 新增：设置原点模式下的光标样式 */
+    .set-origin-cursor {
+      cursor: crosshair;
+    }
+
+
+
+    /* 新增：坐标系样式 */
+    .coordinate-system {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #fdbb2d;
+      color: white;
+      font-size: 14px;
+    }
+
+    .origin-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background-color: red;
+      border-radius: 50%;
+      z-index: 15;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    }
+
+    .highlight-point {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: rgba(255, 215, 0, 0.7);
+      border: 2px solid #FFA500;
+      border-radius: 50%;
+      z-index: 15;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .highlight-label {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      z-index: 15;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+
+
+
+
+
+
+
+
+    /* 新增保存配置按钮样式 */
+    .save-origin-btn {
+      padding: 8px 15px;
+      background: #4a6fa5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+
+    }
+
+    .save-origin-btn.active {
+      background: #dc3545;
+    }
+
+    .save-origin-cursor {
+      cursor: crosshair;
+    }
+    .origin-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background-color: red;
+      border-radius: 50%;
+      z-index: 15;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    }
+
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .component-list {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .component-item {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .component-item:hover {
+      border-color: #4b6cb7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .component-item.active {
+      border-color: #28a745;
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .component-info {
+      flex: 1;
+    }
+
+    .designator {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #4b6cb7;
+      margin-bottom: 5px;
+    }
+
+
+
+    .pdf-att{
+      font-size: 0.8rem;
+      color: #6c757d;
+      word-break: break-all;
+    }
+
+    .layer {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-left: 10px;
+    }
+
+
+    /* 新增：搜索框样式 */
+    .pdf-search-container {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 25%;
+    }
+
+    .pdf-search-input {
+      width: 70%;
+      padding: 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .pdf-search-btn {
+      padding: 8px 15px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .pdf-search-results {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .component-list {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .component-item {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .component-item:hover {
+      border-color: #4b6cb7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .component-item.active {
+      border-color: #28a745;
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .component-info {
+      flex: 1;
+    }
+
+    .designator {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #4b6cb7;
+      margin-bottom: 5px;
+      word-break: break-all;
+    }
+    .pdf-name {
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: green;
+      margin-bottom: 5px;
+      word-break: break-all;
+    }
+    .coordinates {
+      font-size: 0.8rem;
+      color: black;
+    }
+
+    .layer {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-left: 10px;
+    }
+
+    .status-found {
+      background-color: #28a745;
+    }
+
+    .status-not-found {
+      background-color: #dc3545;
+    }
+    .component-item.selected .selection-indicator {
+      background: #4CAF50;
+      border-color: #4CAF50;
+    }
+
+    .component-item.selected .selection-indicator::after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .selection-indicator {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ddd;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .component-item.selected {
+      border-color: #4CAF50;
+      background: linear-gradient(135deg, #f8fff8, #f0fff0);
+      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+    }
+    .control-group input[type="range"] {
+      flex: 1;
+    }
+
+
+
+
+
+
+
+    /* 简单按钮样式 */
+    .simple-btn {
+      padding: 8px 15px;
+      background: #4a6fa5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-left: 10px;
+    }
+
+    .simple-btn.active {
+      background: #dc3545;
+    }
+
+    /* 点标记样式 - 简化版 */
+    .point-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background-color: #ff4757;
+      border-radius: 50%;
+      z-index: 100; /* 提高z-index，确保在最上层 */
+      transform: translate(-50%, -50%);
+      border: 2px solid white;
+      box-shadow: 0 0 4px rgba(0,0,0,0.5);
+      font-size: 8px;
+      text-align: center;
+      line-height: 12px;
+      color: white;
+      font-weight: bold;
+      pointer-events: none; /* 防止干扰点击事件 */
+    }
+
+    .region-line {
+      position: absolute;
+      background-color: rgba(255, 71, 87, 0.7);
+      height: 2px;
+      z-index: 99;
+      pointer-events: none; /* 防止干扰点击事件 */
+      transform-origin: 0 0;
+    }
+
+    .region-area {
+      position: absolute;
+      /*background-color: rgba(74, 111, 165, 0.3);*/
+      border: 2px solid #4a6fa5;
+      z-index: 98;
+      pointer-events: none; /* 防止干扰点击事件 */
+    }
+
+
+  /*  找到0个禁用*/
+    .component-item {
+      cursor: pointer;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      transition: all 0.2s;
+      background-color: white;
+    }
+
+    .component-item:hover:not(.disabled) {
+      background-color: #f5f5f5;
+      border-color: #007bff;
+    }
+
+    .component-item.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+      background-color: #f8f9fa;
+      border-color: #e9ecef;
+    }
+
+    .component-item.selected {
+      background-color: #e3f2fd;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .component-item.disabled .pdf-name {
+      color: #6c757d;
+    }
+
+    .component-item.disabled .coordinates {
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header-row" id="titleContent">
+    <div id="name" class="header-col" style="width: 20%;">物料名</div>
+    <div id="material_number" class="header-col" style="width: 20%;">物料号</div>
+    <div id="number" class="header-col" style="width: 10%;">数量</div>
+    <div id="part_number" class="header-col" style="width: 25%;">零件号</div>
+    <div id="notes" class="header-col" style="width: 25%;">备注</div>
+    <!--        <div class="header-col" style="width: 5%;">操作</div>-->
+  </div>
+
+  <div class="bom-content" id="bomContent">
+    <!--        <div class="data-row" draggable="true">-->
+    <!--            <div class="row-content">-->
+    <!--                <div class="row-col" style="width: 20%;">-->
+    <!--                    <b>STM32F107RCT6</b>-->
+    <!--                </div>-->
+    <!--                <div class="row-col" style="width: 20%;">-->
+    <!--                    <b>109040451332350Q03</b>-->
+    <!--                </div>-->
+    <!--                <div class="row-col" style="width:10%;">-->
+    <!--                    <input type="text" disabled>-->
+    <!--                </div>-->
+    <!--                <div class="row-col" style="width: 25%;">-->
+    <!--                    <div >123</div>-->
+    <!--                </div>-->
+    <!--                <div class="row-col" style="width: 25%;">-->
+    <!--                    <div >52525</div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--            <div class="attr-content">-->
+    <!--                封装: LQFP; 管脚数: 64; 品牌: STMICROELECTRONICS; 核心: ARM Cortex M3; 数据总线宽度: 32 bit;-->
+    <!--            </div>-->
+    <!--        </div>-->
+
+    <!--        <div class="data-row" draggable="true">-->
+    <!--            <div class="row-content">-->
+    <!--                <div class="row-col" style="width: 20%;">-->
+    <!--                    <b>电阻 10KΩ</b>-->
+    <!--                </div>-->
+    <!--                <div class="row-col" style="width: 20%;">-->
+    <!--                    <b>RES-001-10K</b>-->
+    <!--                </div>-->
+    <!--                <div class="row-col" style="width: 10%;">-->
+    <!--                    <input type="text" disabled>-->
+    <!--                </div>-->
+    <!--                <div class="row-col" style="width: 25%;">-->
+    <!--                    <div >R001</div>-->
+    <!--                </div>-->
+    <!--                <div class="row-col" style="width: 25%;">-->
+    <!--                    <div >0805封装</div>-->
+    <!--                </div>-->
+
+    <!--            </div>-->
+    <!--            <div class="attr-content">-->
+    <!--                类型: 贴片电阻; 容差: ±1%; 功率: 0.125W; 温度系数: ±100ppm/℃-->
+    <!--            </div>-->
+    <!--        </div>-->
+  </div>
+</div>
+
+
+<!-- 新增PDF查看器弹窗 -->
+<div class="pdf-modal" id="pdf-modal">
+  <div class="pdf-viewer-container">
+<!--    <div class="pdf-header">-->
+<!--      <div class="pdf-title">PDF文档查看器</div>-->
+      <button  class="close-pdf">&times;</button>
+<!--    </div>-->
+    <div class="pdf-content">
+      <div class="pdf-controls">
+        <h3>选择PDF文档</h3>
+        <select class="pdf-select" id="pdf-select">
+          <!-- PDF选项将在这里动态生成 -->
+        </select>
+
+<!--        <div id="password-input-group" style="display: none;">-->
+<!--          <h3>输入密码</h3>-->
+<!--          <input type="password" id="pdf-password" class="pdf-select" placeholder="输入PDF密码...">-->
+<!--          <div class="password-error" id="password-error" style="color: #e74c3c; margin-top: 5px; display: none;">-->
+<!--            密码错误，请重新输入-->
+<!--          </div>-->
+<!--        </div>-->
+
+
+
+        <div class="coordinate-list" id="coordinate-list">
+          <!-- 坐标列表将在这里动态生成 -->
+        </div>
+      </div>
+
+      <div class="pdf-canvas-container">
+        <canvas id="pdf-canvas"></canvas>
+        <!-- 新增坐标系和高亮点容器 -->
+        <div id="coordinate-overlay"></div>
+      </div>
+    </div>
+    <div class="pdf-toolbar" style="position: relative; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px;">
+      <!-- 所有按钮和输入框都保持原样 -->
+      <button class="pdf-btn" id="zoom-out">缩小</button>
+      <input style="border: none; min-width: 100px;" type="range" id="scale-slider" min="1" max="5" step="0.1" value="1.0">
+      <div class="value-display" id="zoom-value">1.50x</div>
+      <button class="pdf-btn" id="zoom-in">放大</button>
+      <button class="pdf-btn" id="location-pdf">定位</button>
+      <button class="pdf-btn" id="prev-page" style="display: none">上一页</button>
+      <button class="pdf-btn" id="next-page" style="display: none">下一页</button>
+      <button class="pdf-btn" id="open-pdf">打开PDF</button>
+      <button class="pdf-btn" id="close-pdf">关闭</button>
+      <button class="pdf-btn" id="close-highlight-label">隐藏标签</button>
+
+      <!-- 搜索结果和搜索容器也需要调整 -->
+      <div class="pdf-search-results" id="pdf-search-results" style="margin-top: 8px;">
+
+      </div>
+
+      <div class="pdf-search-container" style="order: 1; flex: 1 1 auto; min-width: 200px; max-width: 300px;">
+        <input type="text" class="pdf-search-input" id="pdf-search-input"
+               placeholder="输入零件号 (如: U15 等进行搜索)"
+               style="width: 100%;">
+      </div>
+    </div>
+<!--    <div class="pdf-toolbar" style="position: relative">-->
+
+<!--      <button class="pdf-btn" id="zoom-out">缩小</button>-->
+<!--      <input style="border: none" type="range" id="scale-slider" min="1" max="5" step="0.1" value="1.0">-->
+<!--      <div class="value-display" id="zoom-value">1.5x</div>-->
+<!--      <button class="pdf-btn" id="zoom-in">放大</button>-->
+<!--      <button class="pdf-btn" id="location-pdf">定位</button>-->
+<!--      <button class="pdf-btn" id="prev-page" style="display: none">上一页</button>-->
+<!--      <button class="pdf-btn" id="next-page" style="display: none">下一页</button>-->
+<!--      <button class="pdf-btn" id="open-pdf">打开PDF</button>-->
+<!--      <button class="pdf-btn" id="close-pdf">关闭</button>-->
+<!--      <button class="pdf-btn" id="close-highlight-label">隐藏标签</button>-->
+<!--      <div class="pdf-search-results" id="pdf-search-results" style="position: absolute; right: 30%"></div>-->
+<!--      &lt;!&ndash; 新增：搜索功能 &ndash;&gt;-->
+<!--      <div class="pdf-search-container" style="position: absolute; right: 10px" >-->
+<!--        <input type="text" class="pdf-search-input" id="pdf-search-input" placeholder="输入零件号 (如: U15 等进行搜索)">-->
+
+
+<!--      </div>-->
+
+<!--    </div>-->
+  </div>
+</div>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+  function closeHighLabel(){
+    let element = document.querySelectorAll(".highlight-label");
+    if (element.length>0){
+      let button = document.getElementById("close-highlight-label");
+      if (button.innerHTML==="隐藏标签"){
+
+        for (let i = 0; i < element.length; i++) {
+          element[i].style.display="";
+
+        }
+      }
+      else {
+
+
+        for (let i = 0; i < element.length; i++) {
+          element[i].style.display="none";
+
+        }
+      }
+
+
+
+
+    }
+
+  }
+
+  document.getElementById("close-highlight-label").onclick=function (){
+    let element = document.querySelectorAll(".highlight-label");
+    if (element.length>0){
+      let button = document.getElementById("close-highlight-label");
+      if (button.innerHTML==="隐藏标签"){
+        button.innerHTML="显示标签";
+        for (let i = 0; i < element.length; i++) {
+          element[i].style.display="none";
+
+        }
+      }
+      else {
+        button.innerHTML="隐藏标签";
+
+        for (let i = 0; i < element.length; i++) {
+          element[i].style.display="";
+
+        }
+      }
+
+
+
+
+    }
+    else {
+      alert("请打开pdf后再试！")
+    }
+
+
+  }
+
+
+
+  //设置整体的数据
+  let allData=[];
+
+
+  // 展开范围项的函数
+  function expandRangesInString(input) {
+    const rangePattern = /([A-Za-z]+)(\d+)-([A-Za-z]+)(\d+)/g;
+
+    return input.replace(rangePattern, (match, prefix1, startStr, prefix2, endStr) => {
+      // 检查前缀是否相同（不区分大小写）
+      if (prefix1.toLowerCase() !== prefix2.toLowerCase()) {
+        return match;
+      }
+
+      const prefix = prefix1;
+      const start = parseInt(startStr, 10);
+      const end = parseInt(endStr, 10);
+
+      // 处理起始大于结束的情况
+      if (start > end) {
+        return match;
+      }
+
+      // 生成展开的序列
+      const items = [];
+      for (let i = start; i <= end; i++) {
+        // 保持数字的位数与起始数字一致（如01, 02, ...）
+        const numStr = i.toString().padStart(startStr.length, '0');
+        items.push(prefix + numStr);
+      }
+
+      return items.join(' ');
+    });
+  }
+
+  // 简化乘法项的函数
+  function simplifyMultipliersInString(input) {
+    const multiplierPattern = /([A-Za-z]+\d+)\s*\*\s*\d+/g;
+
+    return input.replace(multiplierPattern, (match, item) => {
+      return item;
+    });
+  }
+
+  // 去除逗号并用空格分隔的函数
+  function removeCommasAndNormalizeSpaces(input) {
+    // 先替换逗号为空格
+    let result = input.replace(/,/g, ' ');
+    // 然后将多个连续空格替换为一个空格
+    result = result.replace(/\s+/g, ' ').trim();
+    return result;
+  }
+
+  // 分割为数据项的函数，返回数组
+  function splitIntoDataItems(input) {
+    // 使用空格分割字符串
+    const items = input.split(/\s+/);
+
+    // 过滤空字符串
+    const filteredItems = items.filter(item => item.length > 0);
+
+    return filteredItems; // 返回数组
+  }
+
+  // 主处理函数，返回数组
+  function processAllItems(input, options = {}) {
+    const { expandRanges = false, removeMultipliers = false } = options;
+
+    let result = input;
+
+    if (expandRanges) {
+      result = expandRangesInString(result);
+    }
+
+    if (removeMultipliers) {
+      result = simplifyMultipliersInString(result);
+    }
+
+    // 无论是否进行其他处理，都去除逗号并用空格分隔
+    result = removeCommasAndNormalizeSpaces(result);
+
+    // 最后将结果分割为数据项并返回数组
+    result = splitIntoDataItems(result);
+
+    return result; // 返回数组
+  }
+
+  // 格式化数组显示的函数
+  // function formatArrayForDisplay(arr) {
+  //   return '[' + arr.map(item => `"${item}"`).join(', ') + ']';
+  // }
+
+
+
+  // 全部处理
+  function processAll(str) {
+
+
+    const resultArray = processAllItems(str, { expandRanges: true, removeMultipliers: true });
+    // 控制台输出数组，便于调试
+
+    return resultArray;
+
+
+  }
+
+
+
+
+
+  //接收上个页面传来的参数
+
+  function getHref(){
+    var url = decodeURI(location.search);
+    var theRequest = {};
+    if (url.indexOf("?") !== -1) {
+      var str = url.substr(1);
+      strs = str.split("&");
+      for(var i = 0; i < strs.length; i ++) {
+        theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+      }
+    }
+    return theRequest;
+  }
+
+  //用法  var 自己变量名字 = getHref().要获取的参数名字
+  var finId=getHref().finId;
+  var bomTitleId=getHref().bomTitleId;
+  let bomvault = getHref().vault;
+  let myBrather =  getHref().myBrather;
+
+  let localName="orderBy"+myBrather+""
+  //创建一个保存函数
+  var save = function (arr) {
+
+    // let b=JSON.stringify(arr)
+    // localStorage.setItem(localName,b);
+
+    //调用axios进行保存数据
+    axios({
+      method:"post",
+      url:"userSetting/addSetting?sort=bom&infoHead="+localName+"",
+      data:arr
+    }).then(function (resp){
+      if (resp.data!=="success"){
+        alert("用户配置保存失败，请联系相关人员！")
+      }
+    })
+  }
+
+
+  //收集数据储存在本地
+  function saveLocation(){
+
+
+
+    let header = document.querySelectorAll(".header-col");
+    let list=[header.length];
+
+    for (let i = 0; i < header.length; i++) {
+      let formdata={
+        orderBy:"",
+        name:"",
+        width:"",
+        chName:""
+      }
+      formdata={
+        orderBy:i,
+        name:header[i].id,
+        width:header[i].style.width,
+        chName:header[i].innerHTML
+      }
+      list[i]=formdata;
+      formdata={
+        orderBy:"",
+        name:"",
+        width:"",
+        chName:""
+      }
+    }
+    console.log(list)
+    save(list);
+  }
+
+  let bratherData;
+  //读取数据
+  axios({
+    method:"post",
+    url:"userSetting/selectSetting?sort=bom&infoHead="+localName+""
+  }).then(function (resp){
+    bratherData=resp.data;
+    if (bratherData!==null && bratherData.length>0){
+      let title="";
+      for (let i = 0; i < bratherData.length; i++) {
+        title+=' <div id='+bratherData[i].name+' class="header-col" style="width: '+bratherData[i].width+';">'+bratherData[i].chName+'</div>'
+      }
+      document.getElementById("titleContent").innerHTML=title;
+    }
+    console.log(bratherData)
+  })
+  // let bratherData = JSON.parse(localStorage.getItem(localName));//把本地存储的my转成数组
+
+
+
+
+
+  function move(){
+    // 表头拖动功能
+    const headerRow = document.querySelector('.header-row');
+    const headerCols = Array.from(headerRow.children);
+    const dataRows = Array.from(document.querySelectorAll('.data-row'));
+    const rowContents = Array.from(document.querySelectorAll('.row-content'));
+
+    let draggedHeader = null;
+    let draggedRow = null;
+
+    // 初始化表头拖动事件
+    headerCols.forEach(col => {
+      col.draggable = true;
+      col.addEventListener('dragstart', handleHeaderDragStart);
+      col.addEventListener('dragover', handleHeaderDragOver);
+      col.addEventListener('dragenter', handleHeaderDragEnter);
+      col.addEventListener('dragleave', handleHeaderDragLeave);
+      col.addEventListener('drop', handleHeaderDrop);
+      col.addEventListener('dragend', handleHeaderDragEnd);
+    });
+
+    // 初始化数据行拖动事件
+    dataRows.forEach(row => {
+      row.addEventListener('dragstart', handleRowDragStart);
+      row.addEventListener('dragover', handleRowDragOver);
+      row.addEventListener('dragenter', handleRowDragEnter);
+      row.addEventListener('dragleave', handleRowDragLeave);
+      row.addEventListener('drop', handleRowDrop);
+      row.addEventListener('dragend', handleRowDragEnd);
+    });
+
+
+    // 表头拖动处理函数
+    function handleHeaderDragStart(e) {
+      draggedHeader = this;
+      e.dataTransfer.effectAllowed = 'move';
+      this.classList.add('dragging');
+      setTimeout(() => this.style.opacity = '0.6', 0);
+    }
+
+    function handleHeaderDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+
+    function handleHeaderDragEnter(e) {
+      this.classList.add('over');
+    }
+
+    function handleHeaderDragLeave() {
+      this.classList.remove('over');
+    }
+
+    function handleHeaderDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (draggedHeader !== this) {
+        const allHeaders = Array.from(headerRow.children);
+        const draggedIdx = allHeaders.indexOf(draggedHeader);
+        const targetIdx = allHeaders.indexOf(this);
+
+        // 移动表头列
+        if (draggedIdx < targetIdx) {
+          headerRow.insertBefore(draggedHeader, this.nextSibling);
+        } else {
+          headerRow.insertBefore(draggedHeader, this);
+        }
+
+        // 同步移动所有数据行的对应列
+        rowContents.forEach(content => {
+          const contentChildren = Array.from(content.children);
+          if (contentChildren.length > Math.max(draggedIdx, targetIdx)) {
+            const draggedCol = contentChildren[draggedIdx];
+            const targetCol = contentChildren[targetIdx];
+
+            if (draggedIdx < targetIdx) {
+              content.insertBefore(draggedCol, targetCol.nextSibling);
+            } else {
+              content.insertBefore(draggedCol, targetCol);
+            }
+          }
+        });
+      }
+
+      this.classList.remove('over');
+      return false;
+    }
+
+    function handleHeaderDragEnd() {
+      this.classList.remove('dragging');
+      this.style.opacity = '1';
+      headerCols.forEach(col => col.classList.remove('over'));
+      saveLocation();
+    }
+
+    // 数据行拖动处理函数
+    function handleRowDragStart(e) {
+      draggedRow = this;
+      e.dataTransfer.effectAllowed = 'move';
+      this.classList.add('dragging');
+      setTimeout(() => this.style.opacity = '0.6', 0);
+    }
+
+    function handleRowDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+
+    function handleRowDragEnter(e) {
+      if (this !== draggedRow) {
+        this.classList.add('over');
+      }
+    }
+
+    function handleRowDragLeave() {
+      this.classList.remove('over');
+    }
+
+    function handleRowDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (this !== draggedRow) {
+        const bomContent = document.getElementById('bomContent');
+        const allRows = Array.from(bomContent.children);
+        const draggedIndex = allRows.indexOf(draggedRow);
+        const targetIndex = allRows.indexOf(this);
+
+        if (draggedIndex < targetIndex) {
+          bomContent.insertBefore(draggedRow, this.nextSibling);
+        } else {
+          bomContent.insertBefore(draggedRow, this);
+        }
+      }
+
+      this.classList.remove('over');
+      return false;
+    }
+
+    function handleRowDragEnd() {
+      this.classList.remove('dragging');
+      this.style.opacity = '1';
+      dataRows.forEach(row => row.classList.remove('over'));
+
+    }
+
+    // ===== 新增：列拖动功能 =====
+    // 初始化列拖动事件
+    const rowCols = Array.from(document.querySelectorAll('.row-col'));
+    rowCols.forEach(col => {
+      col.draggable = true;
+      col.addEventListener('dragstart', handleColDragStart);
+      col.addEventListener('dragover', handleColDragOver);
+      col.addEventListener('dragenter', handleColDragEnter);
+      col.addEventListener('dragleave', handleColDragLeave);
+      col.addEventListener('drop', handleColDrop);
+      col.addEventListener('dragend', handleColDragEnd);
+    });
+
+    let draggedCol = null;
+    let placeholder = null;
+
+    // 列拖动处理函数
+    function handleColDragStart(e) {
+      draggedCol = this;
+      e.dataTransfer.effectAllowed = 'move';
+      this.classList.add('dragging');
+      setTimeout(() => this.style.opacity = '0.6', 0);
+    }
+
+    function handleColDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+
+      // 创建占位符
+      if (!placeholder) {
+        placeholder = document.createElement('div');
+        placeholder.className = 'placeholder-col';
+        placeholder.style.width = `${draggedCol.offsetWidth}px`;
+        placeholder.style.height = `${draggedCol.offsetHeight}px`;
+
+        // 插入占位符
+        if (this !== draggedCol) {
+          const rect = this.getBoundingClientRect();
+          const isAfter = e.clientX > rect.left + rect.width / 2;
+
+          if (isAfter) {
+            this.parentNode.insertBefore(placeholder, this.nextSibling);
+          } else {
+            this.parentNode.insertBefore(placeholder, this);
+          }
+        }
+      }
+
+      return false;
+    }
+
+    function handleColDragEnter(e) {
+      if (this !== draggedCol) {
+        this.classList.add('over');
+      }
+    }
+
+    function handleColDragLeave() {
+      this.classList.remove('over');
+
+      // 移除占位符
+      if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.removeChild(placeholder);
+        placeholder = null;
+      }
+    }
+
+    function handleColDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (this !== draggedCol && placeholder) {
+        // 移除占位符
+        placeholder.parentNode.removeChild(placeholder);
+        placeholder = null;
+
+        // 移动列
+        this.parentNode.insertBefore(draggedCol, this);
+
+        // 更新表头列顺序
+        updateHeaderOrder();
+
+
+      }
+
+
+      this.classList.remove('over');
+      return false;
+    }
+
+    function handleColDragEnd() {
+      this.classList.remove('dragging');
+      this.style.opacity = '1';
+      rowCols.forEach(col => col.classList.remove('over'));
+
+      // 移除占位符
+      if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.removeChild(placeholder);
+        placeholder = null;
+      }
+
+
+    }
+
+    // 更新表头列顺序
+    function updateHeaderOrder() {
+      const firstRow = document.querySelector('.row-content');
+      if (!firstRow) return;
+
+      const rowCols = Array.from(firstRow.children);
+      const headerCols = Array.from(headerRow.children);
+
+      // 移除表头列
+      headerCols.forEach(col => headerRow.removeChild(col));
+
+      // 重新添加表头列（按数据列顺序）
+      rowCols.forEach((col, index) => {
+        if (index < headerCols.length) {
+          headerRow.appendChild(headerCols[index]);
+        }
+      });
+
+    }
+
+
+  }
+
+
+  //暂时关闭展开功能
+
+
+
+  //查询该物料是否有BOM表的数据
+
+ axios({
+    method:"post",
+    url:"finBom/selectByPage",
+    data:bomTitleId
+  }).then(async function (resp)
+  {
+    let rows=resp.data.rows;
+    // document.getElementById("productNumber").innerHTML=resp.data.totalCount;
+    let formdata="";
+    if (rows.length>0){
+      let allPoint="";
+
+
+      for (let i = 0; i < rows.length; i++) {
+        allPoint+=rows[i].part_number+" "  ;
+        let dataIn={
+          name:rows[i].name,
+          materialNumber:rows[i].material_number,
+          partNumber:rows[i].part_number,
+          attributeContent:""
+        }
+        allData.push(dataIn);
+        let orderData='';
+
+
+        if (bratherData!==null && bratherData.length>0){
+          for (let j = 0; j < bratherData.length; j++) {
+            orderData+=  '<div class="row-col" style="width:'+bratherData[j].width+'">\n' +
+                    '              <b class='+bratherData[j].name+'>'+rows[i][bratherData[j].name]+'</b>\n' +
+                    '         </div>\n'
+          }
+          formdata+=' <div class="data-row" draggable="true">\n' +
+                  '<div class="vault" style="display: none">'+rows[i].vault+'</div>' +
+                  '<div class="idValue" style="margin: auto;align-self: center;width: fit-content;height: auto;display: none">'+rows[i].productId+'</div>' +
+                  '<div class="inBo" style="display: none">'+rows[i].id+'</div>' +
+                  '            <div class="row-content">'+orderData+'</div>\n' +
+                  '            <div class="attr-content attributeContent" >\n' +
+
+                  '            </div>\n' +
+                  '        </div>'
+        }
+        else {
+          formdata+=' <div class="data-row" draggable="true">\n' +
+                  '<div class="vault" style="display: none">'+rows[i].vault+'</div>' +
+                  '<div class="idValue" style="margin: auto;align-self: center;width: fit-content;height: auto;display: none">'+rows[i].productId+'</div>' +
+                  '<div class="inBo" style="display: none">'+rows[i].id+'</div>' +
+                  '            <div class="row-content">\n' +
+                  '                <div class="row-col" style="width: 20%;">\n' +
+                  '                    <b>'+rows[i].name+'</b>\n' +
+                  '                </div>\n' +
+                  '                <div class="row-col" style="width: 20%;">\n' +
+                  '                    <b class="material-number">'+rows[i].material_number+'</b>\n' +
+                  '                </div>\n' +
+                  '                <div class="row-col" style="width:10%;">\n' +
+                  '                   <b>'+rows[i].number+'</b>\n' +
+                  '                </div>\n' +
+                  '                <div class="row-col" style="width: 25%;">\n' +
+                  '                    <div class="part_number" >'+rows[i].part_number+'</div>\n' +
+                  '                </div>\n' +
+                  '                <div class="row-col" style="width: 25%;">\n' +
+                  '                    <div >'+rows[i].notes+'</div>\n' +
+                  '                </div>\n' +
+                  '                <div class="row-col" style="width: 5%;display: none">\n' +
+                  '                        <input type="checkbox" class="zk" title="展开该产品下的零件信息">' +
+                  '                    </div>\n'+
+                  '                </div>\n' +
+                  '            <div class="attr-content attributeContent" >\n' +
+                  '            </div>\n' +
+                  '        </div>'
+        }
+
+        // if(Number(rows[i].vault)===1){
+        //
+        //
+        // }
+        // else {
+        //
+        //
+        // }
+
+      }
+      document.getElementById("bomContent").innerHTML=formdata;
+      await PDF(allPoint);
+      //查询BOM表的属性信息
+      await axios({
+        method:"post",
+        url:"finBom/selectAttribute",
+        data:bomTitleId
+      }).then(function (resp){
+        let datas=resp.data;
+        let atts = document.querySelectorAll(".attributeContent");
+        for (let i = 0; i <rows.length ; i++) {
+          let formdata="";
+          let formdataNone=""
+          for (let j = 0; j < datas.length; j++) {
+            if (rows[i].productId===datas[j].productId && rows[i].vault ===datas[j].vault && datas[j].attributeName !=='存放位置'){
+              formdata+='<span style="margin-left: 10px;width: fit-content;" class='+datas[j].attributeName+datas[j].nameId+'>'+datas[j].attributeName+':'+datas[j].content+''+datas[j].attributeNameUnit+'</span>'
+              formdataNone+='<span style="margin-left: 10px;width: fit-content;display: none" class='+datas[j].attributeName+datas[j].nameId+'>'+datas[j].attributeName+':'+datas[j].content+''+datas[j].attributeNameUnit+'</span>'
+
+            }
+          }
+          allData[i].attributeContent = formdataNone;
+          atts[i].innerHTML=formdata;
+        }
+        //拖动
+        move();
+
+
+      })
+
+      let numbers = document.querySelectorAll(".idValueNumber");
+      let updates = document.querySelectorAll(".update");
+      let partNumbers = document.querySelectorAll(".partNumbers");
+      let notes = document.querySelectorAll(".notes");
+      for (let i = 0; i < numbers.length; i++) {
+        numbers[i].onchange = function () {
+
+          let value = numbers[i].value;
+          if (value.length > 0) {
+            if (Number(value) !== Number(rows[i].number)) {
+              updates[i].innerHTML = "<div class='updateSign'></div>";
+            } else {
+              updates[i].innerHTML = "";
+            }
+
+          }
+
+        }
+        partNumbers[i].onchange=function (){
+
+          let value = partNumbers[i].value;
+
+          if (value.length > 0) {
+
+            if (value !== rows[i].partNumbers) {
+
+              updates[i].innerHTML = "<div class='updateSign'></div>";
+            } else {
+
+              updates[i].innerHTML = "";
+            }
+
+          }
+        }
+        notes[i].onchange=function (){
+
+          let value = notes[i].value;
+
+          if (value.length > 0) {
+
+            if (value !== rows[i].notes) {
+
+              updates[i].innerHTML = "<div class='updateSign'></div>";
+            } else {
+
+              updates[i].innerHTML = "";
+            }
+
+          }
+        }
+
+      }
+      // submitButton();
+
+      //暂时屏蔽展开功能
+      // zkFunction();
+
+    }
+    else {
+      document.getElementById("bomContent").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">暂未添加BOM表信息!</div>'
+    }
+  })
+
+
+
+
+
+  let currentExcelId=0;
+
+
+  //  ========== 新增文件管理功能 ==========
+  // 文件管理相关变量
+  let uploadedFiles = [];
+  let currentMaterial = '';
+  let highlightPoints = [];
+  // ========== 四个点区域管理 ==========
+  let fourPoints = []; // 存储4个点的PDF坐标
+  let isSelectingPoints = false; // 是否正在选择点
+  let pointMarkers = []; // 点标记DOM元素
+  let regionLines = []; // 区域线DOM元素
+  let regionArea = null; // 区域DOM元素
+  let originalCursor = 'default'; // 保存原始光标样式
+  // 文件管理功能
+  async function initFileManagement() {
+
+    uploadedFiles = await selectpdf();
+
+    const fileList = document.getElementById('file-list');
+
+
+
+
+
+
+
+    // 更新PDF选择下拉框
+    function updatePdfSelect() {
+      const pdfSelect = document.getElementById('pdf-select');
+      pdfSelect.innerHTML = '';
+
+      const pdfFiles = uploadedFiles.filter(f => f.type === '.pdf');
+
+      pdfFiles.forEach(pdfFile => {
+        const option = document.createElement('option');
+        option.value = pdfFile.name;
+        option.textContent = `${pdfFile.name} ${pdfFile.paired ? '(已配对Excel)' : ''}`;
+        option.dataset.url = pdfFile.url;
+        pdfSelect.appendChild(option);
+      });
+    }
+
+
+
+    updatePdfSelect();
+
+    return {
+      getPdfUrl: function (pdfName) {
+        const pdfFile = uploadedFiles.find(f => f.name === pdfName && f.type === '.pdf');
+        return pdfFile ? pdfFile : null;
+      }
+    };
+  }
+
+  async function selectpdfById(id) {
+    let s = "";
+    await axios({
+      method: "post",
+      url: "pdfExcel/selectpdfById",
+      data: id
+    }).then(function (resp) {
+      s = resp.data;
+    })
+
+    return s;
+  }
+  //f查询已经存在的pdf文件
+  async function selectpdf() {
+    let s = "";
+    await axios({
+      method: "post",
+      url: "pdfExcel/selectPdf",
+      data: bomTitleId
+    }).then(function (resp) {
+      s = resp.data;
+
+
+    })
+
+    return s;
+  }
+
+  async function selectExcel(id) {
+    let s = "";
+    //查询是否已经配对，如果配对返回配对文件路径
+    await axios({
+      method:"post",
+      url:"pdfExcel/selectExcelUrlByPdfId",
+      data:id
+    }).then(function (resp){
+
+      if (resp.data.length>0){
+        //已经配对
+        s = resp.data;
+        currentExcelId=id;
+      }
+
+    })
+
+    return s;
+  }
+
+
+  // 判断点是否在三角形内
+  function isPointInTriangle(px, py, p1, p2, p3) {
+    // 计算三角形面积
+    const area = Math.abs(
+            (p2.pdfX - p1.pdfX) * (p3.pdfY - p1.pdfY) -
+            (p3.pdfX - p1.pdfX) * (p2.pdfY - p1.pdfY)
+    ) / 2;
+
+    if (area === 0) return false;
+
+    // 计算子三角形面积
+    const area1 = Math.abs(
+            (p1.pdfX - px) * (p2.pdfY - py) -
+            (p2.pdfX - px) * (p1.pdfY - py)
+    ) / 2;
+
+    const area2 = Math.abs(
+            (p2.pdfX - px) * (p3.pdfY - py) -
+            (p3.pdfX - px) * (p2.pdfY - py)
+    ) / 2;
+
+    const area3 = Math.abs(
+            (p3.pdfX - px) * (p1.pdfY - py) -
+            (p1.pdfX - px) * (p3.pdfY - py)
+    ) / 2;
+
+    // 如果三个子三角形面积之和等于原三角形面积，则点在三角形内
+    return Math.abs(area1 + area2 + area3 - area) < 0.0001;
+  }
+  // 判断点是否在四边形内
+  function isPointInQuadrilateral(point, quadPoints) {
+    if (!point || !quadPoints || quadPoints.length !== 4) return true;
+
+    const x = parseFloat(point['Mid X']);
+    const y = parseFloat(point['Mid Y']);
+
+    // 将四边形分解为两个三角形
+    const triangles = [
+      [quadPoints[0], quadPoints[1], quadPoints[2]],
+      [quadPoints[0], quadPoints[2], quadPoints[3]]
+    ];
+
+    // 检查点是否在任一三角形内
+    for (const triangle of triangles) {
+      if (isPointInTriangle(x, y, triangle[0], triangle[1], triangle[2])) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // 使用四个点过滤高亮点
+  function filterPointsByQuadrilateral(points) {
+    console.log("在测试"+fourPoints)
+    if (!fourPoints || fourPoints.length !== 4) return points;
+
+    // 将fourPoints转换为只包含PDF坐标的数组
+    const quadPoints = fourPoints.map(p => ({
+      pdfX: p.pdfX,
+      pdfY: p.pdfY
+    }));
+
+    const filteredPoints = points.filter(point =>
+            isPointInQuadrilateral(point, quadPoints)
+    );
+
+    return filteredPoints;
+  }
+  // ========== 新增PDF查看功能 ==========
+
+  // 查询Excel数据
+  function queryExcelData(partNumbers) {
+
+    highlightPoints = filterPointsByQuadrilateral(highlightPoints);
+
+    const results = [];
+    const notFound = [];
+
+    partNumbers.forEach(part => {
+      const found = highlightPoints.find(item =>
+              item.Designator.toUpperCase() === part.toUpperCase()
+      );
+
+      if (found) {
+        results.push({
+          ...found,
+          status: 'found'
+        });
+      }
+
+      else {
+        notFound.push(part);
+        results.push({
+          Designator: part,
+          'Mid X': '未找到',
+          'Mid Y': '未找到',
+          Layer: '未找到',
+          status: 'not found'
+        });
+      }
+    });
+
+    return {
+      results,
+      stats: {
+        total: partNumbers.length,
+        found: results.filter(r => r.status === 'found').length,
+        notFound: notFound.length,
+        notFoundItems: notFound,
+        matchRate: ((results.filter(r => r.status === 'found').length / partNumbers.length) * 100).toFixed(1) + '%'
+      }
+    };
+  }
+
+
+  // 状态存储和加载函数
+  function getPDFIdentifier() {
+    // 使用PDF文件名、路径或其他唯一标识符
+    // 这里假设您有一个全局变量存储PDF文件名
+    if (typeof pdfFileName !== 'undefined') {
+      return pdfFileName;
+    }
+
+    // 尝试从页面标题获取
+    const title = document.title || '';
+    if (title.includes('.pdf') || title.includes('PDF')) {
+      return title;
+    }
+
+    // 如果都没有，使用默认标识符
+    return 'default_pdf';
+  }
+
+  // 选择1: 简单的内存存储
+  let allPDFStatuses = {};  // 全局变量存储所有PDF状态
+
+  function saveStatusToStorage() {
+    const pdfId = getPDFIdentifier();
+    allPDFStatuses[pdfId] = itemStatus;
+  }
+
+  function loadStatusFromStorage() {
+    const pdfId = getPDFIdentifier();
+    itemStatus = allPDFStatuses[pdfId] || {};
+  }
+
+
+  // 根据状态数据更新物料项显示
+  function updateItemDisplayByStatus() {
+    // 遍历所有物料项
+
+    document.querySelectorAll('.component-item').forEach((itemElement, index) => {
+
+      const status = itemStatus[index];
+
+      // 清除所有状态类
+      itemElement.classList.remove('status-completed', 'status-missing', 'status-partial');
+
+      // 清除所有状态标签
+      const oldBadge = itemElement.querySelector('.status-badge');
+      if (oldBadge) {
+        oldBadge.remove();
+      }
+
+      // 如果有状态，重新应用
+      if (status === STATUS.COMPLETED || status === STATUS.MISSING || status === STATUS.PARTIAL) {
+        itemElement.classList.add(`status-${status}`);
+
+        // 添加状态标签
+        const badge = document.createElement('span');
+        badge.className = `status-badge ${status}`;
+        badge.textContent = statusDisplayText[status];
+        itemElement.appendChild(badge);
+      }
+    });
+
+    console.log('状态显示已刷新，当前状态数据:', itemStatus);
+  }
+  //高亮坐标数据
+
+  // 添加状态存储对象（前端临时存储）
+  let itemStatus = {};
+
+  let currentPDFName = ''; // 用于标识当前PDF文件
+ let  pdfFileName='';//全局pdf变量名
+  // 状态常量
+  // 状态常量定义
+  const STATUS = {
+    COMPLETED: 'completed',
+    MISSING: 'missing',
+    PARTIAL: 'partial',  // 新增：单面完成
+    NONE: 'none'
+  };
+  // 状态显示文本映射
+  const statusDisplayText = {
+    [STATUS.COMPLETED]: '已完成',
+    [STATUS.MISSING]: '缺料',
+    [STATUS.PARTIAL]: '单面完成'
+  };
+  async function PDF(allP) {
+    let returnData = processAll(allP);
+// 初始化PDF.js
+    try {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/http_cdnjs.cloudflare.com_ajax_libs_pdf.js_3.4.120_pdf.worker.js';
+    } catch (e) {
+      console.error('Worker加载失败:', e);
+      pdfjsLib.disableWorker = true;
+    }
+    // PDF查看器变量
+    let pdfDoc = null;
+    let pageNum = 1;
+    let pageRendering = false;
+    let pageNumPending = null;
+    let scale = 1.5;
+    let highlightElements = [];
+    let currentMaterial = '';
+    let currentCoordinates = [];
+    let currentPdfUrl = '';
+    let currentPdfPassword = '';
+
+
+    // 获取DOM元素
+    const pdfModal = document.getElementById('pdf-modal');
+    const pdfCanvas = document.getElementById('pdf-canvas');
+    const closePdfBtn = document.querySelector('.close-pdf');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    let locationPdf = document.getElementById("location-pdf");
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const openPdfBtn = document.getElementById('open-pdf');
+    const closeBtn = document.getElementById('close-pdf');
+    const coordinateList = document.getElementById('coordinate-list');
+    const pdfSelect = document.getElementById('pdf-select');
+    // const pdfPassword = document.getElementById('pdf-password');
+    const passwordError = document.getElementById('password-error');
+    const passwordInputGroup = document.getElementById('password-input-group');
+
+    let pdfId=null;
+    // 新增：搜索相关元素
+    const pdfSearchInput = document.getElementById('pdf-search-input');
+    const pdfSearchResults = document.getElementById("pdf-search-results")
+
+
+    // 物料号点击事件
+    document.querySelectorAll('.part_number').forEach(link => {
+      link.addEventListener('click', function () {
+        //获取点击的零件号信息
+        currentMaterial = this.textContent;
+
+        openPdfViewer();
+
+        initFileManagement();
+
+
+      });
+    });
+
+    // 打开PDF查看器
+    function openPdfViewer() {
+      pdfModal.style.display = 'flex';
+
+    }
+
+    // 关闭PDF查看器
+    function closePdfViewer() {
+      pdfModal.style.display = 'none';
+      clearHighlights();
+      currentMaterial = '';
+      currentCoordinates = [];
+      currentPdfUrl = '';
+      currentPdfPassword = '';
+      // pdfPassword.value = '';
+      passwordError.style.display = 'none';
+      passwordInputGroup.style.display = 'none';
+    }
+
+    const fileManager = await initFileManagement();
+
+
+    // 修改打开选中的PDF函数
+    async function openSelectedPdf() {
+
+      const selectedOption = pdfSelect.options[pdfSelect.selectedIndex];
+      const pdfName = selectedOption.value;
+      pdfFileName=pdfName;
+
+      const pdfUrl = fileManager.getPdfUrl(pdfName).url || selectedOption.value;
+
+      //获取pdf的id
+      let id = fileManager.getPdfUrl(pdfName).id;
+
+      pdfId = id;
+
+
+
+      //查询对应的excel数据
+
+      let s = await selectExcel(id);
+     if (s.length>0){
+       let excelData = await parseExcelToJson(s);
+       if (excelData) {
+         // 使用四个点过滤高亮点
+
+         highlightPoints =  filterPointsByQuadrilateral(excelData.Sheet1);
+         // 从后端获取该物料号对应的PDF列表
+         // 方案2：使用for循环（更传统的方法）
+         function filterGroup2(group1, group2) {
+           const result = [];
+           for (let i = 0; i < group2.length; i++) {
+
+             if (group1.includes(group2[i].Designator)) {
+               result.push(group2[i]);
+             }
+           }
+           return result;
+         }
+
+
+         highlightPoints = filterGroup2(returnData,highlightPoints);
+
+
+         console.log('加载Excel坐标数据:', highlightPoints);
+       } else {
+         highlightPoints = []; // 使用简化的示例数据
+         console.log('未找到配对的Excel文件，使用示例数据');
+       }
+
+       // 原有加载PDF的逻辑保持不变
+       // if (pdfUrl === currentPdfUrl) {
+         loadPdf(pdfUrl);
+       // } else {
+       //   // passwordInputGroup.style.display = 'block';
+       //   currentPdfUrl = pdfUrl;
+       // }
+     }
+     else {
+
+       // // 原有加载PDF的逻辑保持不变
+       // if (pdfUrl === currentPdfUrl) {
+         loadPdf(pdfUrl);
+         alert("该BOM表暂未配对！")
+       // } else {
+       //   // passwordInputGroup.style.display = 'block';
+       //   currentPdfUrl = pdfUrl;
+       // }
+     }
+
+    }
+
+    // // 使用密码打开PDF
+    // function openPdfWithPassword() {
+    //   passwordError.style.display = 'none';
+    //   const password = pdfPassword.value;
+    //
+    //   if (password === currentPdfPassword) {
+    //     passwordError.style.display = 'none';
+    //     loadPdf(currentPdfUrl, password);
+    //   } else {
+    //     passwordError.style.display = 'block';
+    //   }
+    // }
+
+    // 加载PDF文档
+    function loadPdf(url) {
+      const loadingTask = pdfjsLib.getDocument({
+        url: url,
+        withCredentials: false,
+        password: 'SxJlHbSmt'
+      });
+
+      loadingTask.promise.then(async pdf => {
+        const materialList = document.getElementById('coordinate-list');
+
+        materialList.innerHTML = '';
+        allData.forEach((material, index) => {
+
+          const item = document.createElement('div');
+          item.className = 'component-item';
+
+          let all = processAll(material.partNumber);
+          // 执行查询
+          const queryResult = queryExcelData(all);
+
+          // 检查是否找到0个匹配
+          const isDisabled = queryResult.stats.found === 0;
+
+          // 如果找到0个，添加禁用类
+          if (isDisabled) {
+            item.classList.add('disabled');
+          }
+
+          item.innerHTML = `
+    <div class="component-info">
+      <div class="pdf-name">${material.name}</div>
+      <div style="display: none" class="designator">${material.materialNumber}</div>
+      <div class="coordinates">
+        ${material.partNumber}
+      </div>
+      <div class="pdf-att" style="display: none">
+        <div>${material.attributeContent}</div>
+      </div>
+      <div class="selection-indicator"></div>
+    </div>
+  `;
+
+          // 如果找到0个，禁用点击事件
+          if (isDisabled) {
+            item.style.pointerEvents = 'none'; // 禁用所有鼠标事件
+            item.style.opacity = '0.6'; // 添加半透明效果
+          } else {
+            // 正常状态下可以添加点击事件
+            item.addEventListener('click', function () {
+              // 正常点击逻辑
+              item.classList.toggle('selected');
+            });
+          }
+
+          materialList.appendChild(item);
+        });
+
+        // 查询所有保存的属性
+        async function selectSaveAttribute() {
+
+          await axios({
+            method: "post",
+            url: "bomAttributeSetting/selectAll"
+          }).then(function (resp) {
+            let data = resp.data;
+            for (let i = 0; i < data.length; i++) {
+              let ele = document.querySelectorAll('.' + data[i].name + data[i].id + '');
+              if (ele.length > 0) {
+                for (let j = 0; j < ele.length; j++) {
+                  ele[j].style.display = "";
+                }
+              }
+            }
+
+          });
+
+        }
+
+        await selectSaveAttribute();
+
+        currentSelectedIndex = -1;
+
+        pdfDoc = pdf;
+        results = [];
+        filteredHighlightPoints = [];
+
+        pdfSearchResults.textContent = "";
+        pdfSearchInput.value = "";
+        renderPage(pageNum, "", highlightPoints);
+        // passwordInputGroup.style.display = 'none';
+        // 在PDF加载完成后调用这个函数
+        function initStatusForCurrentPDF() {
+          // 设置当前PDF标识
+          currentPDFName = getPDFIdentifier();
+
+          // 加载状态数据
+          loadStatusFromStorage();
+
+          // 如果有物料项，应用状态显示
+          setTimeout(() => {
+            updateItemDisplayByStatus();
+          }, 100);
+        }
+
+        initStatusForCurrentPDF();
+
+
+        // 加载完成后查询关联的坐标数据
+        //加载完成后执行
+        // onPdfRenderComplete();
+
+      }).catch(err => {
+        console.error('PDF加载错误:', err);
+
+        // 如果是密码错误
+        if (err.name === 'PasswordException') {
+          passwordError.style.display = 'block';
+        } else {
+          alert('PDF加载失败: ' + err.message);
+        }
+      });
+    }
+
+    async function parseExcelToJson(filePath, targetColumn = 'Mid X') {
+      try {
+        // 使用Fetch API获取文件
+        const response = await fetch(filePath);
+
+        if (!response.ok) {
+          throw new Error(`无法获取文件: ${response.status} ${response.statusText}`);
+        }
+
+        // 获取文件内容
+        const arrayBuffer = await response.arrayBuffer();
+
+        // 解析Excel
+        const data = new Uint8Array(arrayBuffer);
+        const workbook = XLSX.read(data, {type: 'array'});
+
+        // 获取所有工作表数据
+        const result = {};
+        workbook.SheetNames.forEach(sheetName => {
+          const worksheet = workbook.Sheets[sheetName];
+          const sheetData = XLSX.utils.sheet_to_json(worksheet);
+
+          // 处理数据：如果Layer是B，则目标列取相反数
+          const processedData = sheetData.map(row => {
+            // 检查是否存在Layer列且值为B，同时目标列存在且为数字
+            if (row.Layer === 'B' && row[targetColumn] != null) {
+              // 将目标列的值转换为相反数
+              const numericValue = parseFloat(row[targetColumn]);
+              if (!isNaN(numericValue)) {
+                return {
+                  ...row,
+                  [targetColumn]: -numericValue
+                };
+              }
+            }
+            return row;
+          });
+
+          result[sheetName] = processedData;
+        });
+
+        return result;
+      } catch (error) {
+        console.error('Excel解析错误:', error);
+        throw error;
+      }
+    }
+
+    let results=[];//点击
+    let filteredHighlightPoints=[];//搜索
+    // 当前选中的物料索引
+    let currentSelectedIndex = -1;
+    // 渲染页面
+    async function renderPage(num, str, highlightPoints) {
+      let item = document.querySelectorAll(".component-item");
+        let ss;
+      // 修改坐标系状态对象
+      const coordinateState = {
+        scale: 1.0,
+
+        rotation: 0,
+        offsetX: 0,
+        offsetY: 0,
+        isFlippedX: false,
+        isFlippedY: false,
+        // 原点相关状态
+        originSet: true, // 是否设置了原点
+        originCanvasX: 0, // 原点在画布上的X坐标
+        originCanvasY: 0, // 原点在画布上的Y坐标
+        originPdfX: 0,   // 原点在PDF上的X坐标（毫米）
+        originPdfY: 0,    // 原点在PDF上的Y坐标（毫米）
+        // 新增：记录原始原点位置，用于计算相对移动
+        originalOriginX: 0,
+        originalOriginY: 0
+      };
+
+      function pdfToCanvasCoords(pdfX, pdfY) {
+        const pdfCanvas = document.getElementById('pdf-canvas');
+        if (!pdfCanvas) return null;
+
+        const canvasWidth = pdfCanvas.width;
+        const canvasHeight = pdfCanvas.height;
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
+
+        // 计算原点位置
+        let originX, originY;
+        if (coordinateState.originSet) {
+          originX = coordinateState.originCanvasX + coordinateState.offsetX;
+          originY = coordinateState.originCanvasY + coordinateState.offsetY;
+        } else {
+          originX = centerX + coordinateState.offsetX;
+          originY = centerY + coordinateState.offsetY;
+        }
+
+        // 毫米转换为像素
+        let x = pdfX * 3.78;
+        let y = -pdfY * 3.78;
+
+        // 应用变换
+        const scale = coordinateState.scale;
+        const rotation = coordinateState.rotation * Math.PI / 180;
+        const isFlippedX = coordinateState.isFlippedX;
+        const isFlippedY = coordinateState.isFlippedY;
+
+        // 应用翻转
+        if (isFlippedX) {
+          x = -x;
+        }
+        if (isFlippedY) {
+          y = -y;
+        }
+
+        // 应用旋转
+        const cosA = Math.cos(rotation);
+        const sinA = Math.sin(rotation);
+
+        const rotatedX = x * cosA - y * sinA;
+        const rotatedY = x * sinA + y * cosA;
+
+        // 应用缩放
+        const scaledX = rotatedX * scale;
+        const scaledY = rotatedY * scale;
+
+        // 计算最终位置
+        const canvasX = originX + scaledX;
+        const canvasY = originY + scaledY;
+
+        return { x: canvasX, y: canvasY };
+      }
+      // 清除区域元素
+      function clearRegionElements() {
+        pointMarkers.forEach(marker => {
+          if (marker.parentNode) {
+            marker.parentNode.removeChild(marker);
+          }
+        });
+        pointMarkers = [];
+
+        regionLines.forEach(line => {
+          if (line.parentNode) {
+            line.parentNode.removeChild(line);
+          }
+        });
+        regionLines = [];
+
+        if (regionArea && regionArea.parentNode) {
+          regionArea.parentNode.removeChild(regionArea);
+          regionArea = null;
+        }
+      }
+
+
+      // 创建点标记
+      function createPointMarker(x, y, pointNumber) {
+        const overlay = document.getElementById('coordinate-overlay');
+        if (!overlay) return;
+
+        const marker = document.createElement('div');
+        marker.className = 'point-marker';
+        marker.style.left = `${x}px`;
+        marker.style.top = `${y}px`;
+        marker.textContent = pointNumber;
+        marker.dataset.index = pointNumber - 1;
+
+        overlay.appendChild(marker);
+        pointMarkers.push(marker);
+      }
+
+      // 创建区域连线
+      function createRegionLine(x1, y1, x2, y2) {
+        const overlay = document.getElementById('coordinate-overlay');
+        if (!overlay) return;
+
+        const line = document.createElement('div');
+        line.className = 'region-line';
+
+        // 计算连线长度和角度
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+        line.style.width = `${length}px`;
+        line.style.left = `${x1}px`;
+        line.style.top = `${y1}px`;
+        line.style.transform = `rotate(${angle}deg)`;
+
+        overlay.appendChild(line);
+        regionLines.push(line);
+      }
+
+      // 绘制区域
+      function drawRegionArea() {
+        if (fourPoints.length !== 4) return;
+
+        const overlay = document.getElementById('coordinate-overlay');
+        if (!overlay) return;
+
+        // 清除旧的区域
+        if (regionArea && regionArea.parentNode) {
+          regionArea.parentNode.removeChild(regionArea);
+        }
+
+        // 创建区域
+        regionArea = document.createElement('div');
+        regionArea.className = 'region-area';
+
+        // 计算边界框
+        const points = fourPoints.map(p => ({x: p.canvasX, y: p.canvasY}));
+        const xCoords = points.map(p => p.x);
+        const yCoords = points.map(p => p.y);
+        const minX = Math.min(...xCoords);
+        const minY = Math.min(...yCoords);
+        const maxX = Math.max(...xCoords);
+        const maxY = Math.max(...yCoords);
+
+        regionArea.style.left = `${minX}px`;
+        regionArea.style.top = `${minY}px`;
+        regionArea.style.width = `${maxX - minX}px`;
+        regionArea.style.height = `${maxY - minY}px`;
+
+        // 使用clip-path创建多边形区域
+        const clipPoints = points.map(p => {
+          const x = ((p.x - minX) / (maxX - minX)) * 100;
+          const y = ((p.y - minY) / (maxY - minY)) * 100;
+          return `${x}% ${y}%`;
+        }).join(', ');
+
+        regionArea.style.clipPath = `polygon(${clipPoints})`;
+
+        overlay.appendChild(regionArea);
+      }
+      // 从数据库加载点
+      async function loadPointsFromDB() {
+        if (currentExcelId===0) {
+          return false;
+        }
+
+        try {
+          await  axios({
+            method:"post",
+            url:"pdfFourPointsRegions/selectByExcelId",
+            data:currentExcelId
+          }).then(function (resp){
+            let regionData = resp.data;
+            fourPoints = regionData.map((point, index) => {
+              const canvasCoords = pdfToCanvasCoords(point.x, point.y);
+
+              return {
+                pdfX: point.x,
+                pdfY: point.y,
+                canvasX: canvasCoords ? canvasCoords.x : 0,
+                canvasY: canvasCoords ? canvasCoords.y : 0
+              };
+            });
+
+            if (fourPoints.length === 4) {
+              // updateFourPointsDisplay();
+
+              return true;
+            }
+          })
+
+
+          return false;
+        } catch (error) {
+          console.error('从数据库加载点数据失败:', error);
+          return false;
+        }
+      }
+      // 更新四个点显示（关键函数：在PDF缩放后调用）
+      function updateFourPointsDisplay() {
+        if (fourPoints.length !== 4) return;
+
+        // 重新计算每个点的画布坐标
+        fourPoints.forEach((point, index) => {
+          const canvasCoords = pdfToCanvasCoords(point.pdfX, point.pdfY);
+          if (canvasCoords) {
+            point.canvasX = canvasCoords.x;
+            point.canvasY = canvasCoords.y;
+          }
+        });
+
+        // 清除旧的显示
+        clearRegionElements();
+
+        // 重新绘制四个点
+        fourPoints.forEach((point, index) => {
+          createPointMarker(point.canvasX, point.canvasY, index + 1);
+
+          if (index > 0) {
+            const prevPoint = fourPoints[index - 1];
+            createRegionLine(prevPoint.canvasX, prevPoint.canvasY, point.canvasX, point.canvasY);
+          }
+        });
+
+        // 连接第四个点和第一个点
+        const firstPoint = fourPoints[0];
+        const lastPoint = fourPoints[3];
+        createRegionLine(lastPoint.canvasX, lastPoint.canvasY, firstPoint.canvasX, firstPoint.canvasY);
+
+        // 绘制四边形区域
+        drawRegionArea();
+      }
+      if (pdfId !== null) {
+        let q = await selectpdfById(pdfId);
+
+        if (q.originCanvasX > 0) {
+          coordinateState.scale = q.scale;
+          coordinateState.originCanvasX = q.originCanvasX;
+          coordinateState.originCanvasY = q.originCanvasY;
+          coordinateState.originPdfX = q.originCanvasX;
+          coordinateState.originPdfY = q.originCanvasY;
+          coordinateState.rotation = q.rotation;
+          coordinateState.isFlippedX = q.flippedX;
+          coordinateState.isFlippedY = q.flippedY;
+
+
+          if (str!=="suoFang"){
+            scale = q.pdfScale;
+
+          }
+          ss=q.pdfScale;
+          coordinateState.originSet = true;
+
+
+        } else {
+          coordinateState.originSet = false;
+        }
+      }
+      pageRendering = true;
+      document.getElementById("scale-slider").value=scale;
+      document.getElementById('zoom-value').textContent =scale.toFixed(2) + 'x';
+      pdfDoc.getPage(num).then(page => {
+        const viewport = page.getViewport({scale: scale});
+        pdfCanvas.height = viewport.height;
+        pdfCanvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: pdfCanvas.getContext('2d'),
+          viewport: viewport
+        };
+
+        const renderTask = page.render(renderContext);
+
+        renderTask.promise.then(async () => {
+          pageRendering = false;
+
+          if (pageNumPending !== null) {
+            await renderPage(pageNumPending,"",highlightPoints);
+            pageNumPending = null;
+          }
+
+          // ========== 新增：坐标系和高亮点功能 ==========
+          // 坐标系状态
+
+          const originalViewport = page.getViewport({scale:ss});
+
+          // 计算缩放因子
+          const scaleX = viewport.width / originalViewport.width;
+          const scaleY = viewport.height / originalViewport.height;
+
+          //坐标转换方法
+          function toScaledCoordinates() {
+
+
+            coordinateState.originCanvasX = coordinateState.originCanvasX * scaleX; // PDF X坐标 × X轴缩放因子
+            coordinateState.originCanvasY = (coordinateState.originCanvasY) * scaleY;
+
+
+          }
+
+          if (str === "suoFang") {
+
+            toScaledCoordinates();
+          }
+
+
+
+
+          // 高亮点渲染函数（修改后）
+          async function renderHighlightPoints() {
+            // 新增：加载四个点区域
+
+            await loadPointsFromDB();
+
+            results = [];
+            filteredHighlightPoints = [];
+            const overlay = document.getElementById('coordinate-overlay');
+            const pdfCanvas = document.getElementById('pdf-canvas');
+
+            if (!overlay || !pdfCanvas) return;
+// 新增：更新四个点区域的显示（如果存在）
+            if (fourPoints && fourPoints.length === 4) {
+              // updateFourPointsDisplay();
+            }
+            if (!pdfCanvas) return;
+
+            const canvasWidth = pdfCanvas.width;
+            const canvasHeight = pdfCanvas.height;
+
+            // 计算画布中心
+            const centerX = canvasWidth / 2;
+            const centerY = canvasHeight / 2;
+
+            // 计算原点位置（应用偏移量）
+            let originX, originY;
+
+            if (coordinateState.originSet) {
+              // 如果设置了原点，使用设置的原点位置 + 偏移量
+              originX = coordinateState.originCanvasX + coordinateState.offsetX;
+              originY = coordinateState.originCanvasY + coordinateState.offsetY;
+            } else {
+              // 如果没有设置原点，使用画布中心 + 偏移量
+              originX = centerX + coordinateState.offsetX;
+              originY = centerY + coordinateState.offsetY;
+            }
+
+            // 清除旧的高亮点和标签
+            const oldPoints = overlay.querySelectorAll('.highlight-point, .highlight-label, .origin-marker, .coordinate-system');
+            oldPoints.forEach(point => point.remove());
+
+            // 创建原点标记
+            const originMarker = document.createElement('div');
+            originMarker.className = 'origin-marker';
+            originMarker.style.left = `${originX}px`;
+            originMarker.style.top = `${originY}px`;
+            overlay.appendChild(originMarker);
+
+            // 创建坐标系显示
+            const coordinateSystem = document.createElement('div');
+            coordinateSystem.className = 'coordinate-system';
+            coordinateSystem.style.left = `${originX + 10}px`;
+            coordinateSystem.style.top = `${originY - 30}px`;
+            coordinateSystem.innerHTML = `原点`;
+            overlay.appendChild(coordinateSystem);
+            // 使用四个点过滤高亮点
+            const filteredPoints = filterPointsByQuadrilateral(highlightPoints);
+            // 渲染每个高亮点
+            filteredPoints.forEach(point => {
+              // 转换毫米坐标为像素坐标
+              let x = parseFloat(point['Mid X']) * 3.78;
+              let y = -parseFloat(point['Mid Y']) * 3.78;
+
+              // 应用旋转
+              const rad = coordinateState.rotation * Math.PI / 180;
+              const rotatedX = x * Math.cos(rad) - y * Math.sin(rad);
+              const rotatedY = x * Math.sin(rad) + y * Math.cos(rad);
+
+              // 应用翻转
+              const finalX = coordinateState.isFlippedX ? -rotatedX : rotatedX;
+              const finalY = coordinateState.isFlippedY ? -rotatedY : rotatedY;
+
+              // 应用缩放
+              let scaledX = finalX * coordinateState.scale;
+              let scaledY = finalY * coordinateState.scale;
+
+              if (str === "suoFang") {
+                scaledX = scaleX * scaledX;
+                scaledY = scaleY * scaledY;
+              }
+
+              // 计算最终位置（相对于原点 + 偏移量）
+              const pointX = originX + scaledX;
+              const pointY = originY + scaledY;
+
+              // 创建高亮点
+              const highlight = document.createElement('div');
+              highlight.className = 'highlight-point';
+              highlight.style.left = `${pointX}px`;
+              highlight.style.top = `${pointY}px`;
+              highlight.setAttribute('data-designator', point.Designator);
+              overlay.appendChild(highlight);
+
+              // 创建标签
+              const label = document.createElement('div');
+              label.className = 'highlight-label';
+              label.textContent = point.Designator;
+              label.style.left = `${pointX + 15}px`;
+              label.style.top = `${pointY - 15}px`;
+              overlay.appendChild(label);
+            });
+            closeHighLabel();
+            scrollToHighlights();
+          }
+
+
+          // 搜索结果高亮点渲染函数
+          function searchRenderHighlightPoints(searchRe) {
+
+            str="suoFang"
+            const overlay = document.getElementById('coordinate-overlay');
+            const pdfCanvas = document.getElementById('pdf-canvas');
+
+            if (!pdfCanvas) return;
+
+            const canvasWidth = pdfCanvas.width;
+            const canvasHeight = pdfCanvas.height;
+
+            // 计算画布中心
+            const centerX = canvasWidth / 2;
+            const centerY = canvasHeight / 2;
+
+            // 计算原点位置（应用偏移量）
+            let originX, originY;
+
+            if (coordinateState.originSet) {
+              // 如果设置了原点，使用设置的原点位置 + 偏移量
+              originX = coordinateState.originCanvasX + coordinateState.offsetX;
+              originY = coordinateState.originCanvasY + coordinateState.offsetY;
+            } else {
+              // 如果没有设置原点，使用画布中心 + 偏移量
+              originX = centerX + coordinateState.offsetX;
+              originY = centerY + coordinateState.offsetY;
+            }
+
+            // 清除旧的高亮点和标签
+            const oldPoints = overlay.querySelectorAll('.highlight-point, .highlight-label, .origin-marker, .coordinate-system');
+            oldPoints.forEach(point => point.remove());
+
+            // 创建原点标记
+            const originMarker = document.createElement('div');
+            originMarker.className = 'origin-marker';
+            originMarker.style.left = `${originX}px`;
+            originMarker.style.top = `${originY}px`;
+            overlay.appendChild(originMarker);
+
+            // 创建坐标系显示
+            const coordinateSystem = document.createElement('div');
+            coordinateSystem.className = 'coordinate-system';
+            coordinateSystem.style.left = `${originX + 10}px`;
+            coordinateSystem.style.top = `${originY - 30}px`;
+            coordinateSystem.innerHTML = `原点`;
+            overlay.appendChild(coordinateSystem);
+
+            // 渲染每个高亮点
+           searchRe.forEach(point => {
+             if (point['Mid X']!=='未找到'){
+               // 转换毫米坐标为像素坐标
+               let x = parseFloat(point['Mid X']) * 3.78;
+               let y = -parseFloat(point['Mid Y']) * 3.78;
+
+               // 应用旋转
+               const rad = coordinateState.rotation * Math.PI / 180;
+               const rotatedX = x * Math.cos(rad) - y * Math.sin(rad);
+               const rotatedY = x * Math.sin(rad) + y * Math.cos(rad);
+
+               // 应用翻转
+               const finalX = coordinateState.isFlippedX ? -rotatedX : rotatedX;
+               const finalY = coordinateState.isFlippedY ? -rotatedY : rotatedY;
+
+               // 应用缩放
+               let scaledX = finalX * coordinateState.scale;
+               let scaledY = finalY * coordinateState.scale;
+
+               if (str === "suoFang") {
+                 scaledX = scaleX * scaledX;
+                 scaledY = scaleY * scaledY;
+               }
+
+               // 计算最终位置（相对于原点 + 偏移量）
+               const pointX = originX + scaledX;
+               const pointY = originY + scaledY;
+
+               // 创建高亮点
+               const highlight = document.createElement('div');
+               highlight.className = 'highlight-point';
+               highlight.style.left = `${pointX}px`;
+               highlight.style.top = `${pointY}px`;
+               highlight.setAttribute('data-designator', point.Designator);
+               overlay.appendChild(highlight);
+
+               // 创建标签
+               const label = document.createElement('div');
+               label.className = 'highlight-label';
+               label.textContent = point.Designator;
+               label.style.left = `${pointX + 15}px`;
+               label.style.top = `${pointY - 15}px`;
+               overlay.appendChild(label);
+             }
+
+            });
+
+            closeHighLabel();
+            scrollToHighlights();
+          }
+
+          // 在PDF渲染完成后初始化坐标系
+          async function onPdfRenderComplete() {
+            if (str === "suoFang") {
+              if (results.length > 0) {
+                searchRenderHighlightPoints(results)
+              } else if (filteredHighlightPoints.length > 0) {
+                searchRenderHighlightPoints(filteredHighlightPoints);
+              } else {
+                await renderHighlightPoints();
+              }
+            } else {
+              await renderHighlightPoints();
+            }
+
+            await updateItemDisplayByStatus();
+
+          }
+
+
+
+
+                  // 搜索功能 - 修复了Designator类型检查
+          function searchComponents(searchTerm) {
+            results = [];
+
+            if (!searchTerm.trim()) {
+
+              // 如果搜索词为空，显示所有零件
+              pdfSearchResults.textContent = `显示所有 ${highlightPoints.length} 个零件`;
+              filteredHighlightPoints=[];
+              renderHighlightPoints();
+            } else {
+              // 移除所有物料项的选中样式
+              document.querySelectorAll('.component-item').forEach(item => {
+                item.classList.remove('selected');
+              });
+              // displayMaterialList();
+              // 过滤匹配的零件 - 修复：添加类型检查
+
+              filteredHighlightPoints= highlightPoints.filter(point => {
+                // 确保Designator存在且是字符串
+                if (point.Designator && typeof point.Designator === 'string') {
+
+                  return point.Designator.toLowerCase().includes(searchTerm.toLowerCase());
+                }
+                return false; // 如果Designator不是字符串，跳过这个点
+              });
+              pdfSearchResults.textContent = `找到 ${filteredHighlightPoints.length} 个匹配的零件`;
+
+              searchRenderHighlightPoints(filteredHighlightPoints);
+            }
+
+
+            // 更新零件列表显示
+
+          }
+// 新增：搜索按钮事件
+          pdfSearchInput.oninput = function (){
+            const searchTerm = pdfSearchInput.value.trim();
+            searchComponents(searchTerm);
+          }
+          document.getElementById("pdf-canvas").onmouseenter = function () {
+            pdfSearchInput.focus();
+
+
+
+
+          }
+
+          document.getElementById("pdf-canvas").onmouseleave = function () {
+            pdfSearchInput.blur();
+
+          }
+
+
+
+
+
+
+
+
+          // 添加CSS样式
+          const style = document.createElement('style');
+          style.textContent = `
+  .material-item.status-completed {
+    background-color: #e8f5e9 !important;
+    border-left: 3px solid #4caf50;
+  }
+
+  .material-item.status-missing {
+    background-color: #ffebee !important;
+    border-left: 3px solid #f44336;
+  }
+
+  .material-item.status-partial {
+    background-color: #fff3e0 !important;
+    border-left: 3px solid #ff9800;
+  }
+
+  .material-item.status-completed.selected {
+    background-color: #c8e6c9 !important;
+  }
+
+  .material-item.status-missing.selected {
+    background-color: #ffcdd2 !important;
+  }
+
+  .material-item.status-partial.selected {
+    background-color: #ffe0b2 !important;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+    color: white;
+  }
+
+  .status-badge.completed {
+    background-color: #4caf50;
+  }
+
+  .status-badge.missing {
+    background-color: #f44336;
+  }
+
+  .status-badge.partial {
+    background-color: #ff9800;
+  }
+
+  /* 刷新按钮样式 */
+  #refreshStatusBtn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 999;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  #refreshStatusBtn:hover {
+    background-color: #0b7dda;
+  }`;
+          document.head.appendChild(style);
+
+/// 创建并初始化状态选择容器
+          const statusModal = document.createElement('div');
+          statusModal.id = 'statusModal';
+          statusModal.style.cssText = `
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  display: none;
+`;
+          statusModal.innerHTML = `
+  <div style="background: white; padding: 20px; border-radius: 8px; min-width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+    <h3 style="margin-top: 0; text-align: center; color: #333;">请选择物料状态</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px 0;">
+      <button class="status-btn" data-status="completed" style="padding: 12px 16px; background: #e8f5e9; color: #2e7d32; border: 2px solid #4caf50; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span style="font-size: 18px;">✅</span>
+          <span>已完成</span>
+        </div>
+        <div style="font-size: 12px; opacity: 0.8; font-weight: normal;">物料已全部完成</div>
+      </button>
+      <button class="status-btn" data-status="partial" style="padding: 12px 16px; background: #fff3e0; color: #ef6c00; border: 2px solid #ff9800; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span style="font-size: 18px;">⏳</span>
+          <span>单面完成</span>
+        </div>
+        <div style="font-size: 12px; opacity: 0.8; font-weight: normal;">物料仅完成单面</div>
+      </button>
+      <button class="status-btn" data-status="missing" style="padding: 12px 16px; background: #ffebee; color: #c62828; border: 2px solid #f44336; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span style="font-size: 18px;">❌</span>
+          <span>缺料</span>
+        </div>
+        <div style="font-size: 12px; opacity: 0.8; font-weight: normal;">物料缺失需处理</div>
+      </button>
+    </div>
+    <div style="text-align: center;">
+      <button id="statusCancel" style="padding: 8px 20px; background: #f5f5f5; color: #666; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+        取消
+      </button>
+    </div>
+  </div>
+`;
+          document.body.appendChild(statusModal);
+
+
+
+
+
+// 状态管理函数
+          // 状态管理函数
+          function updateItemStatus(itemElement, index, status) {
+            // 移除之前的状态类
+            itemElement.classList.remove('status-completed', 'status-missing', 'status-partial');
+
+            // 移除之前的状态标签
+            const oldBadge = itemElement.querySelector('.status-badge');
+            if (oldBadge) {
+              oldBadge.remove();
+            }
+
+            // 存储状态
+            if (status && status !== STATUS.NONE) {
+              itemStatus[index] = status;
+              itemElement.classList.add(`status-${status}`);
+
+              // 添加状态标签
+              const badge = document.createElement('span');
+              badge.className = `status-badge ${status}`;
+              badge.textContent = statusDisplayText[status];
+              itemElement.appendChild(badge);
+            } else {
+              delete itemStatus[index];
+            }
+            // 新增：保存到本地存储
+            saveStatusToStorage();  // 在状态更新后自动保存
+          }
+// 根据状态数据更新物料项显示
+          function updateItemDisplayByStatus() {
+            // 遍历所有物料项
+            document.querySelectorAll('.material-item').forEach((itemElement, index) => {
+              const status = itemStatus[index];
+
+              // 清除所有状态类
+              itemElement.classList.remove('status-completed', 'status-missing', 'status-partial');
+
+              // 清除所有状态标签
+              const oldBadge = itemElement.querySelector('.status-badge');
+              if (oldBadge) {
+                oldBadge.remove();
+              }
+
+              // 如果有状态，重新应用
+              if (status === STATUS.COMPLETED || status === STATUS.MISSING || status === STATUS.PARTIAL) {
+                itemElement.classList.add(`status-${status}`);
+
+                // 添加状态标签
+                const badge = document.createElement('span');
+                badge.className = `status-badge ${status}`;
+                badge.textContent = statusDisplayText[status] || status;
+                itemElement.appendChild(badge);
+              }
+            });
+
+            console.log('状态显示已刷新，当前状态数据:', itemStatus);
+          }
+
+// 状态选择弹窗函数
+          function showStatusSelector(itemElement, index) {
+            return new Promise((resolve) => {
+              const modal = document.getElementById('statusModal');
+              modal.style.display = 'flex';
+
+              // 处理状态选择
+              const handleStatusSelect = (status) => {
+                modal.style.display = 'none';
+                resolve(status);
+              };
+
+              // 绑定按钮事件
+              modal.querySelectorAll('.status-btn').forEach(btn => {
+                btn.onclick = () => handleStatusSelect(btn.dataset.status);
+              });
+
+              // 取消按钮
+              modal.querySelector('#statusCancel').onclick = () => {
+                modal.style.display = 'none';
+                resolve(null);
+              };
+
+              // 点击背景关闭
+              modal.onclick = (e) => {
+                if (e.target === modal) {
+                  modal.style.display = 'none';
+                  resolve(null);
+                }
+              };
+            });
+          }
+
+
+
+          // 修改您的点击事件处理代码
+          for (let i = 0; i < item.length; i++) {
+            item[i].onclick = async function() {
+              // 如果当前有选中的物料，询问它的状态
+              if (currentSelectedIndex !== -1 && currentSelectedIndex !== i) {
+                console.log(currentSelectedIndex)
+                const lastItem = item[currentSelectedIndex];
+                if (!itemStatus[currentSelectedIndex]) {
+                  // 上一个选中的物料没有状态，需要设置状态
+                  const status = await showStatusSelector(lastItem, currentSelectedIndex);
+                  if (status) {
+                    updateItemStatus(lastItem, currentSelectedIndex, status);
+                  } else {
+                    // 用户取消了状态选择，保持当前选中状态
+                    // return;
+                  }
+                } else {
+                  // 上一个选中的物料已有状态，询问是否更改
+                  const currentStatus = itemStatus[currentSelectedIndex];
+                  const currentStatusText = statusDisplayText[currentStatus] || currentStatus;
+                  const changeStatus = confirm(`上一个物料状态: ${currentStatusText}\n\n是否要更改状态？`);
+                  if (changeStatus) {
+                    const newStatus = await showStatusSelector(lastItem, currentSelectedIndex);
+                    if (newStatus) {
+                      updateItemStatus(lastItem, currentSelectedIndex, newStatus);
+                    } else {
+                      // 用户取消了状态选择，保持当前选中状态
+                      // return;
+                    }
+                  }
+                }
+              }
+
+              // 移除所有物料项的选中样式
+              document.querySelectorAll('.component-item').forEach(item => {
+                item.classList.remove('selected');
+                item.querySelector(".pdf-att").style.display = "none";
+              });
+
+              // 切换选中状态
+              if (currentSelectedIndex === i) {
+                console.log("取消选中");
+                // 取消选中
+                item[i].classList.remove('selected');
+                currentSelectedIndex = -1;
+                pdfSearchResults.textContent = "";
+                results = [];
+                item[i].querySelector(".pdf-att").style.display = "none";
+                // 所有亮点亮起
+                await renderHighlightPoints();
+              } else {
+                pdfSearchResults.textContent = "";
+                pdfSearchInput.value = "";
+                filteredHighlightPoints = [];
+
+                // 移除之前选中的样式
+                if (currentSelectedIndex !== -1) {
+                  const previousItem = document.querySelector(`.material-item.selected`);
+                  if (previousItem) {
+                    previousItem.classList.remove('selected');
+                  }
+                }
+
+                item[i].querySelector(".pdf-att").style.display = "";
+                // 设置当前选中
+                item[i].classList.add('selected');
+                currentSelectedIndex = i;
+
+                // 执行查询
+                const partNumbers = processAll(item[i].querySelector(".coordinates").innerHTML);
+                const queryResult = queryExcelData(partNumbers);
+                results = queryResult.results;
+
+                console.log(results);
+                pdfSearchResults.textContent = `找到 ${queryResult.stats.found} 个匹配的零件，未找到${queryResult.stats.notFound}`;
+                // 点亮坐标信息
+                searchRenderHighlightPoints(results);
+
+
+
+                item[i].scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                  inline: 'nearest'
+                });
+              }
+            };
+          }
+
+// 右键菜单功能
+          for (let i = 0; i < item.length; i++) {
+            item[i].addEventListener('contextmenu', async function(e) {
+              e.preventDefault();
+              const status = await showStatusSelector(this, i);
+              if (status) {
+                updateItemStatus(this, i, status);
+              }
+            });
+          }
+            // displayMaterialList();
+
+
+          //加载完成后执行
+          await onPdfRenderComplete();
+
+        });
+      });
+    }
+
+    // 放大
+    function zoomIn() {
+      if(scale>4.95){
+        return
+      }
+      // scale += 0.1;
+      scale = Number(scale)+Number(0.1);
+      renderPage(pageNum, 'suoFang',highlightPoints);
+    }
+
+    // 缩小
+    function zoomOut() {
+      if (scale <1.05) return;
+      // scale -= 0.1;
+      scale = Number(scale)-Number(0.1)
+      renderPage(pageNum, 'suoFang',highlightPoints);
+    }
+
+
+
+
+
+    // 滚动到坐标位置
+
+    function scrollToHighlights() {
+
+      const container = document.querySelector('.pdf-canvas-container');
+      const highlights = document.querySelectorAll('.highlight-point');
+      if (highlights.length === 0) return;
+
+      // 计算所有高亮点的边界框
+      let minTop = Infinity, maxBottom = -Infinity;
+      let minLeft = Infinity, maxRight = -Infinity;
+
+      highlights.forEach(highlight => {
+        const rect = highlight.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        // 转换为相对于容器的坐标
+        const top = rect.top - containerRect.top + container.scrollTop;
+        const bottom = top + rect.height;
+        const left = rect.left - containerRect.left + container.scrollLeft;
+        const right = left + rect.width;
+
+        minTop = Math.min(minTop, top);
+        maxBottom = Math.max(maxBottom, bottom);
+        minLeft = Math.min(minLeft, left);
+        maxRight = Math.max(maxRight, right);
+      });
+
+      // 计算中心点
+      const centerY = (minTop + maxBottom) / 2;
+      const centerX = (minLeft + maxRight) / 2;
+      const viewportHeight = container.clientHeight;
+
+      // 滚动到中心位置
+      container.scrollTop = centerY - viewportHeight / 2;
+      container.scrollLeft = centerX - container.clientWidth / 2;
+    }
+
+    // 清除高亮
+    function clearHighlights() {
+      highlightElements.forEach(el => {
+        if (el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+      });
+      highlightElements = [];
+    }
+
+
+    // 事件监听器
+    zoomInBtn.addEventListener('click', zoomIn);
+    zoomOutBtn.addEventListener('click', zoomOut);
+    closePdfBtn.addEventListener('click', closePdfViewer);
+    closeBtn.addEventListener('click', closePdfViewer);
+    openPdfBtn.addEventListener('click', openSelectedPdf);
+    locationPdf.addEventListener('click',scrollToHighlights);
+    //滑动缩放
+    let scaleTimeout;
+
+    document.getElementById("scale-slider").oninput = function (e) {
+      const newScale = parseFloat(e.target.value);
+      scale = newScale;
+      document.getElementById('zoom-value').textContent = newScale.toFixed(2) + 'x';
+
+      // 清除之前的定时器
+      clearTimeout(scaleTimeout);
+
+      // 设置新的定时器，延迟执行renderPage
+      scaleTimeout = setTimeout(function() {
+        renderPage(pageNum, 'suoFang', highlightPoints);
+      }, 300); // 300毫秒后执行，可以根据需要调整这个延迟时间
+    };
+    // pdfPassword.addEventListener('keyup', function (e) {
+    //   if (e.key === 'Enter') {
+    //     openPdfWithPassword();
+    //   }
+    // });
+
+
+
+
+
+
+
+    // 初始加载一些数据
+    document.addEventListener('DOMContentLoaded', function () {
+      // 为物料号添加类名
+      document.querySelectorAll('.row-col:nth-child(2) b').forEach(el => {
+        el.classList.add('material-number');
+      });
+    });
+
+
+  }
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
+

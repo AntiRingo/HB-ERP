@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>物料</title>
+  <link href="css/product.css" rel="stylesheet" />
+  <script src="js/axios-0.18.0.js"></script>
+  <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+
+</head>
+<style>
+  html{
+    font-family: 宋体,serif;
+  }
+  #content div:hover{
+    background-color: #999a9c;
+  }
+  #content div:hover a{
+    color: black;
+  }
+  #content div{
+    cursor: pointer;
+  }
+</style>
+<body>
+<div style="display: flex;width: 100%;height: auto">
+
+  <div style="width: 90%; margin: auto" >
+    <div class="sticky" >
+      <div style="width: 90%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: auto">
+        <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px">
+          <div style="width:100%;background-color:#9eb6d8;margin: auto  ;height: auto;"><b><span id="nameProduct" style="color: black"></span>已弃用的物料列表</b></div>
+
+
+        </div>
+        <div style="width: 98%;height: auto;text-align: right;margin-top: 10px;margin-bottom: 10px;">
+          <input id="searchContent" style="margin-right: 5px" type="search" placeholder="请输入物料号或者名称" oninput="value=value.replace(/\s+/g,'')"><button id="search">搜索</button>
+        </div>
+
+        <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: auto;max-height: 70vh;overflow: auto">
+          <div style="width: 100%;height: auto;display: flex;text-align: center;color: white">
+            <div style="width: 34.5%;margin: auto;background-color: #9eb6d8; border:white solid 1px" ><b>物料名称</b></div>
+            <div style="width: 40%;margin: auto  ;background-color: #9eb6d8; border:white solid 1px" ><b>物料号</b></div>
+            <div style="width: 25%;margin: auto;background-color: #9eb6d8  ; border:white solid 1px"    ><b>操作</b></div>
+          </div>
+          <div id="content" style="width: 100%;height: auto;margin: auto">
+            <!--                            <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+            <!--                                <div style="width: 34.5%;margin: auto; border: white solid 1px"><b>物料名称</b></div>-->
+            <!--                                <div style="width: 40%;margin: auto  ; border: white solid 1px"><b>物料号</b></div>-->
+            <!--                                <div style="width: 25%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+            <!--                            </div>-->
+
+            <!--                            <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+            <!--                                <div style="width: 34.5%;margin: auto; border: white solid 1px"><b>物料名称</b></div>-->
+            <!--                                <div style="width: 40%;margin: auto  ; border: white solid 1px"><b>物料号</b></div>-->
+            <!--                                <div style="width: 25%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+            <!--                            </div>-->
+          </div>
+        </div>
+
+        <!--点击分类的分页-->
+        <div id="pageDiv1" style="width: 100%;margin: 10px auto auto auto;text-align: center;display: none">
+          共<span style="margin: auto;color: orange;font-weight: bolder" id="pageSum1"></span>页丨
+          当前页：<span id="currentPage1" style="color: red;margin: auto;font-weight: bolder"></span>丨
+          <button style="margin: auto" id="firstPage1">首页</button>
+          <button style="margin: auto" id="lastPage1">上一页</button>
+          <button style="margin: auto" id="nextPage1">下一页</button>
+          <button style="margin: auto" id="endPage1">尾页</button>丨
+          请输入页码：
+          <label for="jumpValue1"></label><input style="width: 50px;margin: auto" type="text" id="jumpValue1">
+          <button id="jump1">跳转</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="window">
+  <!--    物料号-->
+  <div style="display: none" id="produceId"></div>
+
+  <div class="window-content">
+
+    <div class="window-content-close">×</div>
+
+    <div id="addBlock" class="aa" style="width:750px ;max-height:90%;overflow-y: auto;overflow-x: hidden;  margin: 5px auto auto;background-color: white;padding-bottom: 5px">
+
+      <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>物料信息添加</b></div>
+      <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName"></div>
+          </div>
+          <div class="qwe"  style="width:638px ;height: 38px;border-bottom: 1px solid #d6e0ef;position: relative">
+            &nbsp;<input maxlength="50" style="width: 90%;height: 20px; " type="text" name="" id="name" value=""> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+
+
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div style="width:100px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName"></div>
+          </div>
+
+          <div class="qwe" style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+
+            <input type="hidden" name="id"  value="">
+            &nbsp;<input style="width: 80%;height: 20px;" type="text" name="" id="url0" value="">&nbsp;  <input style="width:fit-content;height: 24px;display: none" id="file0" type="file" accept="image/*" >
+            <button style="width:40px;"  type="button" class="uploads" >上传</button>
+            <!--                        <div style="width: 275px;height: 24px; display: flex;margin-top: 10px" >&nbsp;-->
+            <!--                          -->
+
+
+            <!--                        </div>-->
+
+          </div>
+        </div>
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto"></div>
+          </div>
+          <div class="qwe"  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;display: flex">
+            <div style="width: 90%;height: 20px;margin: auto 1px;display: flex;align-self: center">
+              <div id="sortNumberA" style="width:fit-content;text-align: center;border: black solid 1px;padding: 0 5px;margin: 0 5px"></div>
+              <div id="materialNumberF" style="width:fit-content;display: flex">
+                <div id="mdiv1" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+                <div id="mdiv2" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+                <div id="mdiv3" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+                <div id="mdiv4" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+                <div id="mdiv5" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+                <div id="mdiv6" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+                <div id="mdiv7" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+                <div id="mdiv8" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+                <div id="mdiv9" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;">0</div>
+              </div>
+              <div id="serialNumber" style="width: fit-content;text-align: center;border: black solid 1px;padding: 0 5px;margin: 0 5px"></div>
+            </div>
+          </div>
+        </div>
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName"></div>
+          </div>
+          <div class="qwe"  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+
+            &nbsp;<input maxlength="20" style="width: 90%;height: 20px;" type="text" name="" id="materialNumber" value="" disabled> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName"></div>
+          </div>
+          <div  class="qwe" style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+            &nbsp;<input maxlength="20" style="width: 90%;height: 20px;" type="text" name="" id="brand" value=""> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+
+        <div style="width:738px ;height: auto;display: flex;">
+          <div  style="width: 100px;height: auto; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName"></div>
+          </div>
+          <div style="width:638px ;height: auto;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;position: relative">
+            &nbsp;<textarea maxlength="100" style="width: 90%;min-height: 100px;max-height: 100px;max-width: 90%;min-width:90%"  name="" id="description" ></textarea> &nbsp;<b>*</b>
+          </div>
+        </div>
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName"></div>
+          </div>
+          <div class="qwe"  style="width:638px ;height: 38px;border-bottom: 1px solid #d6e0ef;position: relative">
+            &nbsp;<input maxlength="20" style="width: 90%;height: 20px; " type="text" name="" id="number" value="" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"> &nbsp;<b>*</b>
+          </div>
+        </div>
+        <!--下面是后来添加的属性 -->
+        <div id="selectAttributeAdd" style="width: 738px;height: auto">
+
+        </div>
+
+
+
+
+
+        <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+          <button id="submit" >确定添加</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="updateBlock" class="aa" style="width:750px ;max-height:90%;overflow-y: auto;overflow-x: hidden;margin: 5px auto auto;background-color: white;padding-bottom: 5px">
+
+      <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>物料信息修改</b></div>
+      <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName1"></div>
+          </div>
+          <div class="qwe"  style="width:638px ;height: 38px;border-bottom: 1px solid #d6e0ef;">
+            &nbsp;<input maxlength="50" style="width: 90%;height: 20px;" type="text" name="" id="updateName" value=""> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+
+
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div style="width:100px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName1"></div>
+          </div>
+
+          <div class="qwe" style="width:638px ;height:38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+
+            <input type="hidden" name="id"  value="">
+            &nbsp;<input style="width:80%;height: 20px;" type="text" name="" id="url1" value="">&nbsp; <input style="width: 223px;height: 24px;display: none" id="file1" type="file" accept="image/*">
+            <button style="width:40px;"  type="button" class="uploads" >上传</button>
+            <!--                        <div style="width: 275px;height: 24px; display: flex;margin-top: 10px" >&nbsp;-->
+            <!--                          -->
+
+
+            <!--                        </div>-->
+
+          </div>
+        </div>
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto"></div>
+          </div>
+          <div class="qwe"  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;display: flex">
+            <div style="width: 90%;height: 20px;margin: auto 1px;display: flex;align-self: center">
+              <div id="updateSortNumberA" style="width: fit-content;text-align: center;border: black solid 1px;padding: 0 5px;margin: 0 5px"></div>
+              <div id="updateMaterialNumberF" style="width: fit-content;display: flex">
+                <div id="upmdiv1" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+                <div id="upmdiv2" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+                <div id="upmdiv3" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+                <div id="upmdiv4" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+                <div id="upmdiv5" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+                <div id="upmdiv6" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+                <div id="upmdiv7" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+                <div id="upmdiv8" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+                <div id="upmdiv9" style="width:fit-content;border: black solid 1px;padding: 0 5px;margin: 0 5px;"></div>
+              </div>
+              <div id="updateSerialNumber" style="width: fit-content;text-align: center;border: black solid 1px;padding: 0 5px;margin: 0 5px"></div>
+            </div>
+          </div>
+        </div>
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName1"></div>
+          </div>
+          <div class="qwe"  style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+            &nbsp;<input maxlength="20" style="width: 90%;height: 20px;" type="text" name="" id="UpdateMaterialNumber" value=""> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName1"></div>
+          </div>
+          <div class="qwe" style="width:638px ;height: 38px;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;">
+            &nbsp;<input maxlength="20" style="width: 90%;height: 20px;" type="text" name="" id="updateBrand" value=""> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+
+        <div style="width:738px ;height: auto;display: flex;">
+          <div  style="width: 100px;height: auto; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName1"></div>
+          </div>
+          <div  style="width:638px ;height: auto;border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;position: relative">
+            &nbsp;<textarea maxlength="100" style="width: 90%;min-height: 100px;max-height: 100px;max-width: 90%;min-width:90%"  name="" id="updateDescription" ></textarea> &nbsp;<b>*</b>
+          </div>
+        </div>
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 100px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex">
+            <div style="width: fit-content;height: auto;align-self: center;margin: auto" class="basicName1"></div>
+          </div>
+          <div class="qwe"  style="width:638px ;height: 38px;border-bottom: 1px solid #d6e0ef;">
+            &nbsp;<input maxlength="20" style="width: 90%;height: 20px;" type="text" name="" id="updateNumber" value="" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+        <!--下面是后来添加的属性 -->
+        <div id="selectAttributeUpdate" style="width: 738px;height: auto">
+
+        </div>
+
+
+
+
+
+        <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+
+          <button id="updateSubmit">重新启用</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="addAttribute" class="aa" style="width:750px ;max-height:90%;overflow-y: auto;overflow-x: hidden;margin: 5px auto auto;background-color: white;padding-bottom: 5px">
+
+
+      <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>新增属性</b></div>
+      <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 37px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;line-height: 19px;">属性<br> 名称</div>
+          <div  style="width:701px ;height: 38px;border-bottom: #d6e0ef solid 1px">
+            &nbsp;<input maxlength="20" style="width: 90%;height: 20px;" type="text" name="" id="attributeName" value=""> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+
+        <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+          <input style="width:64px ;height: 22px;border-right: 2px solid black;border-bottom: 2px solid black;
+             border-top: 2px solid grey;border-left: 2px solid grey;" type="button" name="" id="attributeSubmit" value="确定添加">&nbsp;
+        </div>
+      </div>
+    </div>
+
+    <div id="updateAttribute" class="aa" style="width:750px ;max-height:90%;overflow-y: auto;overflow-x: hidden;margin: 5px auto auto;">
+
+
+      <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;"><b>修改属性</b></div>
+
+      <div class="aa" style="width:740px ;height: auto;margin: 20px auto auto;">
+        <div style="width: 100%;height: auto;display: flex;text-align: center;color: white">
+          <div style="width: 70%;margin: auto;background-color:   #698CC3; border:white solid 2px" ><b>属性名称</b></div>
+          <div style="width: 29.5%;margin: auto;background-color: #698CC3; border:white solid 2px"    ><b>操作</b></div>
+        </div>
+        <div  id="updateAttributeData" style="width: 100%;height: auto;margin: auto">
+
+        </div>
+
+
+
+      </div>
+    </div>
+
+    <div id="updateAttribute2" class="aa" style="width:750px ;max-height:90%;overflow-y: auto;overflow-x: hidden;margin: 5px auto auto;background-color: white;padding-bottom: 5px">
+
+
+      <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt"><b>修改属性</b></div>
+      <div class="aa" style="width:740px ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;font-size: 9pt;">
+        <div style="width:738px ;height: 38px;display: flex;">
+          <div  style="width: 37px;height: 38px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;line-height: 19px;">属性<br> 名称</div>
+          <div  style="width:701px ;height: 38px;border-bottom: #d6e0ef solid 1px">
+            &nbsp;<input maxlength="20" style="width: 90%;height: 20px;" type="text" name="" id="updateAttributeName" value=""> &nbsp;<b>*</b>
+          </div>
+        </div>
+
+
+        <div style="width:735px ;height: 28px;text-align: center;margin-top: 5px;">
+          <input style="width:64px ;height: 22px;border-right: 2px solid black;border-bottom: 2px solid black;
+             border-top: 2px solid grey;border-left: 2px solid grey;" type="button" name="" id="updateAttributeSubmit" value="确定修改">&nbsp;
+          <input style="width:64px ;height: 22px;border-right: 2px solid black;border-bottom: 2px solid black;
+             border-top: 2px solid grey;border-left: 2px solid grey;" type="button" name="" id="updateAttributeSubmitBack" value="返回">&nbsp;
+        </div>
+      </div>
+    </div>
+
+    <div id="addMapping" class="aa" style="width:750px ;max-height:90%;overflow-y: auto;overflow-x: hidden;margin: 5px auto auto;padding-bottom: 5px;display: none">
+
+      <div style="width: 746px;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;"><b>映射管理</b></div>
+
+      <div style="width: 100%;height: 50px;display: flex;margin: auto;">
+        <div id="div1" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+        <div id="div2" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+        <div id="div3" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+        <div id="div4" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+        <div id="div5" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+        <div id="div6" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+        <div id="div7" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+        <div id="div8" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+        <div id="div9" style="width: 10%;height: 40px;border: #1890ff solid 1px;margin: auto"></div>
+      </div>
+
+      <div id="mappingDiv" style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: 25px auto auto;">
+        <div style="width: 100%;height: auto;display: flex;text-align: center;color: white">
+          <div style="width: 60%;margin: auto;background-color: #9eb6d8; border:white solid 1px" ><b>属性名称</b></div>
+
+          <div style="width: 40%;margin: auto;background-color: #9eb6d8  ; border:white solid 1px"    ><b>操作</b></div>
+        </div>
+        <div id="mappingContent" style="width: 100%;height: auto;margin: auto">
+          <!--                            <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+          <!--                                <div style="width: 74.5%;margin: auto; border: white solid 1px"><b>分类名称</b></div>-->
+          <!--                                <div style="width: 15%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+          <!--                            </div>-->
+
+          <!--              <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+          <!--                  <div style="width: 34.5%;margin: auto; border: white solid 1px"><b>分类名称</b></div>-->
+          <!--                  <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>分类描述</b></div>-->
+          <!--                  <div style="width: 15%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+          <!--              </div>-->
+        </div>
+      </div>
+
+
+      <div id="mappingAddDiv" style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: 25px auto auto;display: none">
+        <label for="ctrlZLength"></label><input id="ctrlZLength" style="display: none" value="">
+        <label for="ctrlZBeginLocation"></label><input id="ctrlZBeginLocation" style="display: none" value="">
+
+        <div style="width: 100%;height: auto;display: flex;text-align: center;">
+          <div style="width: 25%;margin: auto; border:white solid 1px" ><b>属性名称</b></div>
+          <div style="width: 74.5%;margin: auto; border:white solid 1px" ><label for="attributeName"></label><input id="mappingAttributeName" style="width: 90%;height: 25px;" disabled></div>
+        </div>
+
+
+        <div style="width: 100%;height: auto;display: flex;text-align: center;">
+
+          <div style="width: 25%;margin: auto; border:white solid 1px" ><b>起始位置</b></div>
+          <div style="width: 74.5%;margin: auto; border:white solid 1px" ><label for="beginLocation"></label><input id="beginLocation" maxlength="1" oninput="if(this.value.length===1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" style="width: 90%;height: 25px;" ></div>
+        </div>
+
+        <div style="width: 100%;height: auto;display: flex;text-align: center;">
+
+          <div style="width: 25%;margin: auto;border:white solid 1px"  ><b>长度</b></div>
+          <div style="width: 74.5%;margin: auto; border:white solid 1px" ><label for="length"></label><input id="length" maxlength="1" oninput="if(this.value.length===1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" style="width: 90%;height: 25px;"></div>
+        </div>
+        <div style="width: 100%;height: auto;display: flex;text-align: center;">
+
+          <div style="width: 25%;margin: auto; border:white solid 1px"><b>结束位置</b></div>
+          <div style="width: 74.5%;margin: auto; border:white solid 1px" ><label for="endLocation"></label><input id="endLocation" maxlength="1" oninput="if(this.value.length===1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" style="width: 90%;height: 25px;" disabled ></div>
+
+        </div>
+
+        <div id="mappingAddContent" style="width: 100%;height: auto;margin: auto">
+
+        </div>
+
+
+      </div>
+
+
+      <div style="width: 100%;height: auto;text-align: center">
+        <button style="display: none;margin: 10px auto  5px auto;padding: 5px 10px" id="submitMapping">加入映射</button>
+        <button style="display: none;margin: 10px auto  5px auto;padding: 5px 10px" id="submitUpdateMapping">修改映射</button>
+        <button style="display: none;margin: 10px auto  5px auto;padding: 5px 10px" id="reloadMapping">还原</button>
+        <button style="display: none;margin: 10px auto  5px auto;padding: 5px 10px" id="backMapping">返回</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+<script type="text/javascript" src="js/axios-0.18.0.js"></script>
+<script type="text/javascript" src="js/abandonedproduct.js"></script>
+
+
+</html>

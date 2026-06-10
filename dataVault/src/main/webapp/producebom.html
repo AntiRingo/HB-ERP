@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>可拖动表头BOM列表</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 20px auto;
+            border: 1px solid #9eb6d8;
+            border-radius: 8px;
+            overflow: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background: white;
+        }
+        .header-row {
+            display: flex;
+            background-color: #4a6fa5;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-col {
+            padding: 12px 8px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            cursor: move;
+            user-select: none;
+            transition: all 0.2s ease;
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .header-col:last-child {
+            border-right: none;
+        }
+        .header-col.dragging {
+            background-color: rgba(255, 255, 255, 0.2);
+            opacity: 0.8;
+        }
+        .header-col.over {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        .data-row {
+            border-bottom: 1px solid #e1e5eb;
+            transition: background-color 0.2s;
+        }
+        .data-row:hover {
+            background-color: #f8f9fc;
+        }
+        .row-content {
+            display: flex;
+            min-height: 60px;
+            align-items: center;
+        }
+        .row-col {
+            padding: 10px 8px;
+            border-right: 1px solid #e1e5eb;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .row-col:last-child {
+            border-right: none;
+        }
+        .attr-content {
+            padding: 10px 15px;
+            color: #5a6268;
+            font-size: 0.9em;
+            line-height: 1.6;
+            background-color: #f9fafc;
+            border-top: 1px solid #e1e5eb;
+        }
+        input[type="text"] {
+            width: 90%;
+            border: 1px solid #d1d5db;
+            padding: 6px 8px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            font-size: 0.95em;
+        }
+        textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            resize: vertical;
+            min-height: 60px;
+            font-size: 0.95em;
+        }
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #4a6fa5;
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        .delete-btn {
+            color: #e53e3e;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+        .delete-btn:hover {
+            background-color: #fef2f2;
+        }
+        .bom-content {
+            max-height: 70vh;
+            /*overflow-y: auto;*/
+        }
+        .drag-handle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: move;
+            color: #718096;
+        }
+        .drag-icon {
+            font-size: 18px;
+        }
+        .row-col.dragging {
+            background-color: rgba(74, 111, 165, 0.05);
+        }
+
+        /* 新增：列拖动占位符样式 */
+        .placeholder-col {
+            background-color: #e0e0e0;
+            border: 2px dashed #999;
+            height: 100%;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-row" id="titleContent">
+        <div id="name" class="header-col" style="width: 20%;">物料名</div>
+        <div id="material_number" class="header-col" style="width: 20%;">物料号</div>
+        <div id="number" class="header-col" style="width: 10%;">数量</div>
+        <div id="part_number" class="header-col" style="width: 25%;">零件号</div>
+        <div id="notes" class="header-col" style="width: 25%;">备注</div>
+<!--        <div class="header-col" style="width: 5%;">操作</div>-->
+    </div>
+
+    <div class="bom-content" id="bomContent">
+<!--        <div class="data-row" draggable="true">-->
+<!--            <div class="row-content">-->
+<!--                <div class="row-col" style="width: 20%;">-->
+<!--                    <b>STM32F107RCT6</b>-->
+<!--                </div>-->
+<!--                <div class="row-col" style="width: 20%;">-->
+<!--                    <b>109040451332350Q03</b>-->
+<!--                </div>-->
+<!--                <div class="row-col" style="width:10%;">-->
+<!--                    <input type="text" disabled>-->
+<!--                </div>-->
+<!--                <div class="row-col" style="width: 25%;">-->
+<!--                    <div >123</div>-->
+<!--                </div>-->
+<!--                <div class="row-col" style="width: 25%;">-->
+<!--                    <div >52525</div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="attr-content">-->
+<!--                封装: LQFP; 管脚数: 64; 品牌: STMICROELECTRONICS; 核心: ARM Cortex M3; 数据总线宽度: 32 bit;-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="data-row" draggable="true">-->
+<!--            <div class="row-content">-->
+<!--                <div class="row-col" style="width: 20%;">-->
+<!--                    <b>电阻 10KΩ</b>-->
+<!--                </div>-->
+<!--                <div class="row-col" style="width: 20%;">-->
+<!--                    <b>RES-001-10K</b>-->
+<!--                </div>-->
+<!--                <div class="row-col" style="width: 10%;">-->
+<!--                    <input type="text" disabled>-->
+<!--                </div>-->
+<!--                <div class="row-col" style="width: 25%;">-->
+<!--                    <div >R001</div>-->
+<!--                </div>-->
+<!--                <div class="row-col" style="width: 25%;">-->
+<!--                    <div >0805封装</div>-->
+<!--                </div>-->
+
+<!--            </div>-->
+<!--            <div class="attr-content">-->
+<!--                类型: 贴片电阻; 容差: ±1%; 功率: 0.125W; 温度系数: ±100ppm/℃-->
+<!--            </div>-->
+<!--        </div>-->
+    </div>
+</div>
+
+
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    // function zkFunction(){
+    //     let zks = document.querySelectorAll(".zk");
+    //     for (let i = 0; i < zks.length; i++) {
+    //         //获取插入BOM表展开的位置
+    //         let nextSibling = zks[i].parentNode.parentNode;
+    //
+    //
+    //         //获取ID
+    //         let id = zks[i].parentNode.parentNode.parentNode.querySelector(".idValue").innerHTML;
+    //         let inBomId = zks[i].parentNode.parentNode.parentNode.querySelector(".inBomId").innerHTML;
+    //         zks[i].onclick=async function () {
+    //             if (zks[i].checked === true) {
+    //                 //展开
+    //
+    //                 //获取titleId
+    //                 await axios({
+    //                     method:"post",
+    //                     url:"finBomTitle/selectBomTitle",
+    //                     data:id
+    //                 }).then(async function (resp) {
+    //                     let datas = resp.data;
+    //                     if (datas.length > 0) {
+    //                         let id1 = datas[0].id;
+    //                         //查询该产品的BOM表信息
+    //                         await axios({
+    //                             method: "post",
+    //                             url: "finBom/selectByPage",
+    //                             data: id1
+    //                         }).then(async function (resp) {
+    //                             let rows = resp.data.rows;
+    //                             if (rows.length > 0) {
+    //                                 let a = '<div id=zk' + inBomId + '></div>'
+    //                                 nextSibling.insertAdjacentHTML("afterend", a);
+    //                                 let s = ''
+    //                                 for (let i = 0; i < rows.length; i++) {
+    //                                     let aa = '';
+    //                                     if (rows[i].part_number !==null){
+    //                                         aa=rows[i].part_number;
+    //                                     }
+    //                                     let bb = '';
+    //                                     if (rows[i].notes !==null){
+    //                                         aa=rows[i].notes;
+    //                                     }
+    //
+    //                                     if(Number(rows[i].vault)===1){
+    //                                        s+=' <div class="data-row"  draggable="true">\n' +
+    //                                             '<div class="vault" style="display: none">'+rows[i].vault+'</div>' +
+    //                                             '<div class="idValue" style="margin: auto;align-self: center;width: fit-content;height: auto;display: none">'+rows[i].productId+'</div>' +
+    //                                             '<div class="inBomId" style="display: none">'+rows[i].id+'</div>' +
+    //                                             '            <div class="row-content">\n' +
+    //                                             '                <div class="row-col" style="width: 20%;">\n' +
+    //                                             '                    <b>'+rows[i].name+'</b>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width: 20%;">\n' +
+    //                                             '                    <b>'+rows[i].material_number+'</b>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width:5%;">\n' +
+    //                                             '                   <b>'+rows[i].number+'</b>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width: 25%;">\n' +
+    //                                             '                    <div >'+aa+'</div>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width: 25%;">\n' +
+    //                                             '                    <div >'+bb+'</div>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width: 5%;">\n' +
+    //                                             '                        <input type="checkbox" class="zk" title="展开该产品下的零件信息">' +
+    //                                             '                    </div>\n'+
+    //                                             '                </div>\n' +
+    //                                             '            <div class="attr-content attributeContent'+inBomId+'" >\n' +
+    //
+    //                                             '            </div>\n' +
+    //                                             '        </div>'
+    //
+    //                                     }
+    //                                     else {
+    //
+    //                                         s+=' <div class="data-row"  draggable="true">\n' +
+    //                                             '<div class="vault" style="display: none">'+rows[i].vault+'</div>' +
+    //                                             '<div class="idValue" style="margin: auto;align-self: center;width: fit-content;height: auto;display: none">'+rows[i].productId+'</div>' +
+    //                                             '<div class="inBomId" style="display: none">'+rows[i].id+'</div>' +
+    //
+    //                                             '            <div class="row-content">\n' +
+    //                                             '                <div class="row-col" style="width: 20%;">\n' +
+    //                                             '                    <b>'+rows[i].name+'</b>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width: 20%;">\n' +
+    //                                             '                    <b>'+rows[i].material_number+'</b>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width:5%;">\n' +
+    //                                             '                    <b>'+rows[i].number+'</b>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width: 25%;">\n' +
+    //                                             '                    <div >'+aa+'</div>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width: 25%;">\n' +
+    //                                             '                    <div >'+bb+'</div>\n' +
+    //                                             '                </div>\n' +
+    //                                             '                <div class="row-col" style="width: 5%;">\n' +
+    //                                             '                    </div>\n'+
+    //                                             '                </div>\n' +
+    //                                             '            <div class="attr-content attributeContent'+inBomId+'" >\n' +
+    //
+    //                                             '            </div>\n' +
+    //                                             '        </div>'
+    //
+    //                                     }
+    //
+    //
+    //
+    //                                 }
+    //                                 // 在div中插入代码
+    //                                 let elementById = document.getElementById("zk" +inBomId+ "");
+    //                                 elementById.insertAdjacentHTML("afterbegin", s);
+    //                                 //查询BOM表的属性信息
+    //                                 await axios({
+    //                                     method: "post",
+    //                                     url: "finBom/selectAttribute",
+    //                                     data: id1
+    //                                 }).then(function (resp) {
+    //                                     let datas = resp.data;
+    //                                     let atts = elementById.querySelectorAll(".attributeContent"+inBomId+"");
+    //                                     for (let j = 0; j < rows.length; j++) {
+    //
+    //                                         let formdata = "";
+    //                                         for (let k = 0; k < datas.length; k++) {
+    //
+    //
+    //                                             if (rows[j].productId === datas[k].productId && rows[j].vault === datas[k].vault && datas[k].attributeName !== '存放位置') {
+    //
+    //
+    //                                                 formdata += '' + datas[k].attributeName + ':' + datas[k].content + '' + datas[k].attributeNameUnit + ';<span style="margin-left: 10px;width: fit-content;"></span>      '
+    //
+    //                                             }
+    //
+    //                                             atts[j].innerHTML = formdata;
+    //                                         }
+    //                                     }
+    //                                     //拖动
+    //                                     move();
+    //
+    //                                 })
+    //
+    //                                 zkFunction();
+    //
+    //                             }
+    //                         })
+    //                     }
+    //                     else {
+    //                         zks[i].checked =false;
+    //                         alert("该产品没有BOM表！");
+    //                     }
+    //                 })
+    //
+    //
+    //
+    //
+    //
+    //
+    //             }
+    //             else {
+    //                 //关闭
+    //
+    //
+    //                 document.getElementById("zk"+inBomId+"").remove();
+    //             }
+    //         }
+    //     }
+    // }
+
+
+
+
+
+
+    //接收上个页面传来的参数
+
+    function getHref(){
+        var url = decodeURI(location.search);
+        var theRequest = {};
+        if (url.indexOf("?") !== -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for(var i = 0; i < strs.length; i ++) {
+                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+
+    //用法  var 自己变量名字 = getHref().要获取的参数名字
+    var finId=getHref().finId;
+    var bomTitleId=getHref().bomTitleId;
+    let bomvault = getHref().vault;
+    let myBrather =  getHref().myBrather;
+
+    let localName="orderBy"+myBrather+""
+    //创建一个保存函数
+    var save = function (arr) {
+
+        // let b=JSON.stringify(arr)
+        // localStorage.setItem(localName,b);
+
+        //调用axios进行保存数据
+        axios({
+            method:"post",
+            url:"userSetting/addSetting?sort=bom&infoHead="+localName+"",
+            data:arr
+        }).then(function (resp){
+            if (resp.data!=="success"){
+                alert("用户配置保存失败，请联系相关人员！")
+            }
+        })
+    }
+    //收集数据储存在本地
+    function saveLocation(){
+
+
+
+        let header = document.querySelectorAll(".header-col");
+        let list=[header.length];
+
+        for (let i = 0; i < header.length; i++) {
+            let formdata={
+                orderBy:"",
+                name:"",
+                width:"",
+                chName:""
+            }
+            formdata={
+                orderBy:i,
+                name:header[i].id,
+                width:header[i].style.width,
+                chName:header[i].innerHTML
+            }
+            list[i]=formdata;
+            formdata={
+                orderBy:"",
+                name:"",
+                width:"",
+                chName:""
+            }
+        }
+        console.log(list)
+        save(list);
+    }
+
+    let bratherData;
+    //读取数据
+    axios({
+        method:"post",
+        url:"userSetting/selectSetting?sort=bom&infoHead="+localName+""
+    }).then(function (resp){
+        bratherData=resp.data;
+        if (bratherData!==null && bratherData.length>0){
+            let title="";
+            for (let i = 0; i < bratherData.length; i++) {
+                title+=' <div id='+bratherData[i].name+' class="header-col" style="width: '+bratherData[i].width+';">'+bratherData[i].chName+'</div>'
+            }
+            document.getElementById("titleContent").innerHTML=title;
+        }
+    })
+    // let bratherData = JSON.parse(localStorage.getItem(localName));//把本地存储的my转成数组
+
+
+
+
+
+function move(){
+    // 表头拖动功能
+    const headerRow = document.querySelector('.header-row');
+    const headerCols = Array.from(headerRow.children);
+    const dataRows = Array.from(document.querySelectorAll('.data-row'));
+    const rowContents = Array.from(document.querySelectorAll('.row-content'));
+
+    let draggedHeader = null;
+    let draggedRow = null;
+
+    // 初始化表头拖动事件
+    headerCols.forEach(col => {
+        col.draggable = true;
+        col.addEventListener('dragstart', handleHeaderDragStart);
+        col.addEventListener('dragover', handleHeaderDragOver);
+        col.addEventListener('dragenter', handleHeaderDragEnter);
+        col.addEventListener('dragleave', handleHeaderDragLeave);
+        col.addEventListener('drop', handleHeaderDrop);
+        col.addEventListener('dragend', handleHeaderDragEnd);
+    });
+
+    // 初始化数据行拖动事件
+    dataRows.forEach(row => {
+        row.addEventListener('dragstart', handleRowDragStart);
+        row.addEventListener('dragover', handleRowDragOver);
+        row.addEventListener('dragenter', handleRowDragEnter);
+        row.addEventListener('dragleave', handleRowDragLeave);
+        row.addEventListener('drop', handleRowDrop);
+        row.addEventListener('dragend', handleRowDragEnd);
+    });
+
+
+    // 表头拖动处理函数
+    function handleHeaderDragStart(e) {
+        draggedHeader = this;
+        e.dataTransfer.effectAllowed = 'move';
+        this.classList.add('dragging');
+        setTimeout(() => this.style.opacity = '0.6', 0);
+    }
+
+    function handleHeaderDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleHeaderDragEnter(e) {
+        this.classList.add('over');
+    }
+
+    function handleHeaderDragLeave() {
+        this.classList.remove('over');
+    }
+
+    function handleHeaderDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (draggedHeader !== this) {
+            const allHeaders = Array.from(headerRow.children);
+            const draggedIdx = allHeaders.indexOf(draggedHeader);
+            const targetIdx = allHeaders.indexOf(this);
+
+            // 移动表头列
+            if (draggedIdx < targetIdx) {
+                headerRow.insertBefore(draggedHeader, this.nextSibling);
+            } else {
+                headerRow.insertBefore(draggedHeader, this);
+            }
+
+            // 同步移动所有数据行的对应列
+            rowContents.forEach(content => {
+                const contentChildren = Array.from(content.children);
+                if (contentChildren.length > Math.max(draggedIdx, targetIdx)) {
+                    const draggedCol = contentChildren[draggedIdx];
+                    const targetCol = contentChildren[targetIdx];
+
+                    if (draggedIdx < targetIdx) {
+                        content.insertBefore(draggedCol, targetCol.nextSibling);
+                    } else {
+                        content.insertBefore(draggedCol, targetCol);
+                    }
+                }
+            });
+        }
+
+        this.classList.remove('over');
+        return false;
+    }
+
+    function handleHeaderDragEnd() {
+        this.classList.remove('dragging');
+        this.style.opacity = '1';
+        headerCols.forEach(col => col.classList.remove('over'));
+        saveLocation();
+    }
+
+    // 数据行拖动处理函数
+    function handleRowDragStart(e) {
+        draggedRow = this;
+        e.dataTransfer.effectAllowed = 'move';
+        this.classList.add('dragging');
+        setTimeout(() => this.style.opacity = '0.6', 0);
+    }
+
+    function handleRowDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleRowDragEnter(e) {
+        if (this !== draggedRow) {
+            this.classList.add('over');
+        }
+    }
+
+    function handleRowDragLeave() {
+        this.classList.remove('over');
+    }
+
+    function handleRowDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (this !== draggedRow) {
+            const bomContent = document.getElementById('bomContent');
+            const allRows = Array.from(bomContent.children);
+            const draggedIndex = allRows.indexOf(draggedRow);
+            const targetIndex = allRows.indexOf(this);
+
+            if (draggedIndex < targetIndex) {
+                bomContent.insertBefore(draggedRow, this.nextSibling);
+            } else {
+                bomContent.insertBefore(draggedRow, this);
+            }
+        }
+
+        this.classList.remove('over');
+        return false;
+    }
+
+    function handleRowDragEnd() {
+        this.classList.remove('dragging');
+        this.style.opacity = '1';
+        dataRows.forEach(row => row.classList.remove('over'));
+
+    }
+
+    // ===== 新增：列拖动功能 =====
+    // 初始化列拖动事件
+    const rowCols = Array.from(document.querySelectorAll('.row-col'));
+    rowCols.forEach(col => {
+        col.draggable = true;
+        col.addEventListener('dragstart', handleColDragStart);
+        col.addEventListener('dragover', handleColDragOver);
+        col.addEventListener('dragenter', handleColDragEnter);
+        col.addEventListener('dragleave', handleColDragLeave);
+        col.addEventListener('drop', handleColDrop);
+        col.addEventListener('dragend', handleColDragEnd);
+    });
+
+    let draggedCol = null;
+    let placeholder = null;
+
+    // 列拖动处理函数
+    function handleColDragStart(e) {
+        draggedCol = this;
+        e.dataTransfer.effectAllowed = 'move';
+        this.classList.add('dragging');
+        setTimeout(() => this.style.opacity = '0.6', 0);
+    }
+
+    function handleColDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        // 创建占位符
+        if (!placeholder) {
+            placeholder = document.createElement('div');
+            placeholder.className = 'placeholder-col';
+            placeholder.style.width = `${draggedCol.offsetWidth}px`;
+            placeholder.style.height = `${draggedCol.offsetHeight}px`;
+
+            // 插入占位符
+            if (this !== draggedCol) {
+                const rect = this.getBoundingClientRect();
+                const isAfter = e.clientX > rect.left + rect.width / 2;
+
+                if (isAfter) {
+                    this.parentNode.insertBefore(placeholder, this.nextSibling);
+                } else {
+                    this.parentNode.insertBefore(placeholder, this);
+                }
+            }
+        }
+
+        return false;
+    }
+
+    function handleColDragEnter(e) {
+        if (this !== draggedCol) {
+            this.classList.add('over');
+        }
+    }
+
+    function handleColDragLeave() {
+        this.classList.remove('over');
+
+        // 移除占位符
+        if (placeholder && placeholder.parentNode) {
+            placeholder.parentNode.removeChild(placeholder);
+            placeholder = null;
+        }
+    }
+
+    function handleColDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (this !== draggedCol && placeholder) {
+            // 移除占位符
+            placeholder.parentNode.removeChild(placeholder);
+            placeholder = null;
+
+            // 移动列
+            this.parentNode.insertBefore(draggedCol, this);
+
+            // 更新表头列顺序
+            updateHeaderOrder();
+
+
+        }
+
+
+        this.classList.remove('over');
+        return false;
+    }
+
+    function handleColDragEnd() {
+        this.classList.remove('dragging');
+        this.style.opacity = '1';
+        rowCols.forEach(col => col.classList.remove('over'));
+
+        // 移除占位符
+        if (placeholder && placeholder.parentNode) {
+            placeholder.parentNode.removeChild(placeholder);
+            placeholder = null;
+        }
+
+
+    }
+
+    // 更新表头列顺序
+    function updateHeaderOrder() {
+        const firstRow = document.querySelector('.row-content');
+        if (!firstRow) return;
+
+        const rowCols = Array.from(firstRow.children);
+        const headerCols = Array.from(headerRow.children);
+
+        // 移除表头列
+        headerCols.forEach(col => headerRow.removeChild(col));
+
+        // 重新添加表头列（按数据列顺序）
+        rowCols.forEach((col, index) => {
+            if (index < headerCols.length) {
+                headerRow.appendChild(headerCols[index]);
+            }
+        });
+
+    }
+
+
+}
+
+
+    //暂时关闭展开功能
+
+
+
+    //查询该物料是否有BOM表的数据
+
+    axios({
+        method:"post",
+        url:"finBom/selectByPage",
+        data:bomTitleId
+    }).then(async function (resp)
+    {
+        let rows=resp.data.rows;
+        // document.getElementById("productNumber").innerHTML=resp.data.totalCount;
+        let formdata="";
+        if (rows.length>0){
+
+
+
+            for (let i = 0; i < rows.length; i++) {
+                let orderData='';
+                if (bratherData!==null && bratherData.length>0){
+                    for (let j = 0; j < bratherData.length; j++) {
+                        orderData+=  '<div class="row-col" style="width:'+bratherData[j].width+'">\n' +
+                            '              <b class='+bratherData[j].name+'>'+rows[i][bratherData[j].name]+'</b>\n' +
+                            '         </div>\n'
+                    }
+                    formdata+=' <div class="data-row" draggable="true">\n' +
+                        '<div class="vault" style="display: none">'+rows[i].vault+'</div>' +
+                        '<div class="idValue" style="margin: auto;align-self: center;width: fit-content;height: auto;display: none">'+rows[i].productId+'</div>' +
+                        '<div class="inBomId" style="display: none">'+rows[i].id+'</div>' +
+                        '            <div class="row-content">'+orderData+'</div>\n' +
+                        '            <div class="attr-content attributeContent" >\n' +
+
+                        '            </div>\n' +
+                        '        </div>'
+                }
+                else {
+                    formdata+=' <div class="data-row" draggable="true">\n' +
+                        '<div class="vault" style="display: none">'+rows[i].vault+'</div>' +
+                        '<div class="idValue" style="margin: auto;align-self: center;width: fit-content;height: auto;display: none">'+rows[i].productId+'</div>' +
+                        '<div class="inBomId" style="display: none">'+rows[i].id+'</div>' +
+                        '            <div class="row-content">\n' +
+                        '                <div class="row-col" style="width: 20%;">\n' +
+                        '                    <b>'+rows[i].name+'</b>\n' +
+                        '                </div>\n' +
+                        '                <div class="row-col" style="width: 20%;">\n' +
+                        '                    <b class="material-number">'+rows[i].material_number+'</b>\n' +
+                        '                </div>\n' +
+                        '                <div class="row-col" style="width:10%;">\n' +
+                        '                   <b>'+rows[i].number+'</b>\n' +
+                        '                </div>\n' +
+                        '                <div class="row-col" style="width: 25%;">\n' +
+                        '                    <div >'+rows[i].part_number+'</div>\n' +
+                        '                </div>\n' +
+                        '                <div class="row-col" style="width: 25%;">\n' +
+                        '                    <div >'+rows[i].notes+'</div>\n' +
+                        '                </div>\n' +
+                        '                <div class="row-col" style="width: 5%;display: none">\n' +
+                        '                        <input type="checkbox" class="zk" title="展开该产品下的零件信息">' +
+                        '                    </div>\n'+
+                        '                </div>\n' +
+                        '            <div class="attr-content attributeContent" >\n' +
+
+                        '            </div>\n' +
+                        '        </div>'
+                }
+
+                // if(Number(rows[i].vault)===1){
+                //
+                //
+                // }
+                // else {
+                //
+                //
+                // }
+
+            }
+            document.getElementById("bomContent").innerHTML=formdata;
+
+            //查询BOM表的属性信息
+            await axios({
+                method:"post",
+                url:"finBom/selectAttribute",
+                data:bomTitleId
+            }).then(function (resp){
+                let datas=resp.data;
+                let atts = document.querySelectorAll(".attributeContent");
+                for (let i = 0; i <rows.length ; i++) {
+                    let formdata="";
+                    for (let j = 0; j < datas.length; j++) {
+                        if (rows[i].productId===datas[j].productId && rows[i].vault ===datas[j].vault && datas[j].attributeName !=='存放位置'){
+                            formdata+=''+datas[j].attributeName+':'+datas[j].content+''+datas[j].attributeNameUnit+';<span style="margin-left: 10px;width: fit-content;"></span>      '
+                        }
+                    }
+                    atts[i].innerHTML=formdata;
+                }
+                //拖动
+                move();
+
+
+            })
+
+            let numbers = document.querySelectorAll(".idValueNumber");
+            let updates = document.querySelectorAll(".update");
+            let partNumbers = document.querySelectorAll(".partNumbers");
+            let notes = document.querySelectorAll(".notes");
+            for (let i = 0; i < numbers.length; i++) {
+                numbers[i].onchange = function () {
+
+                    let value = numbers[i].value;
+                    if (value.length > 0) {
+                        if (Number(value) !== Number(rows[i].number)) {
+                            updates[i].innerHTML = "<div class='updateSign'></div>";
+                        } else {
+                            updates[i].innerHTML = "";
+                        }
+
+                    }
+
+                }
+                partNumbers[i].onchange=function (){
+
+                    let value = partNumbers[i].value;
+
+                    if (value.length > 0) {
+
+                        if (value !== rows[i].partNumbers) {
+
+                            updates[i].innerHTML = "<div class='updateSign'></div>";
+                        } else {
+
+                            updates[i].innerHTML = "";
+                        }
+
+                    }
+                }
+                notes[i].onchange=function (){
+
+                    let value = notes[i].value;
+
+                    if (value.length > 0) {
+
+                        if (value !== rows[i].notes) {
+
+                            updates[i].innerHTML = "<div class='updateSign'></div>";
+                        } else {
+
+                            updates[i].innerHTML = "";
+                        }
+
+                    }
+                }
+
+            }
+            // submitButton();
+
+            //暂时屏蔽展开功能
+            // zkFunction();
+
+        }
+        else {
+            document.getElementById("bomContent").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">暂未添加BOM表信息!</div>'
+        }
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
+

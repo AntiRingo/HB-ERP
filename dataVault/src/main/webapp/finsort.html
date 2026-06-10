@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>成品半产品仓库物料分类详情</title>
+    <link href="css/product.css" rel="stylesheet" />
+</head>
+<style>
+    html{
+        padding:0;
+        margin: 0;
+
+        width: 100%;
+        height: 100%;
+        /*断句*/
+        word-break:break-all;
+        font-family: 宋体,serif;
+    }
+    body{
+        width: 90%;
+        height: auto;
+        margin: auto;
+        padding:0;
+        background-color: aliceblue;
+    }
+    .sort{
+        width: 90%;
+        height: auto;
+        border: #9eb6d8 solid 1px;
+        margin: 20px auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+
+    .sort-div{
+        width: 25%;
+        height: auto;
+        min-height: 30px;
+        text-align: center;
+        display: flex;
+
+    }
+    .sort-div div{
+        width: fit-content;
+
+        align-self: center;
+        margin: auto;
+    }
+    .sort-div div a{
+        color:#003366;
+        text-decoration: none;
+    }
+    .sort-div div a:hover{
+        color: cornflowerblue;
+
+    }
+
+    a{
+        color: cornflowerblue;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    a:hover{
+        color: blue;
+    }
+    a:active{
+        color: red;
+    }
+</style>
+<body>
+<div style="width: 100%;height: 90%;">
+    <div style="margin: 20px auto"><span>当前位置：</span><span><a href="finsort.html?id=0">产品总分类</a>&nbsp;/</span> <span id="location"></span></div>
+
+  <div style="width: 80%;margin:auto;height: auto;padding: 1px;border: #9eb6d8 solid 1px">
+      <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px">
+          <div style="width: 75%;background-color:#9eb6d8;height: auto;"><b id="number"></b><b>分类列表</b></div>
+          <div style="width: 24.5%;background-color:#9eb6d8;margin: auto;height: auto;">
+              <button id="add">添加分类</button>
+              <button id="back" style="margin-left: 5px">返回上一级</button>
+          </div>
+      </div>
+
+      <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: 25px auto auto">
+          <div style="width: 100%;height: auto;display: flex;text-align: center;color: white">
+              <div style="width: 25%;background-color: #9eb6d8; border:white solid 1px" ><b>分类名称</b></div>
+              <div style="width: 30%;background-color: #9eb6d8; border:white solid 1px" ><b>分类描述</b></div>
+              <div style="width: 20%;background-color: #9eb6d8; border:white solid 1px" ><b>编码</b></div>
+              <div style="width: 25%;margin: auto;background-color: #9eb6d8  ; border:white solid 1px"    ><b>操作</b></div>
+          </div>
+          <div id="content" style="width: 100%;height: auto;margin: auto">
+<!--              <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+<!--                  <div style="width: 34.5%;margin: auto; border: white solid 1px"><b>分类名称</b></div>-->
+<!--                  <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>分类描述</b></div>-->
+<!--                  <div style="width: 15%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+<!--              </div>-->
+
+<!--              <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+<!--                  <div style="width: 34.5%;margin: auto; border: white solid 1px"><b>分类名称</b></div>-->
+<!--                  <div style="width: 50%;margin: auto  ; border: white solid 1px"><b>分类描述</b></div>-->
+<!--                  <div style="width: 15%;margin: auto;   border: white solid 1px"><b>操作</b></div>-->
+<!--              </div>-->
+          </div>
+      </div>
+
+  </div>
+
+
+</div>
+<div class="window">
+
+    <div class="window-content">
+
+        <div class="window-content-close">×</div>
+
+        <div id="codeView" class="aa" style="width:750px ;height: auto;max-height: 88%; margin: 5px auto auto;background-color: white;padding-bottom: 5px;">
+            <div style="width: 100%;height: auto;display: flex;margin: auto;position: sticky;top: 0">
+                <div style="width: 100%;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;
+     line-height: 29px;text-align: center;color: white;"><b>添加编码规则</b></div>
+
+            </div>
+
+            <div class="aa" id="formdata" style="width:99% ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;">
+                <div style="width:100% ;height: auto;display: flex;">
+
+                    <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+                            编码长度：
+                        </div>
+                    </div>
+                    <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="length" value="" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')"> &nbsp;<b>*</b>
+                    </div>
+                </div>
+
+                <div style="width:100% ;height: auto;display: flex;">
+
+                    <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+                            所需的内容：
+                        </div>
+                    </div>
+                    <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="description" value="" onkeyup="this.value=this.value.replace(/[ ]/g,'')"/> &nbsp;<b>*</b>
+                    </div>
+                </div>
+                <div style="width:100% ;height: auto;display: flex;">
+
+                    <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+                            去除的内容：
+                        </div>
+                    </div>
+                    <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="remove" value="" onkeyup="this.value=this.value.replace(/[ ]/g,'')"/> &nbsp;
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div style="width: 100%;height: auto;text-align: center">
+                <button id="codeAdd" style="padding: 5px 10px;margin: 10px auto 5px auto">提交规则</button>
+                <button id="codeUpdate" style="padding: 5px 10px;margin: 10px auto 5px auto">更新规则</button>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+    // 在用户点击其他地方时，关闭弹窗
+    let wd = document.querySelector(".window");
+    window.onclick = function(event) {
+        if (event.target === wd) {
+            wd.style.display = "none";
+        }
+    }
+
+    //点击close也可以关闭弹窗
+    document.querySelector(".window-content-close").onclick=function (){
+        wd.style.display="none";
+    }
+
+
+
+
+
+
+
+    //这个是我封装后的代码
+    //这个封装的函数并没有树状的结构，它只是把后台的数据重新理整了下
+    //整理后的就是父级的下一位就是子级
+    //当然，在调用的时候，pid参数可传，也可以不传，
+    //如果不传，默认是根级 0
+    //如果传，可随意是哪个，比如说传 3  那么，它就是从pid 为 3 的数据会列出来
+   //当前位置数据格式转换代码
+    function main(arr,pid = 0){
+        var tep = [];
+        function fn(arr,pid,lev = 1, path = ''){
+
+            arr.forEach((item,index)=>{
+                if (index === 0){
+                    if(item.parentId === pid){
+                        item.level = lev;
+                        item.name = path + '&nbsp;'+  '<a href="finsort.html?locationId='+item.id+'">'+item.finSortName+'</a>'
+                        tep.push(item)
+                        fn(arr,item.id , lev + 1 , item.name)
+                    }
+                }else {
+                    if(item.parentId === pid){
+                        item.level = lev;
+                        item.name = path +'&nbsp;' +'/'+'&nbsp;' +'<a href="finsort.html?locationId='+item.id+'">'+item.finSortName+'</a>'
+                        tep.push(item)
+                        fn(arr,item.id , lev + 1 , item.name)
+                    }
+                }
+
+            })
+        }
+        fn(arr, pid);
+        return tep;
+    }
+
+
+    function height(){
+        let iframe = parent.document.getElementById("iframepage");
+        if (iframe){
+            let num= window.parent.innerHeight;
+            if (Number(num)>Number(60)){
+                let s = Number(num)-Number(60)
+                iframe.style.height=s+"px";
+            }
+
+        }
+
+
+    }
+    height();
+
+  function deleteSort(id,parentId){
+
+      if(window.confirm("您确定要删除这项分类吗？")){
+          axios({
+              method: "post",
+              url: "finSort/selectOtherLevel",
+              data:id,
+          }).then(function (resp){
+              let datas=resp.data;
+              //判断是否要删除的分类里面还有分类
+              if (datas.length>0){
+                  //有
+                  alert("删除失败，该分类中还有其他分类!")
+              }else {
+                  //没有就判断该分类下是否有物料，sort表中的id是product表中的productId
+                  axios({
+                      method:"post",
+                      url:"finProduct/selectByParentId",
+                      data:id
+                  }).then(function (resp){
+                      let datas=resp.data;
+                      if (datas===true){
+                          //分分类中有物料存在
+                          alert("删除失败，该分类中还有物料存在！")
+                      }else if (datas===false){
+                          //该分类中没有物料存在
+                          axios({
+                              method:"post",
+                              url:"finSort/deleteById",
+                              data:id
+                          }).then(function (resp){
+                              if (resp.data==="success"){
+                                  alert("删除成功!")
+                                  location.href="finsort.html?nextId="+parentId+""
+                              }else {
+                                  alert("删除失败，请联系相关人员！")
+                              }
+                          })
+
+                      }
+                  })
+              }
+          })
+
+
+          return true;
+      }else {
+          return false;
+      }
+
+    }
+
+   // 接收前端传来的parentId
+    function getHref(){
+        var url = decodeURI(location.search);
+        var theRequest = new Object();
+        if (url.indexOf("?") !== -1) {
+            var str = url.substr(1);
+            strs = str.split("&");
+            for(var i = 0; i < strs.length; i ++) {
+                theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+            }
+        }
+        return theRequest;
+    }
+    let nextId=getHref().nextId;//查看下一级分类
+    let backId=getHref().backId;//查看上一级分类
+    let locationId=getHref().locationId;//根据点击当前位置来显示对应位置下的分类
+
+    if (nextId){
+        axios({
+            method: "post",
+            url: "finSort/selectOtherLevel",
+            data:nextId,
+        }).then(function (resp){
+            let datas= resp.data;
+            let formdata="";
+            if (datas.length===0){
+                // alert("已经没有更多分类了！");
+                // history.back();
+                document.getElementById("content").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">没有更多分类了！<span class="back" style="display: none">'+nextId+'</span></div>'
+                height();
+
+                //根据id查新分类信息
+                axios({
+                    method:"post",
+                    url:"finSort/selectOfSort",
+                    data:nextId
+                }).then(function (resp){
+                    let datas=resp.data;
+                    belong(datas[0].id,Number(datas[0].finSortLevel));
+
+                })
+
+
+            }else {
+               //获取最大分类级数
+                axios({
+                    method:"post",
+                    url:"finCode/maxLevel"
+                }).then(function (resp){
+                    let maxlevel=resp.data;
+
+                    for (let i = 0; i < datas.length; i++) {
+                        if (datas[i].finSortLevel<maxlevel){
+                            document.getElementById("add").style.display="";
+                            formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                '                  <div style="width: 25%; border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a href="finsort.html?nextId='+datas[i].id+'">'+datas[i].finSortName+'</a><span class="back" style="display: none">'+datas[i].parentId+'</span></div></div>\n' +
+                                '                  <div style="width: 30%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortDescription+'</div></div>\n' +
+                                '                  <div style="width: 20%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortCode+'</div></div>\n' +
+                                '                  <div style="width: 25%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a class="update" href="finSortUpdate.html?id='+datas[i].id+'">编辑</a> <a class="delete" href="javascript:void(0)" onclick=deleteSort('+datas[i].id+','+datas[i].parentId+')>删除</a>   <a style="white-space: nowrap;" class="addAttribute" href="finAttributeAdd.html?parentId='+datas[i].id+'&content='+datas[i].finSortName+'&level='+datas[i].finSortLevel+'">属性管理</a></div></div>\n' +
+                                '              </div>'
+                        }else {
+
+                            formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                '                  <div style="width: 25%; border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortName+'<span class="back" style="display: none">'+datas[i].parentId+'</span></div></div>\n' +
+                                '                  <div style="width: 30%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortDescription+'</div></div>\n' +
+                                '                  <div style="width: 20%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortCode+'</div></div>\n' +
+                                '                  <div style="width: 25%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a class="update" href="finSortUpdate.html?id='+datas[i].id+'">编辑</a> <a class="delete" href="javascript:void(0)" onclick=deleteSort('+datas[i].id+','+datas[i].parentId+')>删除</a>   <a style="white-space: nowrap;" class="addAttribute" href="finAttributeAdd.html?parentId='+datas[i].id+'&content='+datas[i].finSortName+'&level='+datas[i].finSortLevel+'">属性管理</a></div></div>\n' +
+                                '              </div>'
+                        }
+
+                    }
+
+                    document.getElementById("content").innerHTML=formdata;
+                    document.getElementById("number").innerHTML=datas[0].finSortLevel+"级";
+                    height();
+                    belong(datas[0].parentId,Number(datas[0].finSortLevel)-1);
+
+
+                })
+
+
+
+            }
+
+
+        })
+    }
+    else if (backId){
+        axios({
+            method:"post",
+            url:"finSort/selectLastLevel",
+            data: backId
+        }).then(function (resp){
+            let formdata="";
+            let datas=resp.data;
+            if (datas.length===0){
+                alert("已经没有更上一级的分类了！");
+                history.back()
+            }else {
+                for (let i = 0; i < datas.length; i++) {
+                    formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                        '                  <div style="width: 25%; border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a href="finsort.html?nextId='+datas[i].id+'">'+datas[i].finSortName+'</a><span class="back" style="display: none">'+datas[i].parentId+'</span></div></div>\n' +
+                        '                  <div style="width: 30%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortDescription+'</div></div>\n' +
+                        '                  <div style="width: 20%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortCode+'</div></div>\n' +
+                        '                  <div style="width: 25%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a class="update" href="finSortUpdate.html?id='+datas[i].id+'">编辑</a> <a class="delete" href="javascript:void(0)" onclick=deleteSort('+datas[i].id+','+datas[i].parentId+')>删除</a>   <a style="white-space: nowrap;" class="addAttribute" href="finAttributeAdd.html?parentId='+datas[i].id+'&content='+datas[i].finSortName+'&level='+datas[i].finSortLevel+'">属性管理</a></div></div>\n' +
+                        '              </div>'
+                }
+                document.getElementById("content").innerHTML=formdata;
+                document.getElementById("number").innerHTML=datas[0].finSortLevel+"级";
+                height();
+                belong(datas[0].parentId,Number(datas[0].finSortLevel)-1);
+
+            }
+
+
+        })
+    }
+    else if (locationId){
+        axios({
+            method: "post",
+            url: "finSort/selectOtherLevel",
+            data:locationId,
+        }).then(function (resp){
+            let datas= resp.data;
+            let formdata="";
+            if (datas.length===0){
+                // alert("已经没有更多分类了！");
+                // history.back();
+                document.getElementById("content").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">没有更多分类了！<span class="back" style="display: none">'+nextId+'</span></div>'
+                height();
+
+                //根据id查新分类信息
+                axios({
+                    method:"post",
+                    url:"finSort/selectOfSort",
+                    data:locationId
+                }).then(function (resp){
+                    let datas=resp.data;
+                    belong(datas[0].id,Number(datas[0].finSortLevel));
+
+                })
+
+
+            }else {
+                axios({
+                    method:"post",
+                    url:"finCode/maxLevel"
+                }).then(function (resp){
+                    let maxlevel=resp.data;
+                    for (let i = 0; i < datas.length; i++) {
+                        if (datas[i].finSortLevel<maxlevel){
+                            document.getElementById("add").style.display="";
+                            formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                '                  <div style="width: 25%; border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a href="finsort.html?nextId='+datas[i].id+'">'+datas[i].finSortName+'</a><span class="back" style="display: none">'+datas[i].parentId+'</span></div></div>\n' +
+                                '                  <div style="width: 30%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortDescription+'</div></div>\n' +
+                                '                  <div style="width: 20%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortCode+'</div></div>\n' +
+                                '                  <div style="width: 25%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a class="update" href="finSortUpdate.html?id='+datas[i].id+'">编辑</a> <a class="delete" href="javascript:void(0)" onclick=deleteSort('+datas[i].id+','+datas[i].parentId+')>删除</a>   <a style="white-space: nowrap;" class="addAttribute" href="finAttributeAdd.html?parentId='+datas[i].id+'&content='+datas[i].finSortName+'&level='+datas[i].finSortLevel+'">属性管理</a></div></div>\n' +
+                                '              </div>'
+                        }else {
+
+                            formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                '                  <div style="width: 25%; border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortName+'<span class="back" style="display: none">'+datas[i].parentId+'</span></div></div>\n' +
+                                '                  <div style="width: 30%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortDescription+'</div></div>\n' +
+                                '                  <div style="width: 20%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortCode+'</div></div>\n' +
+                                '                  <div style="width: 25%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a class="update" href="finSortUpdate.html?id='+datas[i].id+'">编辑</a> <a class="delete" href="javascript:void(0)" onclick=deleteSort('+datas[i].id+','+datas[i].parentId+')>删除</a>   <a style="white-space: nowrap;" class="addAttribute" href="finAttributeAdd.html?parentId='+datas[i].id+'&content='+datas[i].finSortName+'&level='+datas[i].finSortLevel+'">属性管理</a></div></div>\n' +
+                                '              </div>'
+                        }
+
+                    }
+                    document.getElementById("content").innerHTML=formdata;
+                    document.getElementById("number").innerHTML=datas[0].finSortLevel+"级";
+                    height();
+                    belong(datas[0].parentId,Number(datas[0].finSortLevel)-1);
+
+                })
+            }
+
+
+
+
+
+
+
+        })
+    }
+    else {
+        //查询level为1的分类
+        axios({
+            method:"post",
+            url:"finSort/selectOneLevel"
+        }).then(function (resp){
+            let datas=resp.data;
+            let formdata="";
+            //查询是否为最大等级
+            if (datas.length===0){
+                document.getElementById("content").innerHTML='<div style="width: 100%;height: auto;text-align: center;color: red">没有更多分类了！</div>'
+                height();
+
+            }
+            else {
+                axios({
+                    method:"post",
+                    url:"finCode/maxLevel"
+                }).then(function (resp){
+                    let maxlevel=resp.data;
+                    for (let i = 0; i < datas.length; i++) {
+                        if (datas[i].finSortLevel<maxlevel){
+                            document.getElementById("add").style.display="";
+                            formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                '                  <div style="width: 25%; border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a href="finsort.html?nextId='+datas[i].id+'">'+datas[i].finSortName+'</a><span class="back" style="display: none">'+datas[i].parentId+'</span></div></div>\n' +
+                                '                  <div style="width: 30%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortDescription+'</div></div>\n' +
+                                '                  <div style="width: 20%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortCode+'</div></div>\n' +
+                                '                  <div style="width: 25%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a class="update" href="finSortUpdate.html?id='+datas[i].id+'">编辑</a> <a class="delete" href="javascript:void(0)" onclick=deleteSort('+datas[i].id+','+datas[i].parentId+')>删除</a>   <a style="white-space: nowrap;" class="addAttribute" href="finAttributeAdd.html?parentId='+datas[i].id+'&content='+datas[i].finSortName+'&level='+datas[i].finSortLevel+'">属性管理</a></div></div>\n' +
+                                '              </div>'
+                        }else {
+
+                            formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                                '                  <div style="width: 25%; border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortName+'<span class="back" style="display: none">'+datas[i].parentId+'</span></div></div>\n' +
+                                '                  <div style="width: 30%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortDescription+'</div></div>\n' +
+                                '                  <div style="width: 20%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center">'+datas[i].finSortCode+'</div></div>\n' +
+                                '                  <div style="width: 25%;   border: white solid 1px;height: auto;display: flex"><div style="width: fit-content;height: auto;margin: auto;align-self: center"><a class="update" href="finSortUpdate.html?id='+datas[i].id+'">编辑</a> <a class="delete" href="javascript:void(0)" onclick=deleteSort('+datas[i].id+','+datas[i].parentId+')>删除</a>   <a style="white-space: nowrap;" class="addAttribute" href="finAttributeAdd.html?parentId='+datas[i].id+'&content='+datas[i].finSortName+'&level='+datas[i].finSortLevel+'">属性管理</a></div></div>\n' +
+                                '              </div>'
+                        }
+
+                    }
+                    document.getElementById("content").innerHTML=formdata;
+                    document.getElementById("number").innerHTML=datas[0].finSortLevel+"级";
+                    height();
+
+                })
+            }
+
+        })
+    }
+
+
+
+
+    //得到当前位置数据格式的代码
+    var datass=[];
+    function belong(parentId,n){
+
+       if (n>0){
+
+           axios({
+               method:"post",
+               url:"finSort/selectOfSort",
+               data:parentId
+           }).then(function (resp){
+               var datas = resp.data;
+               datass=datas.concat(datass);
+                n--;
+               belong(datas[0].parentId,n)
+           })
+
+
+
+       }else if (n===0) {
+
+          let path = main(datass);
+           for (let i = 0; i < path.length; i++) {
+               if (i===path.length-1){
+
+                    if (path[i].name.length>0){
+                        document.getElementById("location").innerHTML=""+path[i].name+""
+                    }
+
+               }
+
+           }
+
+       }
+
+
+    }
+
+
+
+
+
+
+
+
+
+    //返回上一级分类
+    document.getElementById("back").onclick=function (){
+        if (document.querySelectorAll(".back").length>0){
+            let backs = document.querySelectorAll(".back");
+            location.href="finsort.html?backId="+backs[0].innerHTML+""
+        }else {
+            alert("已经没有上一级了！")
+        }
+
+    }
+
+
+
+    // //添加分类（在当前分类下添加）
+    document.getElementById("add").onclick=function (){
+
+        //添加分类前先判断是否还可以添加，不能超过分级管理那里的最大级数
+        //获取该分类页面中的parentId
+        if (document.querySelectorAll(".back").length>0){
+            let backs = document.querySelectorAll(".back");
+            let parentId = backs[0].innerHTML;
+            location.href="finSortAdd.html?parentId="+parentId+""
+        }else {
+            location.href="finSortAdd.html?parentId="+0+""
+        }
+
+        
+    }
+
+
+
+
+</script>
+</body>
+</html>

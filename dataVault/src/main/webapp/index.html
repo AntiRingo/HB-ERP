@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 嵌入icc profile -->
+  <meta name="color-scheme" content="light dark">
+  <title>主页</title>
+</head>
+<style>
+  html{
+    padding:0;
+    margin: 0;
+    background: linear-gradient(135deg, #f5fbff 0%, #e6f2ff 100%);
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    font-family: 宋体,serif;
+  }
+  body{
+    width: 90%;
+    height: 100%;
+    margin: auto;
+    padding:0;
+      background-color: aliceblue;
+  }
+  .left{
+    width: 15%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+  }
+  .left .menu{
+    width: 90%;
+    height: auto;
+    margin: 20px auto;
+
+  }
+  .accordion {
+
+
+      cursor: pointer;
+      text-align: left;
+      border: none;
+      outline: none;
+      transition: 0.4s;
+      font-weight: bolder;
+      background-color: #9eb6d8;
+      width: 100%;
+      color: white;
+    position: relative;
+
+
+  }
+  /* 为手风琴面板设计样式。 默认隐藏 */
+  .panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease-out;
+      width: 100%;
+      text-align: center;
+  }
+  /* 设置 +、- 标志 */
+  .accordion:after {
+      content: '\002B';  /* Unicode 字符 + 号 */
+      color: black;
+      font-weight: bold;
+      float: right;
+      margin-left: 5px;
+    position: absolute;
+    right: 5px;
+  }
+
+  .active:after {
+      content: "\2212";  /* Unicode 字符 - 号 */
+  }
+
+  .panel div{
+      width: 100%;
+      height:auto;
+      line-height: 21px;
+      border-top: #9eb6d8 solid 1px;
+  }
+
+  .panel a{
+      color: black;
+      text-decoration: none;
+  }
+  .panel a:hover{
+      color: cornflowerblue;
+  }
+
+
+
+  .right{
+    width: 85%;
+    height: 100%;
+
+  }
+  /*//通知图标用的阿里云iconfont这个需要自己去做*/
+  .notice1::before{content: url("images/tongzhi.png");display: inline-block;float: left;height: 25px;}
+  .notice2::before{content: url("images/tongzhi.png");display: inline-block;float: left;height: 25px;}
+
+  .notice1{width:95%;height: 25px;line-height: 25px;margin-left: 5px; background-color: rgb(255, 255, 255);font-size: 15px;padding: 2px;max-height: calc(100vh - 80px);border-radius: 6px;animation: move 1s 0s ;}
+  .notice2{width:95%;height: 25px;line-height: 25px;margin-left: 5px; background-color: rgb(255, 255, 255);font-size: 15px;padding: 2px;max-height: calc(100vh - 80px);border-radius: 6px;animation: move 1s 0s ;margin-top: 5px}
+
+  /*//左右跳动动画*/
+  @keyframes move {
+    25% {
+      transform: translateX(4px);
+    }
+    50% {
+      transform: translateX(-4px);
+    }
+  }
+
+  .haveNotice::after{
+
+    position: relative;
+    content:'\26AB' ;
+    color: #fb9337 !important;
+  }
+
+
+
+
+
+
+
+  /* 基础样式重置 */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  }
+
+  /* 左侧菜单容器样式 */
+  .left {
+    width: 280px;
+    background: linear-gradient(160deg, #f0f8ff 0%, #e1f1ff 100%);
+    border-right: 1px solid #d1e8ff;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 2px 0 10px rgba(140, 180, 220, 0.15);
+  }
+
+  /* 通知区域样式优化 */
+  .left > div:first-child {
+    background: linear-gradient(135deg, #d4e9ff 0%, #e6f2ff 100%);
+    border-bottom: 1px solid #c1dfff;
+    padding: 15px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(140, 180, 220, 0.15);
+  }
+
+  /* 通知项样式 */
+  .notice1, .notice2 {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 5px 0;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    border-left: 4px solid #4a90e2;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  /* 出库通知特殊样式 */
+  .notice1 {
+    border-left-color: #e53935;
+  }
+
+  /* 入库通知特殊样式 */
+  .notice2 {
+    border-left-color: #43a047;
+  }
+
+  /* 通知图标样式 */
+  .notice1::before, .notice2::before {
+    content: "";
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 14px;
+  }
+
+  .notice1::before {
+    content: "📋";
+  }
+
+  .notice2::before {
+    content: "📦";
+  }
+
+  /* marquee 样式优化 */
+  marquee {
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  /* 菜单容器样式 */
+  .menu {
+    flex: 1;
+    padding: 15px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* 自定义滚动条 */
+  .menu::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .menu::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #a1c9ff, #7ab2ff);
+    border-radius: 3px;
+  }
+
+  .menu::-webkit-scrollbar-track {
+    background: #e1f0ff;
+    border-radius: 3px;
+  }
+
+  /* 菜单项样式 */
+  .menu > div {
+    border: 1px solid #d1e8ff;
+    border-radius: 10px;
+    margin: 10px 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(140, 180, 220, 0.1);
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .menu > div:hover {
+    box-shadow: 0 5px 15px rgba(140, 180, 220, 0.2);
+    transform: translateY(-2px);
+    border-color: #a1c9ff;
+  }
+
+  /* 手风琴标题样式 */
+  .accordion {
+    background: linear-gradient(135deg, #7ab2ff 0%, #4a90e2 100%);
+    color: white;
+    padding: 14px 20px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+  }
+
+  .accordion:hover {
+    background: linear-gradient(135deg, #6ba5f5 0%, #3d7bc8 100%);
+  }
+
+  .accordion.active {
+    background: linear-gradient(135deg, #4a90e2 0%, #2c6bb5 100%);
+  }
+
+  /* 添加箭头图标 */
+  .accordion::after {
+    content: "▾";
+    font-size: 16px;
+    margin-left: auto;
+    transition: transform 0.3s ease;
+  }
+
+  .accordion.active::after {
+    transform: rotate(180deg);
+  }
+
+  /* 面板内容样式 */
+  .panel {
+    background-color: rgba(255, 255, 255, 0.9);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .panel div {
+    border-bottom: 1px solid #f0f7ff;
+    transition: background-color 0.2s ease;
+  }
+
+  .panel div:last-child {
+    border-bottom: none;
+  }
+
+  .panel div:hover {
+    background-color: #f5f9ff;
+  }
+
+  .panel a {
+    display: block;
+    padding: 12px 20px 12px 40px;
+    color: #2c3e50;
+    text-decoration: none;
+    font-size: 14px;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+  }
+
+  .panel a:hover {
+    color: #1a5fb4;
+    background-color: #eef6ff;
+    padding-left: 45px;
+  }
+
+  /* 图标字体样式增强 */
+  .iconfont {
+    position: relative;
+  }
+
+  .iconfont::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* 有通知的菜单项样式 */
+  .haveNotice {
+    position: relative;
+    font-weight: 600;
+    color: #1a5fb4;
+  }
+
+  .haveNotice::after {
+    content: "";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: #ff5252;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 0 rgba(255, 82, 82, 0.4);
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: translateY(-50%) scale(0.9);
+      box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
+    }
+    70% {
+      transform: translateY(-50%) scale(1);
+      box-shadow: 0 0 0 8px rgba(255, 82, 82, 0);
+    }
+    100% {
+      transform: translateY(-50%) scale(0.9);
+      box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+    }
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .left {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #d1e8ff;
+    }
+  }
+
+  /* 手风琴交互效果 - 通过CSS实现 */
+  .panel{
+    max-height: 0;
+    transition: max-height 0.4s ease;
+  }
+
+
+
+  /* 悬停时展开面板的简化实现 */
+  /*.menu > div:hover .panel {*/
+  /*  max-height: 500px;*/
+  /*}*/
+</style>
+<body>
+<audio style="display: none" id="voice" controls>
+  <source src="voice/voice.wav" type="audio/Wav">
+</audio>
+
+<div style="width: 100%;height: 100%;display: flex">
+  <div class="left">
+    <div  style="width: auto;height: auto;background-color: #f0f8ff;position: sticky;top: 10px;z-index: 100">
+      <div style="display: none" class="notice1" id="CkNotice"></div>
+      <div style="display: none" class="notice2" id="RkNotice"></div>
+    </div>
+
+    <div class="menu" id="menu">
+<!--      <div  style="margin: 5px auto">-->
+<!--        <div class="accordion" >-->
+<!--          物料管理-->
+<!--        </div>-->
+<!--        <div class="panel" id="oneLevel" >-->
+<!--          <div class="level"><a href="product.html" target="iframe">物料建档</a></div>-->
+<!--          <div class="level"><a href="sort.html" target="iframe">物料分类管理</a></div>-->
+<!--          <div class="level"><a href="level.html" target="iframe">物料分级管理</a></div>-->
+<!--          <div class="level"><a href="publicApplication.html" target="iframe">公共属性管理</a></div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <div  style="margin: 5px auto">-->
+<!--        <div class="accordion" >-->
+<!--          申请模块-->
+<!--        </div>-->
+<!--        <div class="panel"  >-->
+<!--          <div><a href="Purchase.html" target="iframe">生成申请单</a></div>-->
+<!--          <div><a href="applicationForm.html" target="iframe">申请单管理</a></div>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      <div  style="margin: 5px auto">-->
+<!--        <div class="accordion" >-->
+<!--          部门管理-->
+<!--        </div>-->
+<!--        <div class="panel" >-->
+<!--          <div><a href="department.html" target="iframe">部门修改</a></div>-->
+
+<!--        </div>-->
+<!--      </div>-->
+
+
+<!--      <div  style="margin: 5px auto">-->
+<!--        <div class="accordion" >-->
+<!--          用户信息管理-->
+<!--        </div>-->
+<!--        <div class="panel" >-->
+<!--          <div><a href="userManage.html" target="iframe">用户信息</a></div>-->
+
+<!--        </div>-->
+<!--      </div>-->
+
+
+<!--      <div  style="margin: 5px auto">-->
+<!--        <div class="accordion" >-->
+<!--          个人信息管理-->
+<!--        </div>-->
+<!--        <div class="panel" >-->
+<!--          <div><a href="personalManage.html" target="iframe">基本信息管理</a></div>-->
+<!--          <div><a href="personalPasswordManage.html" target="iframe">账号密码管理</a></div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--   -->
+
+<!--      <div  style="margin: 5px auto">-->
+<!--        <div class="accordion" >-->
+<!--          一键导入功能-->
+<!--        </div>-->
+<!--        <div class="panel" >-->
+<!--          <div><a href="fileImport.html" target="iframe">一键导入</a></div>-->
+<!--        </div>-->
+<!--      </div>-->
+    </div>
+  </div>
+<div style="display: none" id="username"></div>
+  <div style="display: none" id="linshi"></div>
+
+
+  <div class="right">
+    <div style="width: 80%;height: auto;display: flex;margin: 10px auto auto auto;">
+      <div style="width: 85%;height: auto;text-align: right;color: red;margin-right: 10px" >尊敬的：<span id="User"></span></div><button id="exit">退出</button>
+      <input style="display: none" id="userId" value="" >
+    </div>
+    <div style="width: 80%;height: auto;display: flex;margin: 10px auto;border-bottom: black solid 1px"></div>
+      <iframe width="100%"  id="iframepage" frameborder="0" name="iframe" scrolling="yes" ></iframe>
+  </div>
+</div>
+
+
+<!--<div id="one">-->
+
+
+<!--</div>-->
+
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+
+
+
+
+
+  let audioVoice = document.getElementById("voice");
+  function height(){
+
+    let iframe = document.getElementById("iframepage");
+    if (iframe){
+      let num= window.innerHeight;
+      if (Number(num)>Number(60)){
+        let s = Number(num)-Number(60)
+        iframe.style.height=s+"px";
+      }
+
+    }
+
+
+  }
+  window.onresize = function(){
+    height();
+  }
+
+  //删除session并退出
+  function exit(){
+    axios({
+      method:"post",
+      url:"user/deleteSession"
+    }).then(function (resp){
+      if (resp.data==="success"){
+        location.href="userlogin.html"
+      }
+    })
+  }
+
+  //导航栏折叠效果
+  function f1(){
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+      acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.maxHeight) {
+          panel.style.maxHeight = null;
+          getComputedStyle(document.querySelector(".accordion"),":after").getPropertyValue('color')
+
+        } else {
+          panel.style.maxHeight = panel.scrollHeight + "px";
+        }
+      });
+    }
+
+  }
+
+
+  let rkList=[];
+  let ckList=[];
+
+
+axios({
+    method:"post",
+    url:"user/selectName"
+}).then(function (resp)
+{
+    let datas=resp.data;
+
+    if (datas.id){
+      document.getElementById("User").innerHTML=datas.userName;
+      document.getElementById("username").innerHTML=datas.name;
+      //获取用户ID查询该用户拥有的功能模块
+      let id = datas.id;
+      document.getElementById("userId").value=id;
+      //获取用户ID
+
+//根据ID查询时间
+      axios({
+        method:"post",
+        url:"user/selectExitTime",
+        data:id
+      }).then(function (resp){
+          let datas=resp.data;
+          let exitTime = datas.exitTime;
+          if (Number(exitTime)<=120){
+            let ti = 1000*60*exitTime;
+            let timer ;
+            // 监听鼠标事件
+            document.addEventListener('mousemove',function (){
+
+              if (timer!==undefined){
+                clearTimeout(timer);
+              }
+              timer= setTimeout(exit,ti);
+
+            })
+          }
+          else if (Number(exitTime)>120) {
+            setInterval(clock,100000);
+            function clock(){
+              axios({
+                method:"post",
+                url:"user/selectExitTime",
+                data:id
+              })
+          }
+
+          }
+
+
+      })
+
+
+
+
+      axios({
+        method: "post",
+        url: "user/selectModuleByUserId",
+        data:id
+      }).then(function (resp){
+        let moduleDatas=resp.data;
+        let module="";
+        if (moduleDatas.length>0){
+          for (let i = 0; i < moduleDatas.length; i++) {
+            module+=" <div  style=\"margin: 5px auto\">\n" +
+                    "        <div class=\"accordion\" id='moduleName"+moduleDatas[i].id+"' >"+moduleDatas[i].name+"</div>\n" +
+                    "        <div class=\"panel\" id='module"+moduleDatas[i].id+"' >\n" +
+                    "        </div>\n" +
+                    "      </div>"
+          }
+
+          //查询通用功能
+          axios({
+            method:"post",
+            url:"function/selectModuleTY"
+          }).then(function (resp){
+            // let moduleDatas=resp.data;
+
+              // for (let i = 0; i < moduleDatas.length; i++) {
+              //   module += " <div  style=\"margin: 5px auto\">\n" +
+              //           "        <div class=\"accordion\" id='moduleName" + moduleDatas[i].id + "' >" + moduleDatas[i].name + "</div>\n" +
+              //           "        <div class=\"panel\" id='module" + moduleDatas[i].id + "' >\n" +
+              //           "        </div>\n" +
+              //           "      </div>"
+              // }
+
+            document.getElementById("menu").innerHTML=module;
+            //得到了用户拥有的功能模块后，去查询用户拥有的具体功能
+            axios({
+              method:"post",
+              url:"user/selectUserFunctionByUserId",
+              data:id
+            }).then(function (resp){
+              let datas=resp.data;
+              for (let i = 0; i < datas.length; i++) {
+                if (Number(datas[i].id)===Number(6)){
+                  document.getElementById("module"+datas[i].moduleId+"").innerHTML+=" <div><a id='RkMessage' class=\"iconfont\" href="+datas[i].url+" target=\"iframe\">"+datas[i].functionName+"</a></div>";
+                  document.querySelector(".notice2").style.display="";
+                  //每十秒执行一次
+                  setInterval(function (){
+                    axios({
+                      method:"post",
+                      url:"applicationForm/selectIfNewApplicationRk"
+                    }).then(function (resp){
+                      let number=resp.data.length;
+                      if (Number(number)>0){
+                        //判断新的是否都存在与旧的list中,如果都存在那就是没变，有不存在的就是新的
+                        for (let j = 0; j <resp.data.length; j++) {
+                          let a=false;
+                          for (let k = 0; k < rkList.length; k++) {
+                            if (resp.data[j]===rkList[k]){
+                              a=true;//存在
+                            }
+                          }
+                          //如果不存在就提醒
+                          if(a===false){
+                            // console.log("有新的入库申请")
+                            audioVoice.play();
+                            rkList=resp.data;
+                          }
+                        }
+                        document.getElementById("RkNotice").innerHTML="<marquee width='80%' >您有"+number+"条新提交的入库申请待查看！</marquee>"
+                        //存在新的入库申请
+
+                      }else {
+                        document.getElementById("RkNotice").innerHTML="";
+                        rkList=[];
+                      }
+                    })
+                  },10000)
+
+                  //大约5分钟执行一次
+                  setInterval(function (){
+                    axios({
+                      method:"post",
+                      url:"applicationForm/selectIfNewApplicationRk"
+                    }).then(function (resp){
+                      let number=resp.data.length;
+                      if (Number(number)>0){
+
+                        //存在新的入库申请
+
+                        //获取是否有出库信息
+                        let innerHTML = document.getElementById("CkNotice").innerHTML;
+                        if (innerHTML.length>0){
+
+                              audioVoice.play();
+                        }
+                        else {
+                          audioVoice.play();
+                        }
+
+
+                      }
+
+
+                    })
+                  },300000)
+                  //打开页面就执行
+                  axios({
+                    method:"post",
+                    url:"applicationForm/selectIfNewApplicationRk"
+                  }).then(function (resp){
+                    let number=resp.data.length;
+                    if (Number(number)>0){
+                      rkList=resp.data;
+                      document.getElementById("RkNotice").innerHTML="<marquee width='80%' >您有"+number+"条新提交的入库申请待查看！</marquee>"
+                      //存在新的入库申请
+                      alert("您有新的入库申请未查看！");
+
+                      //获取是否有出库信息
+                      let innerHTML = document.getElementById("CkNotice").innerHTML;
+                      if (innerHTML.length>0){
+
+                          audioVoice.play();
+
+                      }
+                      else {
+                        audioVoice.play();
+                      }
+
+                    }
+
+                  })
+
+                }
+                else if (Number(datas[i].id)===Number(7)){
+                  document.getElementById("module"+datas[i].moduleId+"").innerHTML+=" <div ><a id='CkMessage' class=\"iconfont\" href="+datas[i].url+" target=\"iframe\">"+datas[i].functionName+"</a></div>";
+                  document.querySelector(".notice1").style.display="";
+                  //出库管理功能
+                  //每十秒执行一次
+                  setInterval(function (){
+                    axios({
+                      method:"post",
+                      url:"applicationForm/selectIfNewApplicationCk"
+                    }).then(function (resp){
+                      let number=resp.data.length;
+                      if (Number(number)>0){
+                        //判断新的是否都存在与旧的list中,如果都存在那就是没变，有不存在的就是新的
+                        for (let j = 0; j <resp.data.length; j++) {
+                          let a=false;
+                          for (let k = 0; k < ckList.length; k++) {
+                            if (resp.data[j]===ckList[k]){
+                              a=true;//存在
+                            }
+                          }
+                          //如果不存在就提醒
+                          if(a===false){
+                            // console.log("有新的出库申请")
+                            audioVoice.play();
+                            ckList=resp.data;
+                          }
+                        }
+                        //存在新的入库申请
+                        document.getElementById("CkNotice").innerHTML="<marquee width='80%' >您有"+number+"条新提交的出库申请待查看！</marquee>"
+
+
+                      }else {
+                        document.getElementById("CkNotice").innerHTML="";
+                        ckList=[];
+                      }
+                    })
+                  },10000)
+
+                  //大约5分钟执行一次
+                  setInterval(function (){
+                    axios({
+                      method:"post",
+                      url:"applicationForm/selectIfNewApplicationCk"
+                    }).then(function (resp){
+                      let number=resp.data.length;
+                      if (Number(number)>0){
+                        //存在新的出库申请
+                        audioVoice.play();
+                      }
+                    })
+                  },300000)
+                  //打开页面就执行
+                  axios({
+                    method:"post",
+                    url:"applicationForm/selectIfNewApplicationCk"
+                  }).then(function (resp){
+                    let number=resp.data.length;
+                    if (Number(number)>0){
+                      ckList=resp.data;
+                      //存在新的入库申请
+                      document.getElementById("CkNotice").innerHTML="<marquee width='80%' >您有"+number+"条新提交的出库申请待查看！</marquee>"
+                      alert("您有新的出库申请未查看！");
+
+                      audioVoice.play();
+
+                    }
+                  })
+                }
+                else if (Number(datas[i].id)===19 || Number(datas[i].id)===37|| Number(datas[i].id)===38 || Number(datas[i].id)===39){
+                  //库存浏览需要打开新的页面
+                  document.getElementById("module"+datas[i].moduleId+"").innerHTML+=" <div><a href="+datas[i].url+" target=\"_blank\">"+datas[i].functionName+"</a></div>";
+
+                }
+                else if (Number(datas[i].id)===Number(23)){
+
+                  //出库审核
+                  document.getElementById("module"+datas[i].moduleId+"").innerHTML+=" <div><a id='CkExamine'  class=\"iconfont\" href="+datas[i].url+" target=\"iframe\">"+datas[i].functionName+"</a></div>";
+                  //查询是否有新的出库
+
+                  let ckExamineList=[];
+                  let message1='';
+                  // let message2='';
+                  function right_bottom_message_CK(){
+                    axios({
+                      method:"post",
+                      url:"applicationForm/selectIfExamine",
+                      data:1
+                    }).then(function (resp)
+                    {
+                      let number=resp.data.length;
+
+                      if (Number(number) > 0) {
+                        // JS代码获取::after
+                        let myIdElement = document.getElementById("CkExamine");
+                      myIdElement.classList.add("haveNotice")
+
+
+                        // //没有新的，但是存在未审核的
+                        // message2="您有" + number + "条出库申请待审核！"
+                        // //判断新的是否都存在与旧的list中,如果都存在那就是没变，有不存在的就是新的
+
+                        for (let j = 0; j < resp.data.length; j++) {
+                          let  a = false;
+                          message1='';
+
+                          for (let k = 0; k < ckExamineList.length; k++) {
+                            if (resp.data[j] === ckExamineList[k]) {
+                              a = true;//存在
+                            }
+                          }
+
+                          //如果不存在就提醒
+                          if (a === false) {
+                            ckExamineList = resp.data;
+                            //存在新的入库申请
+                            message1="您新的出库申请待审核！";
+                            messageNotice(message1,'CK');
+                            break;
+                          }
+
+                        }
+                        // if (message1.length>0 || message2.length>0){
+                        //   let s;
+                        //   if (message1.length>0 && message2.length===0){
+                        //     s=message1;
+                        //   }else if (message2.length>0 && message1.length===0){
+                        //     s=message2;
+                        //   }
+                        //   else {
+                        //     s=message1+'\n'+message2;
+                        //   }
+                        //
+                        //   messageNotice(s,'CK');
+                        // }
+
+
+
+
+
+                      }
+                      else {
+                        message1='';
+                        // message2='';
+                        ckExamineList = [];
+                        let myIdElement = document.getElementById("CkExamine");
+                        myIdElement.classList.remove("haveNotice")
+                      }
+                    })
+                  }
+                  //打开窗口了就执行一次
+                  right_bottom_message_CK();
+
+                  //每十秒执行一次
+
+                  setInterval(function (){
+                    right_bottom_message_CK();
+                  },20000)
+
+
+
+                }
+                else if (Number(datas[i].id)===Number(27)){
+
+
+                  //入库审核
+                  document.getElementById("module"+datas[i].moduleId+"").innerHTML+=" <div><a id='RkExamine' class=\"iconfont\" href="+datas[i].url+" target=\"iframe\">"+datas[i].functionName+"</a></div>";
+                  let rkExamineList=[];
+                  let message1='';
+                  // let message2='';
+
+
+                  function right_bottom_message_RK(){
+                    axios({
+                      method:"post",
+                      url:"applicationForm/selectIfExamine",
+                      data:0
+                    }).then(function (resp)
+                    {
+                      let number=resp.data.length;
+
+                      if (Number(number) > 0) {
+                        let myIdElement = document.getElementById("RkExamine");
+                        myIdElement.classList.add("haveNotice")
+
+                        //存在新的入库申请
+                        // message2="您有" + number + "条入库申请待审核！"
+                        //判断新的是否都存在与旧的list中,如果都存在那就是没变，有不存在的就是新的
+
+                        for (let j = 0; j < resp.data.length; j++) {
+                          let a = false;
+                          message1='';
+                          for (let k = 0; k < rkExamineList.length; k++) {
+                            if (resp.data[j] === rkExamineList[k]) {
+                              a = true;//存在
+                            }
+                          }
+
+
+                          //如果不存在就提醒
+                          if (a === false) {
+
+                            rkExamineList = resp.data;
+                            //存在新的入库申请
+                             message1="您新的入库申请待审核！"
+                            messageNotice(message1,'RK');
+                            break;
+                          }
+                        }
+
+                        // if (message1.length>0 || message2.length>0){
+                        //   let s=message1+'\n'+message2;
+                        //   messageNotice(s,'RK');
+                        // }
+
+
+                      } else {
+                        message1='';
+                        // message2='';
+                        rkExamineList = [];
+                        let myIdElement = document.getElementById("RkExamine");
+                        myIdElement.classList.remove("haveNotice")
+                      }
+                    })
+                  }
+
+                  //打开页面后立即执行一次
+                  right_bottom_message_RK();
+
+
+                  //每过20秒执行一次
+                  setInterval(function (){
+                  right_bottom_message_RK();
+                  },20000)
+                }
+                else {
+
+
+                    document.getElementById("module"+datas[i].moduleId+"").innerHTML+=" <div><a href="+datas[i].url+" target=\"iframe\">"+datas[i].functionName+"</a></div>";
+
+
+
+                }
+              }
+
+              // axios({
+              //   method:"post",
+              //   url:"function/selectTY"
+              // }).then(function (resp){
+              //   let datas=resp.data;
+              //   for (let i = 0; i < datas.length; i++) {
+              //
+              //
+              //       document.getElementById("module"+datas[i].moduleId+"").innerHTML+=" <div><a href="+datas[i].url+" target=\"iframe\">"+datas[i].functionName+"</a></div>";
+              //
+              //
+              //   }
+              //
+              //
+              // })
+              f1();
+
+            })
+          })
+
+
+        }
+        else {
+
+          //查询通用功能
+          axios({
+            method:"post",
+            url:"function/selectModuleTY"
+          }).then(function (resp) {
+            // let moduleDatas = resp.data;
+            //
+            // for (let i = 0; i < moduleDatas.length; i++) {
+            //   module += " <div  style=\"margin: 5px auto\">\n" +
+            //           "        <div class=\"accordion\" id='moduleName" + moduleDatas[i].id + "' >" + moduleDatas[i].name + "</div>\n" +
+            //           "        <div class=\"panel\" id='module" + moduleDatas[i].id + "' >\n" +
+            //           "        </div>\n" +
+            //           "      </div>"
+            // }
+
+            document.getElementById("menu").innerHTML = module;
+            // axios({
+            //   method:"post",
+            //   url:"function/selectTY"
+            // }).then(function (resp){
+            //   let datas=resp.data;
+            //   for (let i = 0; i < datas.length; i++) {
+            //
+            //       document.getElementById("module"+datas[i].moduleId+"").innerHTML+=" <div><a href="+datas[i].url+" target=\"iframe\">"+datas[i].functionName+"</a></div>";
+            //
+            //
+            //   }
+            //
+            //
+            // })
+            f1();
+          })
+        }
+
+
+      })
+    }
+    else {
+      location.href="userlogin.html"
+    }
+
+
+
+
+})
+
+
+
+  document.getElementById("exit").onclick=function (){
+    if (window.confirm("您确定要退出吗？")){
+      //删除session
+      axios({
+        method:"post",
+        url:"user/deleteSession"
+      }).then(function (resp){
+        if (resp.data==="success"){
+          location.href="userlogin.html"
+        }
+      })
+
+      return true;
+    }else {
+      return false;
+    }
+  }
+
+  Notification.requestPermission().then(res => {
+    // denied 或 granted
+    console.log(res)
+  })
+  console.log(Notification.permission)
+  //新信息桌面右下角提示
+  function  messageNotice(s,tag){
+
+    if (window.Notification && Notification.permission !==  "denied" ) {
+      Notification.requestPermission( function (status) {
+        var  notice_ =  new  Notification( '新的消息' , {
+          body:  s,
+          icon: '/dataVault/images/HBlogo.png', // 自定义图标路径
+          image: '/dataVault/images/logo2.png', // 可选图片展示
+          badge: '/dataVault/images/HBlogo.png', // 应用于小尺寸的通知标记图标的URL
+          requireInteraction: true, // 不自动关闭通知
+          tag:tag,//通知标志，重复不通知
+          renotify:true,//新通知出现的时候替换之前的
+        });
+        notice_.onclick =  function () { //单击消息提示框，进入浏览器页面
+          window.focus();
+        }
+
+        notice_.onclose=function (){
+          console.log("关闭了")
+        }
+      });
+    }
+
+  }
+
+
+
+</script>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="fileLinShi" method="post" enctype="multipart/form-data">
+    <input type="file" name="excelFile" accept=".xlsx">
+    <button type="submit">上传并读取Excel</button>
+</form>
+<div id="result"></div>
+
+<script>
+    // document.querySelector("form").addEventListener("submit", async (e) => {
+    //     e.preventDefault();
+    //     const formData = new FormData(e.target);
+    //
+    //     const response = await fetch(e.target.action, {
+    //         method: 'POST',
+    //         body: formData
+    //     });
+    //
+    //     const result = await response.json();
+    //     document.getElementById("result").innerHTML =
+    //         JSON.stringify(result, null, 2);
+    // });
+</script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <title>用户管理</title>
+    <link href="css/product.css" rel="stylesheet" />
+    <script src="js/axios-0.18.0.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+
+  </head>
+  <style>
+
+    html{
+        height: 100%;
+        font-family: 宋体,serif;
+    }
+      input{
+          height:30px;
+          border-radius: 15px;
+          border: #003366 solid 1px;
+          padding-left: 10px;
+          padding-right: 10px;
+          background-color: aliceblue;
+      }
+      button{
+          cursor: pointer;
+          /*border: #003366 solid 1px;*/
+      }
+      /*button:hover{*/
+      /*    color: cornflowerblue;*/
+      /*}*/
+      /*button:active{*/
+      /*    border: cornflowerblue solid 1px;*/
+      /*}*/
+      .sex{
+          width: 30px;
+          height: 30px;
+          margin-right: 20%;
+
+      }
+      .updateSex{
+          width: 30px;
+          height: 30px;
+          margin-right: 20%;
+      }
+
+.accordion1 {
+
+
+    cursor: pointer;
+    text-align: left;
+    outline: none;
+    transition: 0.4s;
+    font-weight: bolder;
+    background-color: #9eb6d8;
+    width: 50% !important;
+    color: white;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 25px;
+    border: #9eb6d8 solid 1px ;
+    padding-right: 5px;
+    padding-left: 5px;
+
+}
+.accordion2 {
+
+
+    cursor: pointer;
+    text-align: left;
+    outline: none;
+    transition: 0.4s;
+    font-weight: bolder;
+    background-color: #9eb6d8;
+    width: 50% !important;
+    color: white;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 25px;
+    border: #9eb6d8 solid 1px ;
+    padding-right: 5px;
+    padding-left: 5px;
+    margin: 2px auto 2px 0;
+
+}
+.accordion {
+
+
+    cursor: pointer;
+    text-align: left;
+    outline: none;
+    transition: 0.4s;
+    font-weight: bolder;
+    width: 50%;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 25px;
+    border: #9eb6d8 solid 1px ;
+    padding-right: 5px;
+    padding-left: 5px;
+
+}
+/* 为手风琴面板设计样式。 默认隐藏 */
+.panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    width: 100%;
+    text-align: center;
+    margin-top: 2px;
+}
+.panel1 {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    width: 100%;
+    text-align: center;
+    margin-top: 2px;
+}
+/* 设置 +、- 标志 */
+.accordion:after {
+    content: '\002B';  /* Unicode 字符 + 号 */
+    color: black;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+/* 设置 +、- 标志 */
+.accordion1:after {
+    content: '\002B';  /* Unicode 字符 + 号 */
+    color: black;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+.active:after {
+    content: "\2212";  /* Unicode 字符 - 号 */
+}
+
+.panel div{
+    width: 100%;
+    height: auto;
+    line-height: 25px;
+    /* border-top: #9eb6d8 solid 1px; */
+}
+
+.panel1 div{
+    width: 100%;
+    min-height:auto;
+    line-height: 25px;
+    /* border-top: #9eb6d8 solid 1px; */
+}
+
+
+input[type="checkbox"] {
+    display: none; /* 隐藏原生复选框 */
+}
+
+label.checkbox {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+label.checkbox::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .1);
+    transition: all .2s;
+}
+
+input[type="checkbox"]:checked + label.checkbox::before {
+    background-color: #007bff;
+    margin-top: -1px;
+    margin-left: -1px;
+}
+/* 全选 */
+input[type="checkbox"]:checked + label.checkbox::after {
+    content: "\2713";
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    font-size: 14px;
+    color: #fff;
+    line-height: normal;
+}
+
+/* 未全选 */
+input[type="checkbox"]:indeterminate + label.checkbox::before {
+    background-color: #007bff;
+    margin-top: -1px;
+    margin-left: -1px;
+}
+
+input[type="checkbox"]:indeterminate + label.checkbox::after {
+    content: "\2212";
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    font-size: 14px;
+    color: #fff;
+    line-height: normal;
+}
+
+  </style>
+  <body>
+  <div style="display: flex;width: 100%;height: auto">
+    <div class="right" style="display: block;margin: auto">
+      <div class="sticky" style="width: 95%;">
+        <div style="width: 100%;height: auto;padding: 1px;border: #9eb6d8 solid 1px">
+          <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px">
+            <div style="width:70%;background-color:#9eb6d8  ;height: auto;display: flex"><b style="margin: auto;align-self: center">用户信息管理</b></div>
+              <div style="width:29.5%;background-color:#9eb6d8;margin: auto  ;height: auto;"><button id="addUser">添加新用户</button>
+                  <button id="addTemporaryUser">添加临时用户</button>
+                  <button id="updateTemporaryUser">临时用户管理</button>
+              </div>
+          </div>
+
+          <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin:10px auto auto auto;overflow-y: scroll">
+            <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;position: sticky;top: 0">
+              <div style="width: 30%;background-color: #9eb6d8; border:white solid 1px  ;display: flex" ><b style="margin: auto;align-self: center">用户名</b></div>
+              <div style="width: 20%;background-color: #9eb6d8; border:white solid 1px  ;display: flex" ><b style="margin: auto;align-self: center">姓名</b></div>
+                <div style="width: 10%;background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="margin: auto;align-self: center">年龄</b></div>
+                <div style="width: 15%;background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="margin: auto;align-self: center">所属部门</b></div>
+              <div style="width: 25%;background-color: #9eb6d8  ; border:white solid 1px;display: flex"    ><b style="margin: auto;align-self: center">操作</b></div>
+            </div>
+            <div id="content" style="width: 100%;height:auto;margin: auto;max-height:500px;">
+<!--                            <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+<!--                                <div style="width: 30%;margin: auto;  border:white solid 1px" ><b>用户名</b></div>-->
+<!--                                <div style="width: 20%;margin: auto;  border:white solid 1px" ><b>姓名</b></div>-->
+<!--                                <div style="width: 10%;margin: auto;  border:white solid 1px" ><b>年龄</b></div>-->
+<!--                                <div style="width: 15%;margin: auto;  border:white solid 1px" ><b>所属部门</b></div>-->
+<!--                                <div style="width: 25%;margin: auto;  border:white solid 1px"    ><b>操作</b></div>-->
+<!--                            </div>-->
+
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="window">
+
+    <div class="window-content">
+
+        <div class="window-content-close">×</div>
+        <div id="addUserForm" class="aa" style="width:80% ;height:80%; margin: 20px auto auto;padding-bottom: 5px;display: none;overflow-y: auto">
+
+
+            <div style="width: 100%;height: auto;">
+
+                <div style="width:90%;margin: 10px auto auto auto">
+                    <div style="width: fit-content;margin: auto ">添加用户信息</div>
+                </div>
+                <div style="height:auto;width: 90%;margin: auto;padding:  2px">
+
+
+                    <!-- 姓名-->
+                    <div id="nameFlex" style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">姓名:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="name" type="text" style="width: 90%;" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--性别-->
+                    <div id="sexFlex" style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">性别:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center;">
+                                <!--          <input id="sex" type="text" style="width: 90%;">-->
+                                男 <input type="radio" name="sex" class="sex" checked> 女  <input type="radio" name="sex" class="sex">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ageFlex" style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">年龄:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="age" type="text" style="width: 90%;" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
+                            </div>
+                        </div>
+                    </div>
+                    <!--   登录名-->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center"  >用户名:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="username" type="text" placeholder="由4~16位字母、数字、减号、下划线组成" style="width: 90%;" >
+                            </div>
+                        </div>
+                    </div>
+                    <!--   密码-->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">密码:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="password" type="text" placeholder="由6~20位字母、数字组成"  style="width: 90%;" >
+                            </div>
+                        </div>
+                    </div>
+                <!--  请在此确认密码                  -->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">密码确认:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="passwordAgain" type="text" placeholder="由6~20位字母、数字组成"  style="width: 90%;" >
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 部门-->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">部门:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <label for="departmentId"></label><input id="departmentId" type="hidden" style="display: none" value="">
+                                <label for="departmentSelect"></label>
+                                <select id="departmentSelect" style="width:90%">
+
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+<!--                    账号等级-->
+                    <div id="setLevel" style="width: 99%;height: auto;display: flex;margin:auto">
+
+                    </div>
+
+
+                    <!--   权限-->
+                    <div id="qxa" style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: auto;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">权限管理:</div></div>
+                        <div style="width: 80%;height: auto;">
+                            <div style="width: 100%;height: fit-content;margin: auto;" id="functionData1">
+
+
+
+                            </div>
+
+                            </div>
+
+
+
+
+
+                        </div>
+<!--                    &lt;!&ndash;                    设置自动退出的时间&ndash;&gt;-->
+<!--                    <div style="width: 99%;height: auto;display: flex;margin:auto">-->
+<!--                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center"  >登录保留时间:</div></div>-->
+<!--                        <div style="width: 80%;height: 50px;display: flex">-->
+<!--                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">-->
+<!--                                <input id="ExitTime" type="number" placeholder="单位（分钟）;大于120将不会自动退出" style="width: 90%;"  max="121" min="30">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    有效期-->
+                    <div id="overTimeFlex" style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center"  >有效期(天):</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="overTime" type="number" max="10" min="1" oninput="if (value>10) value=10;if (value<=0) value='';" style="width: 90%;" >
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+            <div style="width: 90%;height: auto;text-align: center;margin:  auto;">
+                <button id="submit" style="width: 100px;height: 30px;border-radius: 15px;">添加账户</button>
+                <button id="submitTemporary" style="width: 100px;height: 30px;border-radius: 15px;margin-left: 10px">添加临时账户</button>
+            </div>
+            </div>
+
+
+        <div id="updateUserForm" class="aa" style="width:80% ;height: 80%; margin: 20px auto auto;padding-bottom: 5px;display: none;overflow-y: auto">
+
+
+            <div style="width: 100%;height: auto;">
+
+                                <div style="width:90%;margin: 10px auto auto auto">
+                                    <div style="width: fit-content;margin: auto ">修改用户信息</div>
+                                </div>
+                <div style="height:auto;width: 90%;margin: auto;padding:  2px">
+
+
+                    <!-- 姓名-->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">姓名:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="updateName" type="text" style="width: 90%;" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--性别-->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">性别:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center;">
+                                <!--          <input id="sex" type="text" style="width: 90%;">-->
+                                男 <input type="radio" name="updateSex" class="updateSex" checked> 女  <input type="radio" name="updateSex" class="updateSex">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">年龄:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="updateAge" type="text" style="width: 90%;" oninput="value=value.replace(/^(0+)|[^\d]+/g,'')">
+                            </div>
+                        </div>
+                    </div>
+                    <!--   登录名-->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center"  >用户名:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="updateUsername" type="text" placeholder="由4~16位字母、数字、减号、下划线组成" style="width: 90%;" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 部门-->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">部门:</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <label for="updateDepartmentId"></label><input id="updateDepartmentId" type="hidden" style="display: none" value="">
+                                <label for="updateDepartmentSelect"></label>
+                                <select id="updateDepartmentSelect" style="width:90%">
+
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--                    账号等级-->
+                    <div id="setUpdateLevel" style="width: 99%;height: auto;display: flex;margin:auto">
+
+                    </div>
+
+                    <!--   权限-->
+                    <div id="upqxa" style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: auto;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center">权限管理:</div></div>
+                        <div style="width: 80%;height: auto;">
+                            <div style="width: 100%;height: fit-content;margin: auto;" id="upfunctionData">
+
+
+                            </div>
+
+
+
+
+
+                        </div>
+                    </div>
+
+<!--                    设置自动退出的时间-->
+                    <div style="width: 99%;height: auto;display: flex;margin:auto">
+                        <div style="width: 20%;height: 50px;display: flex"><div style="width: fit-content;height:fit-content;margin: auto;align-self: center"  >登录保留时间(min):</div></div>
+                        <div style="width: 80%;height: 50px;display: flex">
+                            <div style="width: 100%;height: fit-content;margin: auto;align-self: center">
+                                <input id="updateExitTime" type="number" placeholder="单位（分钟）;大于120将不会自动退出" style="width: 90%;"  max="121" min="30"  >
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div style="width: 90%;height: auto;text-align: center;margin: auto;">
+
+                <button id="updateSubmit" style="width: 100px;height: 30px;border-radius: 15px;">确定修改</button>
+            </div>
+        </div>
+
+        <div id="updateTemporaryUserForm" class="aa" style="width:80% ;height: 80%; margin: 20px auto auto;padding-bottom: 5px;display: none;overflow-y: auto">
+
+
+            <div style="width: 100%;height: auto;">
+
+                <div style="width:90%;margin: 10px auto auto auto">
+                    <div style="width: fit-content;margin: auto ">修改临时用户信息</div>
+                </div>
+                <div style="height:auto;width: 90%;margin: auto;padding:  2px">
+
+                    <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin:10px auto auto auto;overflow-y: scroll">
+                        <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;position: sticky;top: 0">
+                            <div style="width: 20%;background-color: #9eb6d8; border:white solid 1px  ;display: flex" ><b style="margin: auto;align-self: center">用户名</b></div>
+                            <div style="width: 20%;background-color: #9eb6d8; border:white solid 1px  ;display: flex" ><b style="margin: auto;align-self: center">创建人</b></div>
+                            <div style="width: 15%;background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="margin: auto;align-self: center">所属部门</b></div>
+                            <div style="width: 20%;background-color: #9eb6d8; border:white solid 1px;display: flex" ><b style="margin: auto;align-self: center">到期时间</b></div>
+                            <div style="width: 25%;background-color: #9eb6d8  ; border:white solid 1px;display: flex"    ><b style="margin: auto;align-self: center">操作</b></div>
+                        </div>
+                        <div id="temporaryContent" style="width: 100%;height:auto;margin: auto;max-height:500px;">
+                            <!--                            <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+                            <!--                                <div style="width: 30%;margin: auto;  border:white solid 1px" ><b>用户名</b></div>-->
+                            <!--                                <div style="width: 20%;margin: auto;  border:white solid 1px" ><b>姓名</b></div>-->
+                            <!--                                <div style="width: 10%;margin: auto;  border:white solid 1px" ><b>年龄</b></div>-->
+                            <!--                                <div style="width: 15%;margin: auto;  border:white solid 1px" ><b>所属部门</b></div>-->
+                            <!--                                <div style="width: 25%;margin: auto;  border:white solid 1px"    ><b>操作</b></div>-->
+                            <!--                            </div>-->
+
+
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+
+
+
+
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+</div>
+
+    </div>
+
+
+   
+  </body>
+  <script type="text/javascript" src="js/axios-0.18.0.js"></script>
+  <script type="text/javascript" src="js/userManage.js">
+
+  </script>
+
+<script>
+
+
+
+    let input1 = document.getElementById("updateExitTime");
+    let time1 = null;//time用来控制事件的触发
+    input1.addEventListener('input',function(){
+        let value=input1.value;
+        //防抖语句
+        if(time1 !== null){
+            clearTimeout(time1);
+        }
+        time1 = setTimeout(() => {
+          //业务实现语句
+
+            if (value>121) this.value=121;if (value<=0) this.value='';if (value<30&&value>0) this.value=30
+            //这里的this指向的是input
+        },500)
+    })
+
+
+</script>
+</html>

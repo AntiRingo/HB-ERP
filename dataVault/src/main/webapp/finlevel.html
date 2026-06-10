@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>产品仓库物料分级详情</title>
+    <link href="css/product.css" rel="stylesheet" />
+</head>
+<style>
+    html{
+        padding:0;
+        margin: 0;
+
+        width: 100%;
+        height: 100%;
+        /*断句*/
+        word-break:break-all;
+        font-family: 宋体,serif;
+    }
+    body{
+        width: 90%;
+        height: auto;
+        margin: auto;
+        padding:0;
+        background-color: aliceblue;
+    }
+    .sort{
+        width: 90%;
+        height: auto;
+        border: #9eb6d8 solid 1px;
+        margin: 20px auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+
+    .sort-div{
+        width: 25%;
+        height: auto;
+        min-height: 30px;
+        text-align: center;
+        display: flex;
+
+    }
+    .sort-div div{
+        width: fit-content;
+
+        align-self: center;
+        margin: auto;
+    }
+    .sort-div div a{
+        color:#003366;
+        text-decoration: none;
+    }
+    .sort-div div a:hover{
+        color: cornflowerblue;
+
+    }
+
+    a{
+        color: cornflowerblue;
+        text-decoration: none;
+    }
+    a:hover{
+        color: blue;
+    }
+    a:active{
+        color: red;
+    }
+</style>
+<body>
+<div style="width: 100%;height: 90%;margin-top: 20px">
+
+
+  <div style="width: 80%;margin:auto;height: auto;padding: 1px;border: #9eb6d8 solid 1px">
+      <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px">
+          <div style="width:80%;background-color:#9eb6d8;height: auto;"><b>分级列表</b></div>
+          <div style="width: 20%;background-color:#9eb6d8;margin: auto;height: auto;">
+              <button id="add">添加分级</button>
+              <button id="updateAll">默认字符集</button>
+
+          </div>
+
+      </div>
+
+      <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: 25px auto 15px auto">
+          <div style="width: 100%;height: auto;display: flex;text-align: center;color: white">
+
+              <div style="width:65%;background-color: #9eb6d8; border:white solid 1px" ><b>物料分级信息</b></div>
+              <div style="width: 35%;margin: auto;background-color: #9eb6d8  ; border:white solid 1px"    ><b>编码规则操作</b></div>
+          </div>
+          <div id="content" style="width: 100%;height: auto;margin: auto">
+<!--              <div style="width: 100%;height: auto;display: flex;text-align: center;">-->
+<!--                  <div style="width: 80%;margin: auto; border: white solid 1px"><b>一级分类</b></div>-->
+<!--                  <div style="width:20%;margin: auto  ; border: white solid 1px"><b>分类描述</b></div>-->
+
+<!--              </div>-->
+
+
+          </div>
+      </div>
+
+  </div>
+
+
+</div>
+<div class="window">
+
+    <div class="window-content">
+
+        <div class="window-content-close">×</div>
+
+        <div id="codeView" class="aa" style="width:750px ;height: auto;max-height: 88%; margin: 5px auto auto;background-color: white;padding-bottom: 5px;">
+            <div style="width: 100%;height: auto;display: flex;margin: auto;position: sticky;top: 0">
+                <div style="width: 100%;height: 29px;background-color: #698CC3;margin-top: 1px;margin-left: 1px;margin-right: 1px;
+     line-height: 29px;text-align: center;color: white;"><b id="bmgz">编码规则</b>
+                </div>
+
+            </div>
+
+            <div class="aa" id="formdata" style="width:99% ;height: auto;margin: 4px auto auto;background-color: #f8f8f8;">
+                <div id="bmcd" style="width:100% ;height: auto;display: flex;">
+
+                    <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+                            编码长度：
+                        </div>
+                    </div>
+                    <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="length" value="" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')"> &nbsp;<b>*</b>
+                    </div>
+                </div>
+
+                <div style="width:100% ;height: auto;display: flex;">
+
+                    <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+                            所需的内容：
+                        </div>
+                    </div>
+                    <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input  style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="description" value="" onkeyup="this.value=this.value.replace(/[ ]/g,'')"/> &nbsp;<b id="xh">*</b>
+                    </div>
+                </div>
+                <div style="width:100% ;height: auto;display: flex;">
+
+                    <div  style="width: 19.5%;height: 50px; border-right: 1px solid #d6e0ef;border-bottom: 1px solid #d6e0ef;text-align: center;display: flex;">
+                        <div style="width: fit-content;height: auto;align-self: center;margin: auto">
+                            去除的内容：
+                        </div>
+                    </div>
+                    <div  style="width:80% ;height:50px;border-bottom: 1px solid #d6e0ef;">
+                        &nbsp;<input style="width: 90%;height: 30px;margin-top: 8px;" type="text" name="" id="remove" value="" onkeyup="this.value=this.value.replace(/[ ]/g,'')"/> &nbsp;
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div style="width: 100%;height: auto;text-align: center">
+                <button id="codeAdd" style="padding: 5px 10px;margin: 10px auto 5px auto">提交</button>
+                <button id="codeUpdate" style="padding: 5px 10px;margin: 10px auto 5px auto">更新</button>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+<script src="js/axios-0.18.0.js"></script>
+<script src="js/randexp.min.js"></script>
+<script>
+    //查询权限
+    let userId = parent.document.getElementById("userId").value;
+    // 在用户点击其他地方时，关闭弹窗
+    let wd = document.querySelector(".window");
+    window.onclick = function(event) {
+        if (event.target === wd) {
+            wd.style.display = "none";
+        }
+    }
+
+    //点击close也可以关闭弹窗
+    document.querySelector(".window-content-close").onclick=function (){
+        wd.style.display="none";
+    }
+    async function userFunction(userId){
+        let data;
+        await axios({
+            method:"post",
+            url:"userFunction/selectUserFunctionTwoByUserId",
+            data:userId
+        }).then(function (resp){
+            data= resp.data;
+        })
+        return data;
+    }
+
+    //增改改分级权限
+    async function addAndUpdateLevelQx(){
+        let promise = userFunction(userId);
+        let promiseBoolean=false;
+        await promise.then( async function (resp) {
+
+            for (let j = 0; j < resp.length; j++) {
+                if (resp[j].function_two_id === 54 && resp[j].open_status === 1) {
+                    promiseBoolean = true;
+
+                    break;
+                }
+            }
+
+        })
+        return promiseBoolean;
+    }
+    //删除分级权限
+    async function deleteLevelQx(){
+        let promise = userFunction(userId);
+        let promiseBoolean=false;
+        await promise.then( async function (resp) {
+
+            for (let j = 0; j < resp.length; j++) {
+                if (resp[j].function_two_id === 55 && resp[j].open_status === 1) {
+                    promiseBoolean = true;
+
+                    break;
+                }
+            }
+
+        })
+        return promiseBoolean;
+    }
+
+
+    //删除
+    async function deletes(id, level) {
+        //判断是否有删除权限
+        let b = await deleteLevelQx();
+        if (b===false){
+            alert("您暂未获得删除分级的权限！")
+        }
+        else {
+            if (window.confirm("您确定要删除这条编码规则吗？")) {
+
+                //检查是否被使用
+                axios({
+                    method: "post",
+                    url: "finCode/selectIfLevel",
+                    data: level
+                }).then(function (resp) {
+                    if (resp.data === true) {
+                        alert("这条规则正在使用，不允许删除！")
+                    } else {
+                        axios({
+                            method: "post",
+                            url: "finCode/delete",
+                            data: id
+                        }).then(function (resp) {
+                            if (resp.data === "success") {
+                                alert("删除成功！");
+                                location.reload();
+                            } else {
+                                alert("删除失败，请联系相关人员！")
+                            }
+                        })
+                    }
+                })
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+    }
+
+
+    //判断是否为正则表达式
+    const isRegExp = (v) => {
+        return Object.prototype.toString.call(v) === '[object RegExp]';
+    }
+
+    //先判断是否有物料存在
+    axios({
+        method:"post",
+        url:"finProduct/ifProduct"
+    }).then(function (resp){
+        let productDatas=resp.data;
+        if (productDatas===true){
+            //存在物料信息
+            axios({
+                method:"post",
+                url:"finCode/selectAll",
+
+            }).then(function (resp){
+                let datas=resp.data;
+                let formdata='';
+                for (let i = 0; i < datas.length; i++) {
+
+                        formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                            '                  <div style="width:65%;margin: auto; border: white solid 1px"><b><span>'+datas[i].level+'</span>级分类</b></div>\n' +
+                            '                  <div style="width:35%;margin: auto  ; border: white solid 1px"><a href="javascript:void(0)" onclick="code('+datas[i].level+')">更新编码规则</a></div>\n' +
+                            '              </div>'
+
+
+                }
+
+                document.getElementById("content").innerHTML=formdata;
+
+                //长度框禁用
+                document.getElementById("length").disabled=true;
+                //添加分级按钮禁用
+                document.getElementById("add").disabled=true;
+            })
+
+        }else {
+            //不存在物料信息
+            //查询所有编码
+            axios({
+                method:"post",
+                url:"finCode/selectAll",
+
+            }).then(function (resp){
+                let datas=resp.data;
+                let formdata='';
+                for (let i = 0; i < datas.length; i++) {
+                    if (i===datas.length-1){
+                        formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                            '                  <div style="width:65%;margin: auto; border: white solid 1px"><b><span>'+datas[i].level+'</span>级分类</b></div>\n' +
+                            '                  <div style="width:35%;margin: auto  ; border: white solid 1px"><a href="javascript:void(0)" onclick="code('+datas[i].level+')">更新编码规则</a>' +
+                            '&nbsp;&nbsp;<a href="javascript:void(0)" onclick="deletes('+datas[i].id+','+datas[i].level+')">删除</a></div>\n' +
+                            '\n' +
+                            '              </div>'
+                    }else {
+                        formdata+='  <div style="width: 100%;height: auto;display: flex;text-align: center;">\n' +
+                            '                  <div style="width:65%;margin: auto; border: white solid 1px"><b><span>'+datas[i].level+'</span>级分类</b></div>\n' +
+                            '                  <div style="width:35%;margin: auto  ; border: white solid 1px"><a href="javascript:void(0)" onclick="code('+datas[i].level+')">更新编码规则</a></div>\n' +
+                            '              </div>'
+                    }
+
+                }
+
+                document.getElementById("content").innerHTML=formdata;
+
+
+
+                document.getElementById("add").onclick= async function () {
+                    //查询权限
+                    let b = await addAndUpdateLevelQx();
+                    if (b===false){
+                        alert("您暂未获得添加分级的权限！")
+                    }
+                    else {
+                        //查询默认编码规则
+                        axios({
+                            method: "post",
+                            url: "finCode/selectCode",
+                            data: 0
+                        }).then(function (resp)
+                        {
+                            let code = resp.data;
+                            if (code.length === 0) {
+                                alert("请先添加默认字符集！")
+                            } else {
+                                document.getElementById("description").value = code[0].description;
+                                document.getElementById("remove").value = code[0].remove;
+                                //打开窗口
+                                document.querySelector(".window").style.display = "block";
+                                //表示没有规则存在，显示添加按钮
+                                document.getElementById("codeUpdate").style.display = "none";
+                                document.getElementById("codeAdd").style.display = "block";
+
+                                //清除编辑框的内容
+                                document.getElementById("length").value = "";
+                                document.getElementById("description").value = ""
+                                document.getElementById("remove").value = "";
+                                document.getElementById("length").placeholder = ""
+                                document.getElementById("length").disabled = false;
+                                document.getElementById("bmcd").style.display = "flex";
+                                document.getElementById("bmgz").innerHTML = "编码规则";
+                                document.getElementById("xh").style.display = "none";
+
+                                axios({
+                                    method: "post",
+                                    url: "finCode/selectCount"
+                                }).then(async function (resp) {
+                                    let data = resp.data;
+                                    if (data === 1) {
+                                        //查询另一个仓库是否存在一级分类
+                                        await axios({
+                                            method: "post",
+                                            url: "code/selectCode",
+                                            data: 1
+                                        }).then(function (resp) {
+                                            let code = resp.data;
+                                            if (code.length > 0) {
+
+                                                document.getElementById("length").value = code[0].length;
+                                                document.getElementById("length").disabled = true;
+                                            }
+
+
+                                        })
+                                    }
+                                })
+
+
+                                document.getElementById("codeAdd").onclick = function () {
+
+                                    axios({
+                                        method: "post",
+                                        url: "finCode/selectCount"
+                                    }).then(async function (resp) {
+                                        let data = resp.data;
+                                        if (data <= 8) {
+
+                                            let value = document.getElementById("length").value;
+
+                                            if (value.length === 0) {
+                                                alert("有必填项未填写！")
+                                            } else {
+
+                                                let value1 = document.getElementById("description").value;
+                                                let value3 = document.getElementById("remove").value;
+                                                //判断是不是正则表达式
+                                                let data1 = '';
+                                                let datas2 = '';
+                                                let result = value1.split(",")
+                                                for (let i = 0; i < result.length; i++) {
+                                                    data1 += result[i]
+                                                }
+                                                let result2 = value3.split(",");
+                                                for (let i = 0; i < result2.length; i++) {
+                                                    datas2 += result2[i]
+                                                }
+                                                reg = new RegExp('^[' + data1 + ']{' + document.getElementById("length").value + '}$');//新改的编码长度
+                                                reg1 = new RegExp('[' + datas2 + ']');
+                                                if (isRegExp(reg) === true && isRegExp(reg1) === true) {
+                                                    if (window.confirm("您确定要添加这条规则吗？")) {
+                                                        if (data === 1) {
+                                                            //获取内容
+                                                            let formdata = {
+                                                                id: "",
+                                                                length: "",
+                                                                description: "",
+                                                                remove: "",
+                                                                level: 1
+                                                            }
+
+                                                            formdata.length = document.getElementById("length").value;
+                                                            formdata.description = document.getElementById("description").value;
+                                                            formdata.remove = document.getElementById("remove").value;
+                                                            axios({
+                                                                method: "post",
+                                                                url: "finCode/addCode",
+                                                                data: formdata
+                                                            }).then(function (resp) {
+                                                                if (resp.data === "success") {
+                                                                    alert("规则添加成功！");
+                                                                    location.reload();
+                                                                } else {
+                                                                    alert("规则添加失败，请联系先关人员！")
+                                                                }
+                                                            })
+                                                        } else {
+                                                            //获取内容
+                                                            let formdata = {
+                                                                id: "",
+                                                                length: "",
+                                                                description: "",
+                                                                remove: "",
+                                                                level: Number(datas[datas.length - 1].level) + Number(1)
+                                                            }
+
+                                                            formdata.length = document.getElementById("length").value;
+                                                            formdata.description = document.getElementById("description").value;
+                                                            formdata.remove = document.getElementById("remove").value;
+                                                            axios({
+                                                                method: "post",
+                                                                url: "finCode/addCode",
+                                                                data: formdata
+                                                            }).then(function (resp) {
+                                                                if (resp.data === "success") {
+                                                                    alert("规则添加成功！");
+                                                                    location.reload();
+                                                                } else {
+                                                                    alert("规则添加失败，请联系先关人员！")
+                                                                }
+                                                            })
+                                                        }
+
+
+                                                        return true;
+                                                    } else {
+                                                        return false;
+                                                    }
+                                                } else {
+                                                    alert("您输入的规则系统无法识别！")
+                                                }
+
+
+                                            }
+                                        } else {
+                                            alert("已达到最大级数！")
+                                        }
+                                    })
+
+
+                                }
+                            }
+
+
+                        })
+                    }
+
+
+
+                }
+            })
+
+        }
+    })
+
+
+
+    //更新编码规则
+async function code(level) {
+    //查询权限
+    let b = await addAndUpdateLevelQx();
+
+    if (b===false){
+        alert("您暂未获得更新编码规则的权限！")
+    }
+    else {
+        //打开窗口
+        document.querySelector(".window").style.display = "block";
+
+        //表示有规则存在，查询规则并显示，显示更新按钮
+        document.getElementById("codeAdd").style.display = "none";
+        document.getElementById("codeUpdate").style.display = "block";
+        document.getElementById("bmcd").style.display = "flex";
+        document.getElementById("bmgz").innerHTML = "编码规则";
+        document.getElementById("xh").style.display = "none";
+
+        if (Number(level) === Number(1)) {
+            document.getElementById("length").disabled = true;
+        } else {
+            document.getElementById("length").disabled = false;
+
+        }
+        //有规则存在就获取规则内容并回显
+        axios({
+            method: "post",
+            url: "finCode/selectCode",
+            data: level
+        }).then(function (resp)
+        {
+            let datas = resp.data;
+            document.getElementById("length").value = datas[0].length;
+            document.getElementById("description").value = datas[0].description;
+            document.getElementById("remove").value = datas[0].remove;
+            document.getElementById("length").placeholder = "";
+
+            //修改规则
+            document.getElementById("codeUpdate").onclick = function () {
+                let value = document.getElementById("length").value;
+                let value1 = "";
+                if (document.getElementById("description").value.trim().length > 0) {
+                    value1 = document.getElementById("description").value;
+                } else {
+                    axios({
+                        method: "post",
+                        url: "finCode/selectCode",
+                        data: 0
+                    }).then(function (resp) {
+                        value1 = resp.data[0].description;
+                    })
+                }
+                let value3 = "";
+                if (document.getElementById("remove").value.trim().length > 0) {
+                    value3 = document.getElementById("remove").value;
+                } else {
+                    axios({
+                        method: "post",
+                        url: "finCode/selectCode",
+                        data: 0
+                    }).then(function (resp) {
+                        value3 = resp.data[0].remove;
+                    })
+                }
+                if (value.length === 0) {
+                    alert("有必填项未填写！")
+                } else {
+
+                    let data1 = '';
+                    let datas2 = '';
+                    let result = value1.split(",")
+                    for (let i = 0; i < result.length; i++) {
+                        data1 += result[i]
+                    }
+                    let result2 = value3.split(",");
+                    for (let i = 0; i < result2.length; i++) {
+                        datas2 += result2[i]
+                    }
+                    reg = new RegExp('^[' + data1 + ']{' + value + '}$');//新改的编码长度
+                    reg1 = new RegExp('[' + datas2 + ']');
+
+                    if (isRegExp(reg) === true && isRegExp(reg1) === true) {
+                        //判断是否长度被修改
+                        if (Number(value) !== Number(datas[0].length)) {
+                            if (window.confirm("检测到编码长度已更改，请确认是否要继续修改？")) {
+                                //检测当前分级下的所有分类内容
+                                axios({
+                                    method: "post",
+                                    url: "finSort/selectByLevel",
+                                    data: level
+                                }).then(function (resp) {
+                                    let adatas = resp.data;//得到了该分级下所有的分类信息
+
+                                    reg = new RegExp('^[' + data1 + ']{' + value + '}$');//新改的编码长度
+                                    reg1 = new RegExp('[' + datas2 + ']');
+
+                                    let ban = "";
+                                    for (let i = 0; i < datas[0].length; i++) {
+                                        ban += '0'
+                                    }
+
+
+                                    //生成随机符合新要求的n个编码
+                                    var content = {
+                                        id: "",
+                                        finSortCode: ""
+                                    }
+                                    var list = [adatas.length];
+
+
+                                    function sj(n, m, q, p) {
+                                        if (n > 0) {
+                                            var regex = new RegExp(reg);
+                                            var randomString = new RandExp(regex).gen();
+
+                                            if (reg1.test(randomString) === false && Number(randomString) !== Number(ban)) {
+
+                                                let result = list.find(content => content.code === randomString);//判断编码是否重复
+                                                if (result === undefined) {
+                                                    //符合并且不重复
+                                                    content = {
+                                                        id: adatas[m].id,
+                                                        finSortCode: randomString
+
+                                                    }
+                                                    list[m] = content;
+                                                    content = {
+                                                        id: "",
+                                                        finSortCode: ""
+                                                    }
+                                                    m++;
+                                                    n--;
+                                                    sj(n, m, q, p);
+                                                } else {
+
+                                                    p++
+                                                    if (p < 200) {
+                                                        sj(n, m, q, p);
+                                                    } else {
+                                                        alert("您设置的条件可以生成符合规则的结果太少，请您重新修改规则！")
+                                                    }
+
+
+                                                }
+
+
+                                            } else {
+                                                q++;
+                                                if (q < 200) {
+                                                    sj(n, m, q, p);
+                                                } else {
+                                                    alert("您设置的规则已经没有更多的数据可以生成，请您重新修改规则！")
+                                                }
+                                            }
+                                        } else if (n === 0) {
+
+                                            //得到了所有分类的id以及添加好的符合规则的编码数据，先更新编码的规则，然后再修改含有分类的编码
+                                            //获取内容
+                                            let formdata = {
+                                                id: "",
+                                                length: "",
+                                                description: "",
+                                                remove: "",
+                                                level: level
+                                            }
+
+                                            formdata.length = document.getElementById("length").value;
+                                            formdata.description = document.getElementById("description").value;
+                                            formdata.remove = document.getElementById("remove").value;
+
+                                            axios({
+                                                method: "post",
+                                                url: "finCode/updateCode",
+                                                data: formdata
+                                            }).then(function (resp) {
+                                                let bdatas = resp.data;
+                                                if (bdatas === "success") {
+                                                    if (list[0].id) {
+                                                        //更新编码规则成功，修改所有的分类编码
+                                                        axios({
+                                                            method: "post",
+                                                            url: "finSort/updateCodes",
+                                                            data: list
+                                                        }).then(function (resp) {
+                                                            if (resp.data === "success") {
+                                                                alert("编码长度更新完毕！");
+                                                                location.reload();
+                                                            } else {
+                                                                let cdatas = {
+                                                                    id: datas[0].id,
+                                                                    length: datas[0].length,
+                                                                    description: datas[0].description,
+                                                                    remove: datas[0].remove,
+                                                                    level: datas[0].level
+                                                                }
+                                                                axios({
+                                                                    method: "post",
+                                                                    url: "finCode/updateCode",
+                                                                    data: cdatas
+                                                                }).then(function (resp) {
+                                                                    if (resp.data === "success") {
+                                                                        alert("修改失败，请联系先关人员！")
+                                                                    } else {
+                                                                        alert("出现严重错误，请联系相关人员！")
+                                                                    }
+
+                                                                })
+                                                            }
+                                                        })
+                                                    } else {
+                                                        alert("编码长度更新完毕！");
+                                                        location.reload();
+                                                    }
+
+
+                                                } else {
+                                                    alert("修改失败，请联系相关人员！")
+                                                }
+                                            })
+
+                                        }
+                                    }
+
+                                    sj(adatas.length, 0, 0, 0);
+
+
+                                })
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        } else {
+                            if (window.confirm("您确定要更新这个规则吗")) {
+                                //获取内容
+                                let formdata = {
+                                    id: "",
+                                    length: "",
+                                    description: "",
+                                    remove: "",
+                                    level: level
+                                }
+
+                                formdata.length = document.getElementById("length").value;
+                                formdata.description = document.getElementById("description").value;
+                                formdata.remove = document.getElementById("remove").value;
+
+                                axios({
+                                    method: "post",
+                                    url: "finCode/updateCode",
+                                    data: formdata
+                                }).then(function (resp) {
+                                    let datas = resp.data;
+                                    if (datas === "success") {
+                                        alert("修改成功！");
+                                        location.reload();
+                                    } else {
+                                        alert("修改失败，请联系相关人员！")
+                                    }
+                                })
+
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    } else {
+                        alert("您输入的规则系统无法识别！")
+                    }
+
+
+                }
+
+            }
+
+
+        })
+    }
+
+
+
+
+}
+
+    //默认字符集操作
+    document.getElementById("updateAll").onclick=async function (){
+
+
+        let booleanPromise = addAndUpdateLevelQx();
+        let booleanPromise1 = addAndUpdateLevelQx();
+        let b = false;
+        let b1 = false;
+        await booleanPromise.then(function (resp){
+            if (resp===true){
+                b=true;
+            }
+        })
+        await booleanPromise1.then(function (resp){
+            if (resp===true){
+                b=true
+            }
+        })
+        if (b===true || b1===true){
+
+            document.getElementById("bmcd").style.display="none";
+            document.getElementById("bmgz").innerHTML="默认字符集";
+            document.getElementById("xh").style.display="";
+            //查询默认编码规则
+            axios({
+                method:"post",
+                url:"finCode/selectCode",
+                data:0
+            }).then(function (resp){
+                let code= resp.data;
+                if (code.length>0){
+                    document.getElementById("description").value=code[0].description;
+                    document.getElementById("remove").value=code[0].remove;
+                    //表示有规则存在，显示修改按钮
+                    document.getElementById("codeUpdate").style.display="block";
+                    document.getElementById("codeAdd").style.display="none";
+                }
+                else {
+                    alert("暂未添加默认字符集，请进行添加！")
+                    //表示没有规则存在，显示添加按钮
+                    document.getElementById("codeUpdate").style.display="none";
+                    document.getElementById("codeAdd").style.display="block";
+                    document.getElementById("description").value=""
+                    document.getElementById("remove").value="";
+                }
+
+                //打开窗口
+                document.querySelector(".window").style.display = "block";
+
+                //清除编辑框的内容
+                document.getElementById("length").placeholder="字符集不需要设置长度！"
+                document.getElementById("length").disabled=true;
+
+
+
+                function addAndUpdate(){
+                    let value1 = document.getElementById("description").value;
+
+                    let value3=document.getElementById("remove").value;
+                    if (value1.trim().length===0){
+                        alert("请添加字符集信息！")
+                    }
+                    else {
+                        let data1='';
+                        let datas2='';
+                        let result= value1.split(",")
+                        for (let i = 0; i < result.length; i++) {
+                            data1+=result[i]
+                        }
+                        let result2=value3.split(",");
+                        for (let i = 0; i < result2.length; i++) {
+                            datas2+=result2[i]
+                        }
+                        reg= new RegExp('^['+data1+']');//新改的编码长度
+                        reg1= new RegExp('['+datas2+']');
+
+                        if (isRegExp(reg)===true && isRegExp(reg1)===true){
+                            if (window.confirm("您确定要更新默认字符集吗？")) {
+                                //获取内容
+                                let formdata = {
+                                    id: "",
+                                    length: 0,
+                                    description: "",
+                                    remove: "",
+                                    level:0
+                                }
+
+                                formdata.length = document.getElementById("length").value;
+                                formdata.description = document.getElementById("description").value;
+                                formdata.remove = document.getElementById("remove").value;
+
+                                if (code.length>0){
+                                    //存在默认分类，更新
+                                    axios({
+                                        method: "post",
+                                        url: "finCode/updateCode",
+                                        data: formdata
+                                    }).then(function (resp) {
+                                        let datas = resp.data;
+                                        if (datas === "success") {
+                                            alert("修改成功！");
+                                            location.reload();
+                                        } else {
+                                            alert("修改失败，请联系相关人员！")
+                                        }
+                                    })
+                                }
+                                else {
+                                    //不存在默认分类，添加
+                                    axios({
+                                        method: "post",
+                                        url: "finCode/addCode",
+                                        data: formdata
+                                    }).then(function (resp) {
+                                        let datas = resp.data;
+                                        if (datas === "success") {
+                                            alert("添加成功！");
+                                            location.reload();
+                                        } else {
+                                            alert("添加失败，请联系相关人员！")
+                                        }
+                                    })
+                                }
+
+
+
+
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }else {
+                            alert("您输入的规则系统无法识别！")
+                        }
+                    }
+
+
+
+
+
+                }
+
+                //修改规则
+                document.getElementById("codeUpdate").onclick = addAndUpdate;
+                document.getElementById("codeAdd").onclick = addAndUpdate;
+
+            })
+
+
+
+
+        }
+        else {
+            alert("您暂未获得操作分类字符集的权限！")
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    function height(){
+        //设置iframe高度
+        let scrollHeight = document.body.clientHeight;
+        let parent = window.parent;
+        let clientHeight = parent.document.body.clientHeight;
+        if (Number(clientHeight)>Number(scrollHeight)){
+            let iframe = window.parent.document.getElementById("iframepage");
+            iframe.style.height=""+Number(clientHeight)+"px";
+        }else {
+            let iframe = window.parent.document.getElementById("iframepage");
+            iframe.style.height=""+Number(scrollHeight)+"px";
+        }
+
+    }
+    height();
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

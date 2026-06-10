@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>申请单管理</title>
+    <link href="css/product.css" rel="stylesheet" />
+      <link href="css/print.min.css">
+      <link href="css/window.css" rel="stylesheet">
+    <script src="js/axios-0.18.0.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+      <script src="js/print.min.js"></script>
+      <link href="css/newStyle.css" rel="stylesheet">
+  </head>
+  <style>
+      /*canvas {*/
+      /*    pointer-events: none;*/
+      /*    touch-action: none;*/
+      /*}*/
+      html{
+          font-family: 宋体,serif;
+
+      }
+      thead tr{
+          background-color: #9eb6d8;
+      }
+      thead th{
+          outline: white solid 1px;
+          font-size: 14px;
+      }
+      thead{
+          position: sticky;
+          top: 32px;
+          display: table-header-group;
+      }
+      tbody td{
+          /*outline: #9eb6d8 solid 1px;*/
+          font-size: 12px;
+      }
+      td b{
+          font-weight: 600;
+      }
+      table{
+          page-break-inside: avoid;
+          page-break-after: avoid;
+          page-break-before: avoid;
+
+
+      }
+
+      .canvas-box {
+
+          border: 1px solid darkgrey;
+          margin:  10px auto auto;
+          width: 99%;
+          height: 99%;
+      }
+
+      .signImage {
+          display: none;
+      }
+      /*#yj button{*/
+      /*    width: 80px;*/
+      /*    height: 30px;*/
+
+      /*}*/
+      #qz button{
+          width: 100px;
+          height: calc(10vh);
+      }
+      .checkP{
+          cursor: pointer;
+      }
+      .checkP:hover{
+          color: #85CFEE;
+      }
+      #content b{
+          font-size: clamp(0.75rem, 0.659rem + 0.45vw, 1rem);
+          font-weight: normal;
+          align-self: center;
+          margin:auto 0;
+      }
+      .taked{
+          width:  20px;
+          height: 20px;
+      }
+      .pickUp{
+        white-space: nowrap
+      }
+      .pailie{
+         display: flex;
+      }
+      .pailie b{
+          margin: auto 0;
+      }
+      .goqz{
+          color: red;
+          white-space: nowrap;
+      }
+      b a{
+          white-space: nowrap;
+          display: inline-block;
+          margin: 0 5px;
+      }
+      .lc{
+
+          display: inline-block;
+          word-break: keep-all;
+      }
+      .wtg{
+          color: red;
+      }
+      .wsh{
+          color: orange;
+      }
+      .tg{
+          color: blue;
+      }
+      .completeStatus{
+          cursor: pointer;
+      }
+
+
+
+
+      /* 禁用输入框的基础样式 */
+      input.appNumber:disabled,
+      input.fin-product-number:disabled {
+          /* 背景和边框 */
+          background-color: #fafafa;
+          border: 1px solid #d9d9d9;
+          border-radius: 2px;
+
+          /* 文字 */
+          color: rgba(0, 0, 0, 0.65);
+          font-style: italic;
+
+          /* 光标 */
+          cursor: not-allowed;
+
+          /* 阴影效果 */
+          box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+
+          /* 过渡效果 */
+          transition: all 0.3s ease;
+      }
+
+      /* 鼠标悬停时保持不变 */
+      input.appNumber:disabled:hover,
+      input.fin-product-number:disabled:hover {
+          border-color: #d9d9d9;
+          box-shadow: none;
+      }
+
+      /* 聚焦状态 */
+      input.appNumber:disabled:focus,
+      input.fin-product-number:disabled:focus {
+          outline: none;
+          border-color: #d9d9d9;
+          box-shadow: none;
+      }
+
+      /* 表格中的禁用输入框 */
+      tr.takedColor input:disabled {
+          background-color: #f8f9fa;
+          border: 1px solid #e9ecef;
+      }
+
+      /* 不同状态的提示文本 */
+      input.appNumber:disabled::placeholder,
+      input.fin-product-number:disabled::placeholder {
+          color: #bfbfbf;
+      }
+
+      /* 为整个禁用的表格行添加样式 */
+      tr.disabled-row {
+          background-color: #fafafa;
+          opacity: 0.8;
+      }
+
+      tr.disabled-row td {
+          color: #bfbfbf;
+      }
+  </style>
+  <body>
+  <div style="display: flex;width: 100%;height: auto">
+    <div class="right" style="display: block;margin: auto;width: 90%">
+      <div class="sticky" style="width: 95%;">
+        <div style="width: 100%;height: auto;padding: 1px;border: #9eb6d8 solid 1px">
+          <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;line-height: 25px">
+            <div style="width:100%;background-color:#9eb6d8;margin: auto  ;height: 25px;"><b>申请单列表</b></div>
+
+          </div>
+
+
+
+            <div style="width: 99%;height: auto;margin: auto;display: flex;flex-wrap: wrap">
+                <div style="width: auto;height: auto;max-width: 30%;min-width:fit-content; margin: auto"> <div>开始日期：</div><input id="between" type="date" value=""><label
+                        for="between"> </label></div>
+                <div style="width: auto;height: auto;max-width: 30%;min-width:fit-content; margin: auto"> <div>结束日期：</div><input id="and" type="date" value=""></div>
+                <div style="width: auto;height: auto;max-width: 25%;min-width:fit-content; margin: auto"> <div>申请人：</div>
+                    <label for="applicationUserId"></label><select id="applicationUserId" type="date" value="">
+                    <option class="shUserId" value="">全部</option>
+                </select>
+                </div>
+                <div style="width: auto;height: auto;max-width: 25%;min-width:fit-content; margin: auto"> <div>申请人部门：</div>
+                    <label for="applicationDepartment"></label><select id="applicationDepartment"  value="">
+                        <option class="appDepartment" value="">全部</option>
+                    </select>
+                </div>
+                <div style="width:auto;height: auto;max-width: 20%;margin: auto;min-width: fit-content"> <div>状态：</div><select id="completeId" type="date" value="">
+                    <option class="shComplete" value="">全部</option>
+                    <option class="shComplete" value="0" selected>未审核</option>
+                    <option class="shComplete" value="1">已通过审核</option>
+                    <option class="shComplete" value="2">未通过审核</option>
+
+                </select>
+                </div>
+                <div id="ckSortTwo" style="width: auto;height: auto;max-width: 20%;min-width: fit-content; margin: auto;"> <div>分类：</div>
+                    <label for="sortTwo"></label>
+                    <select id="sortTwo" type="date" value="">
+
+                    </select>
+                </div>
+
+
+            </div>
+
+          <div style="width: 99%;height: auto;padding: 1px;border: #9eb6d8 solid 1px;margin: auto">
+            <div style="width: 100%;height: auto;display: flex;text-align: center;color: white;">
+                <div style="width: 15%;  height: auto; background-color: #9eb6d8;display: flex" ><b style="align-self: center;margin: auto">申请单号</b></div>
+                <div style="width: 15%;  height: auto;display: flex" ><b style="align-self: center;margin: auto">申请日期</b></div>
+                <div style="width: 7.5%;height: auto; display: flex" ><b style="align-self: center;margin: auto">类型</b></div>
+                <div style="width: 10%;height: auto;  display: flex" ><b style="align-self: center;margin: auto">申请部门</b></div>
+                <div style="width: 10%;height: auto;  display: flex" ><b style="align-self: center;margin: auto">申请人</b></div>
+                <div style="width: 12.5%;height: auto;display: flex" ><b style="align-self: center;margin: auto">机型</b></div>
+                <div style="width: 7.5%;height: auto; display: flex" ><b style="align-self: center;margin: auto">总价值</b></div>
+                <div style="width: 10%;height: auto;  display: flex" ><b style="align-self: center;margin: auto">当前审核部门</b></div>
+                <div style="width: 7.5%;height: auto; display: flex" ><b style="align-self: center;margin: auto">审核状态</b></div>
+                <div style="width: 10%;height: auto;  display: flex" ><b style="align-self: center;margin: auto">操作</b></div>
+            </div>
+            <div id="content" style="width: 100%;height: auto;margin: auto">
+
+
+
+            </div>
+
+          </div>
+
+            <div id="pageDiv" style="width: 100%;margin: 10px auto auto auto;text-align: center;">
+                共<span style="color: orange;font-weight: bolder" id="pageSum"></span>页丨
+                当前页：<span id="currentPage" style="color: red;font-weight: bolder"></span>丨
+                <button style="margin: auto" id="firstPage">首页</button>
+                <button style="margin: auto" id="lastPage">上一页</button>
+                <button style="margin: auto" id="nextPage">下一页</button>
+                <button style="margin: auto" id="endPage">尾页</button>丨
+               请输入页码：
+                <label for="jumpValue"></label><input style="width: 50px" type="text" id="jumpValue">
+                <button id="jump">跳转</button>
+            </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="window">
+    <div class="window-content">
+
+        <div class="window-content-close">×</div>
+        <div id="ckDiv"  class="aa" style=" page-break-after:always;width:80% ;height: auto;max-height: 95%; margin: 2px 10%;background-color: white;position: absolute;overflow-y: auto">
+
+
+            <div style="width:99.9%;height: 29px;background-color: #698CC3;margin:1px auto;
+     line-height: 29px;text-align: center;color: white;font-size: 9pt;position: sticky;top: 1px"><b>申请单审核</b></div>
+            <table border="0" cellspacing="1"  width="100%" id="table" >
+                <!--    标题-->
+                <thead >
+                <tr id="title" bgcolor="white" >
+                    <th>物料号</th>
+                    <th>物料名称</th>
+                    <th>申请数量</th>
+                    <th>单价</th>
+                    <th>操作</th>
+                </tr>
+
+                </thead>
+
+
+                <tbody id="content1">
+
+
+                </tbody>
+
+            </table>
+
+            <input id="notes" style="width: 96%;height: 30px;border-radius: 5px;border: black solid 1px;margin:5px 1.5%" disabled>
+
+            <div id="yj" style="width: 100%;height: auto;text-align: center; margin: 0 auto; background-color: white;position: sticky;bottom:0">
+                <button id="yes"   style="margin-right: 20px">通过</button>
+                <button id="no" style="margin-right: 20px">不通过</button>
+
+
+            </div>
+
+        </div>
+
+
+
+
+
+
+    </div>
+
+</div>
+
+
+
+  <div class="window-small">
+
+      <div class="window-small-content">
+          <div style="width: 100%;height: 63px;background-color: white; border-bottom:  #e6eaf0 solid 1px; border-top-left-radius: 20px;
+        border-top-right-radius: 20px;">
+
+              <div class="window-small-close"><button class="window-small-content-close">×</button></div>
+
+              <div style="width: auto;height: 64px;display: flex">
+                  <div class="window-title" style="font-size: 16px">详细信息</div>
+              </div>
+
+          </div>
+          <div id="PAll" style="width: 100%;height: calc(100% - 63px);color: #121315;font-size: 14px;overflow-y: auto" >
+              <div class="PN">物料名称</div>
+              <div class="PNI"><label>
+                  <input id="pName" value="" disabled>
+              </label></div>
+              <div  class="PN">物料编号</div>
+              <div CLASS="PNI"><label>
+                  <input id="pMaterialNumber" value="" disabled>
+              </label></div>
+              <div id="PAttContent" style="width: 100%;height: auto">
+
+              </div>
+          </div>
+
+
+
+
+
+
+      </div>
+
+
+
+  </div>
+
+  <div class="window-small-one">
+
+      <div class="window-small-content-one">
+          <div style="width: 100%;height: 63px;background-color: white; border-bottom:  #e6eaf0 solid 1px; border-top-left-radius: 20px;
+        border-top-right-radius: 20px;">
+
+              <div class="window-small-close-one"><button class="window-small-content-close-one">×</button></div>
+
+
+
+          </div>
+          <div class="shStatus"></div>
+
+
+
+
+
+
+      </div>
+
+
+
+  </div>
+   
+  </body>
+  <script type="text/javascript" src="js/axios-0.18.0.js"></script>
+
+  <script>
+
+      //获取BOM表名称
+      async function bomTitleName(id) {
+          let name = "";
+          await axios({
+              method: "post",
+              url: "finBomTitle/selectById",
+              data: id
+          }).then(function (resp){
+              let data=resp.data;
+
+              if (id!==0){
+                  name= '('+data.title+')';
+              }
+
+
+          })
+          return name;
+      }
+      //接收从物料页面传来的id，然后通过id获取数据
+      function getHref(){
+          var url = decodeURI(location.search);
+          var theRequest = new Object();
+          if (url.indexOf("?") !== -1) {
+              var str = url.substr(1);
+              strs = str.split("&");
+              for(var i = 0; i < strs.length; i ++) {
+                  theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+              }
+          }
+          return theRequest;
+      }
+      //用法  var 自己变量名字 = getHref().要获取的参数名字
+      var sort = getHref().sort
+
+
+      let wdSmall = document.querySelector(".window-small");
+      let wdSmallOne = document.querySelector(".window-small-one");
+
+      //点击显示物料的详细信息
+      function productAttribute(datas){
+
+          let checkP = document.querySelectorAll(".checkP");
+
+          for (let i = 0; i < datas.length; i++) {
+              checkP[i].onclick=function (){
+                  wdSmall.style.display="block";
+                  //根据物料id和仓库来查询该物料的详细信息
+                  axios({
+                      method:"post",
+                      url:"product/selectProductWhenAddBom?id="+datas[i].product_id+"&vault="+datas[i].vault+""
+                  }).then(function (resp){
+                      let productAttribute=resp.data;
+                      if (productAttribute.length>0){
+                          let formdata="";
+
+                          for (let j = 0; j < productAttribute.length; j++) {
+                              formdata+='<div  class="PN">'+productAttribute[j].attributeName+'</div>\n' +
+                                  '            <div CLASS="PNI"><label>\n' +
+                                  '                <input disabled value= '+productAttribute[j].content+' >\n' +
+                                  '            </label></div>'
+                          }
+                          document.getElementById("PAttContent").innerHTML=formdata;
+                          document.getElementById("pName").value=productAttribute[0].name;
+                          document.getElementById("pMaterialNumber").value=productAttribute[0].material_number;
+                      }
+                      else {
+                          alert("未查询到数据请联系相关人员！")
+                      }
+                  })
+
+              }
+
+          }
+      }
+
+      //点击查看审核流程
+      function shLc(data,appFormId){
+          wdSmallOne.style.display="block";
+          let status = document.querySelector(".shStatus");
+
+
+          axios({
+              method:"post",
+              url:"applicationForm/selectPriceAndCount",
+              data:data
+          }).then(async function (resp)
+          {
+              let datas = resp.data;
+              for (let i = 0; i < datas.length; i++) {
+
+                  let minister = datas[i].minister//部长是否筛选
+
+                    if ( Number(datas[i].id)===Number(appFormId) ){
+                        //查询申申请人部门
+                        await axios({
+                            method:"post",
+                            url:"user/selectDepartById",
+                            data:data[i].userId
+                        }).then(function (resp){
+                            //不需要总经理审核
+                            if (Number(minister) === 0) {
+                                status.innerHTML = '<div>'+resp.data[0].departmentName+':<span class="wsh">未审核</span></div><div class="lc"></div>'
+                            } else if (Number(minister) === 1) {
+                                status.innerHTML = '<div>'+resp.data[0].departmentName+':<span class="tg">通过</span></div><div class="lc"></div>'
+                            } else if (Number(minister) === 2) {
+                                status.innerHTML = '<div>'+resp.data[0].departmentName+':<span class="wtg">未通过</span></div><div style="color: red;font-weight: bolder;margin: 10px auto" >未通过原因:<span>'+data[i].refuse+'</span></div><div class="lc"></div>'
+
+
+                            }
+
+                        })
+
+
+
+
+                        //查询审核流程
+                        await axios({
+                            method: "post",
+                            url: "applicationForm/selectLc",
+                            data: datas[i].id
+                        }).then(function (resp)
+                        {
+                            let lcDatas=resp.data;
+                            let lc = document.querySelector(".lc")
+                            for (let j = 0; j < lcDatas.length; j++) {
+
+                                if (Number(lcDatas[j].result)===0){
+                                    lc.innerHTML+="<div>"+lcDatas[j].departmentName+":<span class=\"wsh\">未审核</span></div>"
+                                }
+                                else if (Number(lcDatas[j].result)===1){
+                                    lc.innerHTML+="<div>"+lcDatas[j].departmentName+":<span class=\"tg\">通过</span></div>"
+                                }
+                                else if (Number(lcDatas[j].result)===2){
+                                    lc.innerHTML+="<div>"+lcDatas[j].departmentName+":<span class=\"wtg\">未通过</span></div>"
+                                    lc.innerHTML+="<div style='color: red;font-weight: bolder;margin: 10px auto' >未通过原因:<span>"+data[i].refuse+"</span></div>"
+
+                                }
+
+
+
+
+                            }
+
+
+                        })
+                    }
+
+              }
+          })
+
+
+      }
+
+      //点击close也可以关闭弹窗
+      document.querySelector(".window-small-content-close").onclick=function (){
+          wdSmall.style.display="none";
+      }
+
+      document.querySelector(".window-small-content-close-one").onclick=function (){
+          wdSmallOne.style.display="none";
+      }
+
+      //获取权限信息
+      //查询权限
+      let userId = parent.document.getElementById("userId").value;
+
+
+
+
+
+
+
+
+
+      function height(){
+
+      let iframe = window.parent.document.getElementById("iframepage");
+      if (iframe){
+          let num= window.parent.innerHeight;
+          if (Number(num)>Number(60)){
+              let s = Number(num)-Number(60)
+              iframe.style.height=s+"px";
+          }
+
+      }
+
+
+  }
+  height();
+
+      //设置现在的时间
+      function fDate( t1, format = "YYYY-MM-DD HH:II "){
+          let minutes = t1.getMinutes();
+          if (minutes<10){
+              const config = {
+                  YYYY:t1.getFullYear(),
+                  MM:t1.getMonth()+1,
+                  DD:t1.getDate(),
+                  HH:t1.getHours(),
+                  II:"0"+t1.getMinutes(),
+                  // SS:t1.getSeconds(),
+              };
+              for( const key in config){
+
+                  format = format.replace(key,config[key])
+
+
+              }
+              return format;
+          }
+          else {
+              const config = {
+                  YYYY:t1.getFullYear(),
+                  MM:t1.getMonth()+1,
+                  DD:t1.getDate(),
+                  HH:t1.getHours(),
+                  II:t1.getMinutes(),
+                  // SS:t1.getSeconds(),
+              };
+              for( const key in config){
+
+                  format = format.replace(key,config[key])
+
+
+              }
+              return format;
+          }
+
+
+
+      }
+
+      //设置现在的时间
+      function fDate1( t1, format = "YYYY-MM-DD HH:II:SS "){
+          const config = {
+              YYYY:t1.getFullYear(),
+              MM:t1.getMonth()+1,
+              DD:t1.getDate(),
+              HH:t1.getHours(),
+              II:t1.getMinutes(),
+              SS:t1.getSeconds(),
+          };
+
+          for( const key in config){
+
+              format = format.replace(key,config[key])
+
+
+          }
+          return format;
+      }
+
+      // 在用户点击其他地方时，关闭弹窗
+      let wd = document.querySelector(".window");
+      window.onclick = function(event) {
+          if (event.target === wd) {
+              wd.style.display = "none";
+          }
+      }
+
+      //点击close也可以关闭弹窗
+      document.querySelector(".window-content-close").onclick=function (){
+          wd.style.display="none";
+      }
+
+      //查询出库类型
+      function ckSort(){
+          axios({
+              method:"post",
+              url:"outBoundType/selectOutBound"
+          }).then(function (resp){
+              let datas=resp.data;
+              let formdata='<option value="">所有类型</option>';
+
+              for (let i = 0; i < datas.length; i++) {
+                  formdata+='<option class="type" value="'+datas[i].id+'">'+datas[i].type+'</option>'
+              }
+              document.getElementById("sortTwo").innerHTML=formdata;
+
+
+
+
+
+          })
+      }
+
+      function rkSort(){
+          //入库，查询入库类型
+          axios({
+              method:"post",
+              url:"outBoundType/selectInBound"
+          }).then(function (resp){
+              let datas=resp.data;
+              let formdata='<option value="">所有类型</option>';
+
+              for (let i = 0; i < datas.length; i++) {
+                  formdata+='<option class="type" value="'+datas[i].id+'">'+datas[i].type+'</option>'
+              }
+              document.getElementById("sortTwo").innerHTML=formdata;
+          })
+      }
+      if (Number(sort)===1){
+          ckSort();
+      }
+      else {
+          rkSort();
+      }
+
+
+
+    //获取申请单申请人信息（筛选时使）
+      function screenUser(map){
+          axios({
+              method:"post",
+              url:"applicationForm/screenUser",
+              data:map
+          }).then(function (resp){
+              let userData = resp.data;
+              let formdata=" <option class=\"shUserId\" value=\"\">全部</option>";
+              for (let i = 0; i < userData.length; i++) {
+                  if (Number(map.userId)===Number(userData[i].user_id)){
+                      formdata+=' <option selected class="shUserId" value='+userData[i].user_id+'>'+userData[i].name+'('+userData[i].departmentName+')</option>'
+                  }
+                  else {
+                      formdata+=' <option class="shUserId" value='+userData[i].user_id+'>'+userData[i].name+'('+userData[i].departmentName+')</option>'
+                  }
+
+
+              }
+              document.getElementById("applicationUserId").innerHTML=formdata;
+          })
+      }
+
+      //获取申请单申请人信息（筛选时使）
+      function screenDepartment(map){
+          axios({
+              method:"post",
+              url:"applicationForm/screenDepartment",
+              data:map
+          }).then(function (resp){
+              let departmentData = resp.data;
+              let formdata=" <option class=\"appDepartment\" value=\"\">全部</option>";
+              for (let i = 0; i < departmentData.length; i++) {
+                  if (Number(map.department)===Number(departmentData[i].id)){
+                      formdata+=' <option selected class="appDepartment" value='+departmentData[i].id+'>'+departmentData[i].departmentName+'</option>'
+                  }
+                  else {
+                      formdata+=' <option class="appDepartment" value='+departmentData[i].id+'>'+departmentData[i].departmentName+'</option>'
+                  }
+
+              }
+              document.getElementById("applicationDepartment").innerHTML=formdata;
+          })
+      }
+      //计算价格
+      async function howMuch(id,sum) {
+
+          //计算该产品中的零件价格数据
+          await axios({
+              method: "post",
+              url: "finBom/selectPriceLj",
+              data: id
+          }).then(function (resp) {
+              sum = Number(resp.data) + Number(sum) ;
+          })
+
+          //查询是否存在产品
+          await axios({
+              method: "post",
+              url: "finBom/selectFinFromBom",
+              data: id
+          }).then(async function (resp) {
+              let data = resp.data;
+              for (let i = 0; i < data.length; i++) {
+                  let number = await howMuch(data[i].productId,0);
+
+                  sum = Number(sum) + Number(number)*Number(data[i].number);
+              }
+          })
+          return sum;
+
+      }
+
+      //获取筛选状态
+      function examineStatus(data){
+          //data是申请单数据
+
+          let status = document.querySelectorAll(".completeStatus");
+          let depart = document.querySelectorAll(".examineDepart");
+          axios({
+              method:"post",
+              url:"applicationForm/selectPriceAndCountLj",
+              data:data
+          }).then(async function (resp)
+          {
+              let datas=resp.data;
+              let total = document.querySelectorAll(".totalPrice");
+              for (let i = 0; i < datas.length; i++) {
+                  //查询该申请单中的产品信息
+                 await axios({
+                      method:"post",
+                      url:"applicationContent/selectByAppIdCp",
+                      data:datas[i].id
+                  }).then(async function (resp) {
+                      let fin = resp.data;
+                      let sum=0;
+                      for (let j = 0; j < fin.length; j++) {
+                          let newVar = await howMuch(fin[j].productId, 0);
+                          sum = Number(newVar) * Number(fin[j].appNumber)+Number(sum);
+                      }
+                      let a= Number(sum)+Number(datas[i].totalPrice);
+                     total[i].innerHTML=""+a+""
+                  });
+
+
+                  //查询申申请人部门
+                  await axios({
+                      method:"post",
+                      url:"user/selectDepartById",
+                      data:data[i].userId
+                  }).then(async function (resp) {
+                      let departName = resp.data[0];
+                      let minister = datas[i].minister//部长是否筛选
+                      let appFormId = datas[i].id;
+                      if (Number(minister) === 0) {
+                          //部长未审核
+                          depart[i].innerHTML ='<div>'+departName.departmentName+'</div>'
+                          status[i].innerHTML = '<div><span class="wsh">未审核</span></div>'
+                      } else if (Number(minister) === 1) {
+                          //部长通过审核
+                          //先查询是否该总经理审核，如果不该总经理审核则去查改谁审核
+                          for (let j = 0; j < data.length; j++) {
+                              let id = data[j].id;
+                              let circulation = data[j].circulation;//该哪个部门审核了
+                              if (Number(id) === Number(appFormId)) {
+
+                                  //不该总经理审核，去查询该谁审核
+                                  await axios({
+                                      method: "post",
+                                      url: "applicationForm/selectLc",
+                                      data: datas[i].id
+                                  }).then(function (resp) {
+                                      let lcDatas = resp.data;
+                                      if (lcDatas.length > 0) {
+                                          for (let k = 0; k < lcDatas.length; k++) {
+                                              let department = lcDatas[k].department_id;
+                                              if (Number(circulation) === Number(department)) {
+                                                  //找到了该审核的部门
+                                                  if (Number(lcDatas[k].result) === 0) {
+                                                      depart[i].innerHTML = "" + lcDatas[k].departmentName + ""
+                                                      status[i].innerHTML = "<span class=\"wsh\">未审核</span>"
+                                                  } else if (Number(lcDatas[k].result) === 1) {
+                                                      depart[i].innerHTML = "" + lcDatas[k].departmentName + ""
+                                                      status[i].innerHTML = "<span class=\"tg\">通过</span>"
+
+                                                  } else if (Number(lcDatas[k].result) === 2) {
+                                                      depart[i].innerHTML = "" + lcDatas[k].departmentName + ""
+                                                      status[i].innerHTML = "<span class=\"wtg\">未通过</span>"
+                                                      // status[i].innerHTML+="未通过原因:<span>"+data[j].refuse+"</span>"
+                                                  }
+                                              }
+
+                                          }
+                                      } else {
+                                          depart[i].innerHTML ='<div>'+departName.departmentName+'</div>'
+                                          status[i].innerHTML = "<span class=\"tg\">通过</span>"
+
+                                      }
+
+                                  })
+
+                              }
+                          }
+
+                      } else {
+                          //部长未通过审核
+                          depart[i].innerHTML ='<div>'+departName.departmentName+'</div>'
+                          status[i].innerHTML = "<span class=\"wtg\">未通过</span>"
+                      }
+
+                  })
+
+
+              }
+
+
+          })
+
+          for (let i = 0; i < status.length; i++) {
+              status[i].onclick=function (){
+                  shLc(data,data[i].id);
+              }
+          }
+
+
+
+
+
+      }
+
+        //分辨申请单的详细种类
+      function whichSort(data){
+
+          let which = document.querySelectorAll(".which");
+
+
+          //查询分类
+          axios({
+              method:"post",
+              url:"outBoundType/selectAllType"
+          }).then(function (resp){
+              let types=resp.data;
+              for (let i = 0; i < which.length; i++) {
+                  for (let j = 0; j < types.length; j++) {
+                      if (Number(data[i].sortTwo)===Number(types[j].id)){
+                          //生产出库
+                          which[i].innerHTML=types[j].type;
+                      }
+                  }
+
+
+              }
+          })
+
+      }
+
+
+
+
+
+      //获取属性信息
+      function getAttribute(id) {
+
+          axios({
+              method: "post",
+              url: "applicationContent/selectAppContent",
+              data: id
+          }).then(function (resp) {
+              let contentData=resp.data[0];
+              let locationDz = resp.data[1];
+              let locationCp = resp.data[2];
+              for (let j = 0; j < contentData.length; j++) {
+                  if (Number(contentData[j].vault) === 1) {
+
+
+                      let attributeData = "";
+                      let cfwz = "";
+                      for (let k = 0; k < locationCp.length; k++) {
+                          if (Number(contentData[j].product_id === Number(locationCp[k].id)) && locationCp[k].attributeName !== '存放位置') {
+                              if (locationCp[k].content) {
+                                  attributeData += '' + locationCp[k].attributeName + ':' + locationCp[k].content + '' + locationCp[k].attributeNameUnit + ';<span style="margin-left: 1px;width: fit-content;"></span>      '
+                              }
+
+                          } else if (Number(contentData[j].product_id === Number(locationCp[k].id)) && locationCp[k].attributeName.trim() === '存放位置') {
+
+                              cfwz = locationCp[k].content;
+
+                          }
+                      }
+
+
+                      let ss = document.querySelectorAll(".information"+contentData[j].product_id+1+"");
+                      for (let i = 0; i < ss.length; i++) {
+                          ss[i].innerHTML=attributeData;
+                      }
+
+                  } else if (Number(contentData[j].vault) === 0) {
+
+                      let attributeData = "";
+                      let cfwz = "";
+                      for (let k = 0; k < locationDz.length; k++) {
+                          if (Number(contentData[j].product_id === Number(locationDz[k].productId)) && locationDz[k].attributeName !== '存放位置') {
+                              if (locationDz[k].content.length > 0) {
+                                  attributeData += '' + locationDz[k].attributeName + ':' + locationDz[k].content + '' + locationDz[k].attributeNameUnit + ';<span style="margin-left: 1px;width: fit-content;"></span>      '
+                              }
+
+                          }
+                      }
+
+                      let ss = document.querySelectorAll(".information"+contentData[j].product_id+0+"");
+                      for (let i = 0; i < ss.length; i++) {
+                          ss[i].innerHTML=attributeData;
+                      }
+
+                  }
+              }
+
+          })
+
+      }
+
+
+      //绑定查看信息的方法
+
+      function openWindows(data) {
+          let applicationContents = document.querySelectorAll(".applicationContent");
+
+          //打开窗口
+          for (let i = 0; i < applicationContents.length; i++) {
+              applicationContents[i].onclick = async function () {
+                  examineStatus(data);
+                  //判断是否是采购入库
+                  if (Number(data[i].sortTwo) === 9) {
+                      //采购入库,查询发票
+                      //查询是否有发票信息
+                      axios({
+                          method: "post",
+                          url: "invoice/selectFp",
+                          data: data[i].id
+                      }).then(function (resp) {
+                          let datas = resp.data;
+                          if (datas.length > 0) {
+                              let allPics = document.getElementById("allPics");
+                              if (allPics) {
+                                  allPics.remove();
+                              }
+
+                              //添加一个存放发票信息的框
+                              //有发票
+                              let upFp = '<div id="allPics" style="width: 100%;height: auto;display: flex;flex-wrap: wrap"><div id="upFps" style="text-align: center;display: inline-block;margin-left: 10px">\n' +
+
+                                  '    </div></div>'
+                              document.getElementById("notes").insertAdjacentHTML("afterend", upFp);
+                              let pic = ''
+                              for (let j = 0; j < datas.length; j++) {
+                                  pic += '<div class="responsive">\n' +
+                                      '  <div class="img">\n' +
+                                      '    <a class="ylPic" style="cursor: pointer">\n' +
+                                      '      <img src=' + datas[j].invoiceStr + '  title="点击预览发票"  alt="发票">\n' +
+                                      '    </a>\n' +
+                                      '  </div>\n' +
+                                      '</div>'
+
+                              }
+
+                              document.getElementById("upFps").insertAdjacentHTML('afterend', pic);
+                              let ylPic = document.querySelectorAll(".ylPic");
+                              for (let j = 0; j < ylPic.length; j++) {
+                                  ylPic[j].onclick = function () {
+                                      let src = ylPic[j].querySelector("img").src;
+                                      const img = new Image();
+                                      img.src = src;
+                                      const newWin = window.open("", "_blank");
+                                      newWin.document.write(img.outerHTML);
+                                      newWin.document.title = "预览图";
+                                      newWin.document.close();
+
+                                  }
+                              }
+
+
+                          }
+                      })
+                  } else {
+                      let allPics = document.getElementById("allPics");
+                      if (allPics) {
+                          allPics.remove();
+                      }
+                  }
+                  if (data[i].notes) {
+                      // document.getElementById("notes").style.display="";
+                      document.getElementById("notes").value = "备注信息：" + data[i].notes;
+                  } else {
+                      // document.getElementById("notes").style.display="none";
+                      document.getElementById("notes").value = "备注信息：无";
+                  }
+                  //打开窗口
+                  document.querySelector(".window").style.display = "block";
+                  document.getElementById("ckDiv").style.display = "";
+                  document.getElementById("content1").innerHTML="";
+                  let readData=[];
+                  let readDataIn={
+                      id:"",//物料id
+                      vault:"",//属于哪个仓库
+                      number:"",//申请数量
+                  }
+
+                  //根据ID查询申请的内容
+                  await axios({
+                      method: "post",
+                      url: "applicationContent/selectOneLevel",
+                      data: data[i].id
+                  }).then(async function (resp)
+                  {
+                      let contentData = resp.data;
+                      let formdata = "";
+                      for (let j = 0; j < contentData.length; j++) {
+                          readDataIn = {
+                              id: contentData[j].product_id,//物料id
+                              vault: contentData[j].vault,//属于哪个仓库
+                              number: contentData[j].app_number,//申请数量
+                          }
+                          readData.push(readDataIn);
+                          if (Number(contentData[j].vault)===1){
+                              let newVar = await howMuch(contentData[j].product_id,0);
+                            console.log(newVar)
+                              formdata += '  <tr class="takedColor" >\n' +
+                                  '                    <td style="display: none" ><b class="contentDataId">' + contentData[j].id + '</b></td>\n' +
+                                  '                    <td class="checkP"><b class="meterialNumber">' + contentData[j].material_number + '</b></td>\n' +
+                                  '                    <td ><b class="productName">' + contentData[j].name + '</b></td>\n' +
+                                  '                    <td ><input type="text" pattern="^(0|[1-9]\\d*)(\\.\\d{2})?$"  oninput="this.value = this.value.replace(/[^0-9.]/g, \'\').replace(/(\\..*)\\./g, \'$1\').replace(/^0+(?=\\d)/, \'\').replace(/^\\./, \'0.\').replace(/(\\.\\d{2}).*/, \'$1\').replace(/^(0|[1-9]\\d*)(\\.\\d{0,2})?.*/, \'$1$2\')" data-type="normal" data-content-id="' + contentData[j].id + '"  class="appNumber" value="' + contentData[j].app_number + '"></td>\n' +
+                                  '                    <td ><b>' + newVar + '</b></td>\n' +
+                                  '                </tr><tr ><td colspan="5" class=information'+contentData[j].product_id+contentData[j].vault+'></td></tr>'
+                          }
+                          else {
+                              formdata += '  <tr class="takedColor" >\n' +
+                                  '                    <td style="display: none" ><b class="contentDataId">' + contentData[j].id + '</b></td>\n' +
+                                  '                    <td class="checkP"><b class="meterialNumber">' + contentData[j].material_number + '</b></td>\n' +
+                                  '                    <td ><b class="productName">' + contentData[j].name + '</b></td>\n' +
+                                  '                    <td ><input type="text" pattern="^(0|[1-9]\\d*)(\\.\\d{2})?$"  oninput="this.value = this.value.replace(/[^0-9.]/g, \'\').replace(/(\\..*)\\./g, \'$1\').replace(/^0+(?=\\d)/, \'\').replace(/^\\./, \'0.\').replace(/(\\.\\d{2}).*/, \'$1\').replace(/^(0|[1-9]\\d*)(\\.\\d{0,2})?.*/, \'$1$2\')"  data-type="normal" data-content-id="' + contentData[j].id + '" class="appNumber" value="' + contentData[j].app_number + '"></td>\n' +
+
+                                  '                    <td ><b>' + contentData[j].brand + '</b></td>\n' +
+                                  '                </tr><tr ><td colspan="5" class=information'+contentData[j].product_id+contentData[j].vault+'></td></tr>'
+                          }
+
+
+                          readDataIn = {
+                              id: "",//物料id
+                              vault: "",//属于哪个仓库
+                              number: "",//申请数量
+                          }
+                      }
+                      document.getElementById("content1").innerHTML = formdata;
+                      //查询产品的属性信息
+
+
+
+                      //查询被展开的第一级
+                      await axios({
+                          method: "post",
+                          url: "applicationContent/selectOneLevelZk",
+                          data: data[i].id
+                      }).then(async function (resp) {
+                          let contentData = resp.data;
+                          let formdata = "";
+                          for (let j = 0; j < contentData.length; j++) {
+                              readDataIn = {
+                                  id: contentData[j].fin_product_id,//物料id
+                                  vault: 1,//属于哪个仓库
+                                  number: contentData[j].fin_product_number,//申请数量
+                              }
+                              readData.push(readDataIn)
+                              console.log(contentData[j])
+                              //获取BOM表名称
+                              let s = await bomTitleName(contentData[j].bomTitleId);
+                              formdata += '  <tr  class="takedColor" >\n' +
+                                  '                    <td class="checkP"><b class="meterialNumber">' + contentData[j].material_number + '</b></td>\n' +
+                                  '                    <td ><b class="productName">' + contentData[j].name +s+ '</b></td>\n' +
+                                  '                    <td ><input type="text" pattern="^(0|[1-9]\\d*)(\\.\\d{2})?$"  oninput="this.value = this.value.replace(/[^0-9.]/g, \'\').replace(/(\\..*)\\./g, \'$1\').replace(/^0+(?=\\d)/, \'\').replace(/^\\./, \'0.\').replace(/(\\.\\d{2}).*/, \'$1\').replace(/^(0|[1-9]\\d*)(\\.\\d{0,2})?.*/, \'$1$2\')"  data-material-type="expandable-parent" data-fin-product-id="' + contentData[j].fin_product_id + '" class="appNumber" value="' + contentData[j].fin_product_number + '"></td>\n' +
+
+                                  '                    <td colspan="2" ><input style="cursor: pointer" class=myzk' + contentData[j].fin_product_id + contentData[j].last_level + ' type="checkbox" >展开</td>\n' +
+                                  '                </tr><tr><td class=information' + contentData[j].fin_product_id + 1 + ' colspan="5"></td></tr>'
+
+                              readDataIn = {
+                                  id: "",//物料id
+                                  vault: "",//属于哪个仓库
+                                  number: "",//申请数量
+                              }
+                          }
+                          document.getElementById("content1").innerHTML += formdata;
+                          getAttribute(data[i].id);
+
+                          //给展开按钮绑定方法
+
+                          async function zkMyOrderFunction(contentData) {
+                              for (let j = 0; j < contentData.length; j++) {
+                                  let zkboxs = document.querySelector(".myzk" + contentData[j].fin_product_id + contentData[j].last_level + "");
+                                  if (zkboxs) {
+                                      zkboxs.checked = true;
+                                      //查询该分类下的产品(不可以展开的)
+                                      await axios({
+                                          method: "post",
+                                          url: "applicationContent/selectProductByIdZkContent?applicationId=" + data[i].id + "&lastLevel=" + contentData[j].last_level + "",
+                                          data: contentData[j].fin_product_id
+                                      }).then(async function (resp)
+                                      {
+                                          let contentData1 = resp.data;
+                                          let a = '<tr id=myzk' + contentData[j].fin_product_id + contentData[j].last_level + ' ><td colspan="5"><table id=myzktable' + contentData[j].fin_product_id + contentData[j].last_level + ' border="0" cellspacing="1"  width="99%" style="margin: auto"></table></td></tr>'
+                                          zkboxs.parentElement.parentElement.insertAdjacentHTML("afterend", a);
+                                          let formdata = "    <thead  >\n" +
+                                              "                <tr  id=\"title\" bgcolor=\"white\" >\n" +
+                                              "                    <th>物料号</th>\n" +
+                                              "                    <th>物料名称</th>\n" +
+                                              "                    <th>申请数量</th>\n" +
+                                              "                    <th>单价</th>\n" +
+                                              "                    <th>操作</th>\n" +
+                                              "                </tr>\n" +
+                                              "                </thead>";
+
+                                          for (let k = 0; k < contentData1.length; k++) {
+                                              if (Number(contentData1[k].vault) === 1) {
+                                                  let newVar = await howMuch(contentData1[k].product_id, 0);
+                                                  formdata += '  <tr class="takedColor" >\n' +
+                                                      '                    <td style="display: none" ><b class="contentDataId">' + contentData1[k].id + '</b></td>\n' +
+                                                      '                    <td class="checkP"><b class="meterialNumber">' + contentData1[k].material_number + '</b></td>\n' +
+                                                      '                    <td ><b class="productName">' + contentData1[k].name + '</b></td>\n' +
+                                                      '                    <td ><input type="text" pattern="^(0|[1-9]\\d*)(\\.\\d{2})?$"  oninput="this.value = this.value.replace(/[^0-9.]/g, \'\').replace(/(\\..*)\\./g, \'$1\').replace(/^0+(?=\\d)/, \'\').replace(/^\\./, \'0.\').replace(/(\\.\\d{2}).*/, \'$1\').replace(/^(0|[1-9]\\d*)(\\.\\d{0,2})?.*/, \'$1$2\')" data-material-type="expandable-child" data-content-id="' + contentData1[k].id + '" data-parent-fin-id="' + contentData1[k].fin_product_id + '" value="' + contentData1[k].app_number + '"></td>\n' +
+
+                                                      '                    <td ><b>' + newVar + '</b></td>\n' +
+                                                      '                </tr><tr ><td class=information' + contentData1[k].product_id + contentData1[k].vault + ' colspan="5"></td></tr>'
+                                              } else {
+                                                  formdata += '  <tr class="takedColor" >\n' +
+                                                      '                    <td style="display: none" ><b class="contentDataId">' + contentData1[k].id + '</b></td>\n' +
+                                                      '                    <td class="checkP"><b class="meterialNumber">' + contentData1[k].material_number + '</b></td>\n' +
+                                                      '                    <td ><b class="productName">' + contentData1[k].name + '</b></td>\n' +
+                                                      '                    <td ><input type="text" pattern="^(0|[1-9]\\d*)(\\.\\d{2})?$"  oninput="this.value = this.value.replace(/[^0-9.]/g, \'\').replace(/(\\..*)\\./g, \'$1\').replace(/^0+(?=\\d)/, \'\').replace(/^\\./, \'0.\').replace(/(\\.\\d{2}).*/, \'$1\').replace(/^(0|[1-9]\\d*)(\\.\\d{0,2})?.*/, \'$1$2\')" data-material-type="expandable-child" data-content-id="' + contentData1[k].id + '" data-parent-fin-id="' + contentData1[k].fin_product_id + '" class="appNumber" value="' + contentData1[k].app_number + '"></td>\n' +
+
+                                                      '                    <td ><b>' + contentData1[k].brand + '</b></td>\n' +
+                                                      '                </tr><tr ><td class=information' + contentData1[k].product_id + contentData1[k].vault + ' colspan="5"></td></tr>'
+                                              }
+
+
+                                          }
+                                          document.getElementById("myzktable" + contentData[j].fin_product_id + contentData[j].last_level + "").insertAdjacentHTML("beforeend", formdata)
+                                      })
+                                      //查询可以展开的
+                                      await axios({
+                                          method: "post",
+                                          url: "applicationContent/selectCanZk?applicationId=" + data[i].id + "",
+                                          data: contentData[j].fin_product_id
+                                      }).then(async function (resp) {
+                                          let contentData1 = resp.data;
+                                          let formdata = "";
+
+                                          for (let k = 0; k < contentData1.length; k++) {
+                                              //获取BOM表名称
+                                              let s = await bomTitleName(contentData1[k].bomTitleId);
+                                              formdata += '  <tr class="takedColor" >\n' +
+                                                  '                    <td style="display: none" ><b class="contentDataId">' + contentData1[k].id + '</b></td>\n' +
+                                                  '                    <td class="checkP"><b class="meterialNumber">' + contentData1[k].material_number + '</b></td>\n' +
+                                                  '                    <td ><b class="productName">' + contentData1[k].name +s+ '</b></td>\n' +
+                                                  '                    <td ><input type="text" pattern="^(0|[1-9]\\d*)(\\.\\d{2})?$"  oninput="this.value = this.value.replace(/[^0-9.]/g, \'\').replace(/(\\..*)\\./g, \'$1\').replace(/^0+(?=\\d)/, \'\').replace(/^\\./, \'0.\').replace(/(\\.\\d{2}).*/, \'$1\').replace(/^(0|[1-9]\\d*)(\\.\\d{0,2})?.*/, \'$1$2\')"  data-material-type="expandable-parent" data-fin-product-id="' + contentData1[k].fin_product_id + '" class="appNumber" value="' + contentData1[k].fin_product_number + '"></td>\n' +
+
+                                                  '                    <td ></td>\n' +
+                                                  '                    <td><input style="cursor: pointer" class=myzk' + contentData1[k].fin_product_id + contentData1[k].last_level + ' type="checkbox" >展开</td>\n' +
+                                                  '                </tr><tr ><td colspan="5" class=information' + contentData1[k].fin_product_id + 1 + '></td></tr>'
+
+                                          }
+                                          document.getElementById("myzktable" + contentData[j].fin_product_id + contentData[j].last_level + "").insertAdjacentHTML("beforeend", formdata);
+                                          getAttribute(data[i].id);
+                                          await zkMyOrderFunction(contentData1);
+                                      })
+
+
+
+                                      // 给父级appNumber输入框添加输入事件监听
+                                      let parentAppNumberInput = zkboxs.parentElement.parentElement.querySelector('.appNumber');
+                                      if (parentAppNumberInput) {
+                                          let originalValue = parentAppNumberInput.value; // 记录原始值
+
+                                          parentAppNumberInput.addEventListener('input', async function() {
+                                              let newValue = this.value;
+                                              let originalNum = parseFloat(originalValue) || 1;
+                                              let newNum = parseFloat(newValue) || 0;
+
+                                              // 计算比例
+                                              let ratio = originalNum > 0 ? newNum / originalNum : 0;
+
+                                              // 更新所有子级的appNumber
+                                              let childTable = document.getElementById("myzktable" + contentData[j].fin_product_id + contentData[j].last_level);
+                                              if (childTable) {
+                                                  let childInputs = childTable.querySelectorAll('.appNumber');
+                                                  childInputs.forEach(childInput => {
+                                                      let childOriginalValue = childInput.getAttribute('data-original-value') || childInput.value;
+                                                      let childOriginalNum = parseFloat(childOriginalValue) || 0;
+                                                      let newChildValue = childOriginalNum * ratio;
+
+                                                      // 保留2位小数
+                                                      childInput.value = newChildValue.toFixed(2);
+
+                                                      // 保存原始值以便下次计算
+                                                      if (!childInput.hasAttribute('data-original-value')) {
+                                                          childInput.setAttribute('data-original-value', childOriginalValue);
+                                                      }
+                                                  });
+                                              }
+                                          });
+
+                                          // 当焦点离开时更新原始值记录
+                                          parentAppNumberInput.addEventListener('blur', function() {
+                                              originalValue = this.value;
+                                          });
+                                      }
+
+                                      zkboxs.onclick = async function () {
+                                          if (zkboxs.checked === true) {
+                                              document.getElementById("myzk" + contentData[j].fin_product_id + contentData[j].last_level + "").style.display = "";
+
+                                              // 初始化子级输入框的原始值记录
+                                              let childTable = document.getElementById("myzktable" + contentData[j].fin_product_id + contentData[j].last_level);
+                                              if (childTable) {
+                                                  let childInputs = childTable.querySelectorAll('.appNumber');
+                                                  childInputs.forEach(childInput => {
+                                                      if (!childInput.hasAttribute('data-original-value')) {
+                                                          childInput.setAttribute('data-original-value', childInput.value);
+                                                      }
+                                                  });
+                                              }
+
+                                          } else {
+                                              document.getElementById("myzk" + contentData[j].fin_product_id + contentData[j].last_level + "").style.display = "none";
+                                          }
+                                      }
+                                  }
+
+                              }
+                          }
+
+                          await zkMyOrderFunction(contentData);
+
+                      })
+
+                  })
+
+
+
+
+
+                      //查询用户的级别
+                      axios({
+                          method: "post",
+                          url: "user/selectById",
+                          data: userId
+                      }).then(function (resp) {
+                          let datas = resp.data;
+                          let level = datas.level
+                          let department = datas.department;
+                          //查询该申请单的信息
+
+                          axios({
+                              method: "post",
+                              url: "applicationForm/selectPriceAndCount",
+                              data: data
+                          }).then(async function (resp) {
+                              let datas = resp.data;
+
+                              let minister = datas[i].minister//部长是否筛选
+
+
+                              //查询申请单节点审核信息
+
+                              let sh = false;
+
+                              await axios({
+                                  method: "post",
+                                  url: "examineStepContent/selectByAppId",
+                                  data: data[i].id
+                              }).then(async function (resp) {
+                                  let datas = resp.data;
+                                  let circulation = data[i].circulation;//部门
+                                  await axios({
+                                      method: "post",
+                                      url: "user/selectById",
+                                      data: userId
+                                  }).then(async function (resp) {
+                                      await axios({
+                                          method: "post",
+                                          url: "applicationForm/selectById",
+                                          data: data[i].id
+                                      }).then(function (resp) {
+                                          let datas = resp.data;
+                                          if (datas.length > 0) {
+                                              let circulationBoss = datas[0].circulationBoss;
+                                              if (Number(circulationBoss) === Number(1)) {
+                                                  sh = false;
+                                              }
+                                              // else {
+                                              //     sh=true;
+                                              // }
+                                          }
+                                      })
+
+                                      let userDatas = resp.data;
+                                      let userDepartment = userDatas.department;//审核人的部门
+                                      if (datas.length > 0) {
+                                          for (let j = 0; j < datas.length; j++) {
+                                              let result = datas[j].result;
+
+                                              if ((Number(userDepartment) === Number(circulation) && Number(result) === Number(0) && Number(minister) !== 0) || (Number(minister) === Number(0) && Number(level) === 3)) {
+                                                  sh = true;
+                                                  //该这个节点审核，获取步骤ID，查询是否开启了修改数量的功能
+                                                  let examineStepId = datas[j].examine_step_id;
+                                                  //查询修改数量权限
+
+                                                  axios({
+                                                      method: "post",
+                                                      url: "examineTypeCan/selectByExamineId",
+                                                      data: examineStepId
+                                                  }).then(function (resp) {
+                                                      let data = resp.data;
+                                                      let appNumberInputs = document.getElementsByClassName("appNumber");
+                                                      let canEdit = Number(data.canNumber) === Number(1);
+
+                                                      for (let i = 0; i < appNumberInputs.length; i++) {
+                                                          appNumberInputs[i].disabled = !canEdit;
+                                                      }
+                                                  })
+
+                                              }
+                                              if (Number(result) === 2) {
+                                                  sh = false;
+                                                  break;
+                                              }
+                                              if (Number(minister) === 2) {
+                                                  sh = false;
+                                                  break;
+                                              }
+
+                                          }
+
+                                      } else {
+                                          //不需要走审核流程或者没有审核流程
+                                          if ((Number(userDepartment) === Number(circulation)) || (Number(minister) === Number(0) && Number(level) === 3)) {
+                                              sh = true;
+                                          }
+                                          if (Number(minister) === 2 || Number(minister) === 1) {
+                                              sh = false;
+
+                                          }
+                                      }
+
+
+                                  })
+
+
+                              })
+
+
+                              if (sh === true) {
+                                  document.getElementById("yes").disabled = false;
+                                  document.getElementById("no").disabled = false;
+                              } else {
+                                  document.getElementById("yes").disabled = true;
+                                  document.getElementById("no").disabled = true;
+                              }
+
+
+                          })
+                      })
+
+                      //审核通过
+                      document.getElementById("yes").onclick = function () {
+                          if (window.confirm("您确定要通过该审核吗？")) {
+
+                              let allAppNumberInputs = document.querySelectorAll('.appNumber');
+                              let a = [];
+
+                              // 第一步：验证所有数量是否都大于0
+                              let hasInvalidNumber = false;
+                              let invalidInputs = [];
+
+                              for (let input of allAppNumberInputs) {
+                                  let value = input.value;
+                                  let materialType = input.getAttribute('data-material-type');
+
+                                  // 只验证expandable-child和normal类型的物料（需要提交的数据）
+                                  if (materialType === "expandable-child" || materialType === "normal" || !materialType) {
+                                      if (Number(value) <= 0 || value.length === 0) {
+                                          hasInvalidNumber = true;
+                                          invalidInputs.push(input);
+                                          break;
+                                      }
+                                  }
+                              }
+
+                              if (hasInvalidNumber) {
+                                  alert("请确保所有物料的数量都大于0！");
+                                  return false;
+                              }
+                              // 创建一个Map来存储父物料的值
+                              let parentValues = new Map();
+
+                              // 第一步：先收集父物料的值
+                              for (let input of allAppNumberInputs) {
+                                  let materialType = input.getAttribute('data-material-type');
+                                  let finProductId = input.getAttribute('data-fin-product-id');
+
+                                  if (materialType === "expandable-parent") {
+                                      parentValues.set(finProductId, input.value);
+                                  }
+                              }
+
+                              // 第二步：收集所有需要提交的数据
+                              for (let input of allAppNumberInputs) {
+                                  let materialType = input.getAttribute('data-material-type');
+                                  let contentId = input.getAttribute('data-content-id');
+                                  let parentFinId = input.getAttribute('data-parent-fin-id');
+
+                                  let data = {
+                                      appPrice: "",
+                                      appNumber: "",
+                                      finProductNumber: ""
+                                  };
+
+                                  switch(materialType) {
+                                      case "normal": // 普通物料（物料1、2）
+                                          data.id = contentId;
+                                          data.appNumber = input.value;        // 自己的申请数量
+                                          data.finProductNumber = "";          // 空字符串
+                                          break;
+
+                                      case "expandable-parent": // 可展开的父物料（如物料5）
+                                          // 物料5不需要提交数据，跳过
+                                          continue; // 跳过本次循环，不加入数组
+                                          break;
+
+                                      case "expandable-child": // 展开的子物料（如物料3、4）
+                                          data.id = contentId;
+                                          data.appNumber = input.value;        // 自己的申请数量
+
+                                          // 获取对应的父物料值
+                                          if (parentFinId && parentValues.has(parentFinId)) {
+                                              data.finProductNumber = parentValues.get(parentFinId);
+                                          } else {
+                                              data.finProductNumber = input.value; // 如果找不到父物料，用自己的值
+                                          }
+                                          break;
+
+                                      default:
+                                          // 兼容旧代码（没有data-material-type的情况）
+                                          let row = input.closest('tr');
+                                          let contentIdElement = row.querySelector('.contentDataId');
+                                          if (contentIdElement) {
+                                              data.id = contentIdElement.innerHTML;
+                                              data.appNumber = input.value;
+                                              data.finProductNumber = "";
+                                          }
+                                          break;
+                                  }
+
+                                  a.push(data);
+                              }
+                                  //得到了所有的数据，进行提交
+
+
+                                      axios({
+                                          method:"post",
+                                          url:"applicationContent/updateAppNumber",
+                                          data:a
+                                      }).then(async function (resp){
+                                          if (resp.data==="success"){
+                                              await axios({
+                                                  method: "post",
+                                                  url: "examine/updateMinisterOrBoss?appFormId=" + data[i].id + "&status=" + 1 + "",
+                                              }).then(function (resp) {
+                                                  let datas = resp.data;
+                                                  if (datas === "success") {
+                                                      alert("审核成功，该申请单已通过！");
+                                                      // window.parent.document.getElementById("iframepage").contentWindow.location.reload();
+                                                      location.reload();
+                                                  } else {
+                                                      alert("审核失败！请联系相关人员")
+                                                  }
+                                              })
+                                          }
+                                          else {
+                                              alert("审核失败，请联系相关人员！")
+                                          }
+                                      })
+
+                                      return true
+
+
+
+                          } else {
+                              return false;
+                          }
+                      }
+
+
+                      //审核不通过
+                      document.getElementById("no").onclick = function () {
+                          if (window.confirm("您确定要否决该审核吗？")) {
+                              var refuse = prompt("请输入否决原因！");
+                              if (refuse != null) {
+                                  axios({
+                                      method: "post",
+                                      url: "examine/updateMinisterOrBoss?appFormId=" + data[i].id + "&status=" + 2 + "",
+                                      data: refuse
+                                  }).then(function (resp) {
+                                      let datas = resp.data;
+                                      if (datas === "success") {
+                                          alert("审核成功，该申请单未通过！");
+                                          // window.parent.document.getElementById("iframepage").contentWindow.location.reload();
+                                          location.reload();
+                                      } else {
+                                          alert("审核失败！请联系相关人员")
+                                      }
+                                  })
+                              } else {
+                                  // document.write("请输入否决原因！");
+                                  return false;
+                              }
+
+
+                              return true
+                          } else {
+                              return false;
+                          }
+                      }
+
+
+
+
+              }
+          }
+      }
+
+
+
+
+
+              //筛选
+
+              let screenData = {
+                  sort:sort,
+                  betweenDate: "",
+                  andDate: "",
+                  userId: "",
+                  minister: "0",
+                  sortTwo:"",
+                  department:""
+              }
+              function examineScreen(data,page){
+                  axios({
+                      method:"post",
+                      url:"applicationForm/ministerScreen?currentPage="+page+"",
+                      data:data
+                  }).then(async function (resp) {
+                      if (resp.data===false){
+                          alert("登录超时！")
+                      }
+                      else {
+
+                          let data = resp.data.rows;
+                          let totalCount = resp.data.totalCount;
+                          //改变当前页页码
+                          document.getElementById("currentPage").innerHTML = page;
+                          //计算共有多少页
+                          document.getElementById("pageSum").innerHTML = Math.ceil(Number(totalCount) / 15);
+
+                          if (data !== undefined && data.length > 0) {
+                              let formdata1="";
+                              for (let i = 0; i < data.length; i++) {
+                                  if (Number(data[i].sort) === 0) {
+                                      {
+                                          //入库
+                                          formdata1 += ' <div style="width: 100%;height: auto;display: flex;">\n' +
+                                              '                                <div class="pailie" style="width: 15%;margin: 0 auto;  " ><b >' + data[i].orderNumber + '</b></div>\n' +
+                                              '                                <div class="pailie" style="width: 15%;margin: 0 auto;  " ><b>' + fDate(new Date(data[i].date)) + '</b></div>\n' +
+                                              '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;  " ><b class="which"></b></div>\n' +
+                                              '                                <div class="pailie" style="width: 10%;margin: 0 auto;   " ><b class="appUserDepartment"></b></div>\n' +
+                                              '                                <div class="pailie" style="width: 10%;margin: 0 auto;   " ><b class="appUserName"></b></div>\n' +
+                                              '                                <div class="pailie" style="width: 12.5%;margin: 0 auto;" ><b class="reason">'+data[i].reason+'</b></div>\n' +
+                                              '                                <div class="pailie" style="width: 7.5%;margin: 0 auto; " ><b class="totalPrice"></b></div>\n' +
+                                              '                                <div class="pailie" style="width: 10%;margin: 0 auto;  " ><b class="examineDepart"></b></div>\n' +
+                                              '                                <div class="pailie" style="width: 7.5%;margin: 0 auto; " ><b class="completeStatus"></b></div>\n' +
+                                              '                                <div  style="width: 10%;margin: 0 auto;  display: flex" ><b> <a class="applicationContent" href="javascript:void(0)">查看</a></b></b></div>\n' +
+                                              '                            </div>'
+                                      }
+
+
+                                  } else if (Number(data[i].sort) === 1) {
+                                      //出库
+
+
+                                      formdata1 += ' <div style="width: 100%;height: auto;display: flex;">\n' +
+                                          '                                <div class="pailie" style="width: 15%;margin: 0 auto;  " ><b >' + data[i].orderNumber + '</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 15%;margin: 0 auto;  " ><b>' + fDate(new Date(data[i].date)) + '</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto; " ><b class="which"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto;  " ><b class="appUserDepartment"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto;  " ><b class="appUserName"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 12.5%;margin: 0 auto; " ><b class="reason">'+data[i].reason+'</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;  " ><b class="totalPrice"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto;   " ><b class="examineDepart"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;  " ><b class="completeStatus"></b></div>\n' +
+                                          '                                <div  style="width: 10%;margin: 0 auto;  display: flex" ><b><a class="applicationContent" href="javascript:void(0)">查看</a></b></div>\n' +
+                                          '                            </div>'
+
+
+                                  }
+                                  else if (Number(data[i].sort)===2){
+                                      formdata1 += ' <div style="width: 100%;height: auto;display: flex;">\n' +
+                                          '                                <div class="pailie" style="width: 15%;margin: 0 auto; " ><b >' + data[i].orderNumber + '</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 15%;margin: 0 auto; " ><b>' + fDate(new Date(data[i].date)) + '</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;" ><b class="which"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto; " ><b class="appUserDepartment"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto; " ><b class="appUserName"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 12.5%;margin: 0 auto; " ><b class="reason">'+data[i].reason+'</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;  " ><b class="totalPrice"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto;   " ><b class="examineDepart"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;  " ><b class="completeStatus"></b></div>\n' +
+                                          '                                <div  style="width: 10%;margin: 0 auto;  display: flex" ><b><a class="applicationContent" href="javascript:void(0)">查看</a></b></div>\n' +
+                                          '                            </div>'
+                                  }
+                                  else if (Number(data[i].sort)===3){
+                                      formdata1 += ' <div style="width: 100%;height: auto;display: flex;">\n' +
+                                          '                                <div class="pailie" style="width: 15%;margin: 0 auto; " ><b >' + data[i].orderNumber + '</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 15%;margin: 0 auto; " ><b>' + fDate(new Date(data[i].date)) + '</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;" ><b class="which"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto; " ><b class="appUserDepartment"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto; " ><b class="appUserName"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 12.5%;margin: 0 auto; " ><b class="reason">'+data[i].reason+'</b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;  " ><b class="totalPrice"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 10%;margin: 0 auto;   " ><b class="examineDepart"></b></div>\n' +
+                                          '                                <div class="pailie" style="width: 7.5%;margin: 0 auto;  " ><b class="completeStatus"></b></div>\n' +
+                                          '                                <div  style="width: 10%;margin: 0 auto;  display: flex" ><b><a class="applicationContent" href="javascript:void(0)">查看</a></b></div>\n' +
+                                          '                            </div>'
+                                  }
+
+                              }
+                              document.getElementById("content").innerHTML = formdata1;
+                              //获取用户名称待输入
+                              let userName = document.querySelectorAll(".appUserName");
+                              let appDepart = document.querySelectorAll(".appUserDepartment");
+                              for (let i = 0; i < data.length; i++) {
+                                  //查询申请人名称
+                                  await axios({
+                                      method: "post",
+                                      url: "user/selectDepartById",
+                                      data: data[i].userId
+                                  }).then(function (resp) {
+                                      let data = resp.data;
+                                       userName[i].innerHTML =''+data[0].name+'' ;
+                                      appDepart[i].innerHTML =''+data[0].departmentName+'' ;
+
+                                  })
+
+                              }
+
+
+
+                              //种类填写
+                              whichSort(data);
+                              //审核状态填写
+                              examineStatus(data);
+                              openWindows(data);
+
+                          }
+                          else {
+                              document.getElementById("currentPage").innerHTML = 0;
+                              document.getElementById("content").innerHTML = '<div style="width: 100%;height: auto;text-align: center;color: red;">暂未收到申请！</div>';
+                          }
+                      }
+
+                  })
+
+              }
+              function examineScreenPage(data) {
+                  //首页
+                  document.getElementById("firstPage").onclick = function () {
+                      //获取当前页
+                      let innerHTML = document.getElementById("currentPage").innerHTML;
+                      if (Number(innerHTML) === Number(1)) {
+                          alert("这已经是第一页了！")
+                      } else if (Number(innerHTML) === Number(0)) {
+                          alert("未查询到任何信息！")
+                      } else {
+                          examineScreen(data, 1)
+                      }
+
+                  }
+                  //尾页
+                  document.getElementById("endPage").onclick = function () {
+                      //获取共有几页
+                      let innerHTML = document.getElementById("pageSum").innerHTML;
+                      //获取当前页
+                      let innerHTML1 = document.getElementById("currentPage").innerHTML;
+                      if (Number(innerHTML1) === Number(innerHTML) && Number(innerHTML) !== Number(0)) {
+                          alert("这已经是最后一页了！")
+                      } else if (Number(innerHTML1) === Number(0)) {
+                          alert("未查询到任何信息！")
+                      } else {
+                          examineScreen(data, innerHTML);
+                      }
+
+                  }
+                  //上一页
+                  document.getElementById("lastPage").onclick = function () {
+                      //获取当前页
+                      let innerHTML = document.getElementById("currentPage").innerHTML;
+                      if (Number(innerHTML) > 0 && Number(innerHTML) !== 1) {
+                          examineScreen(data, Number(innerHTML) - 1)
+                      } else if (Number(innerHTML) === Number(1)) {
+                          alert("这已经是首页了!")
+                      } else if (Number(innerHTML) === Number(0)) {
+                          alert("未查询到任何信息！")
+                      } else {
+                          alert("系统错误，请寻找相关人员！")
+                      }
+
+
+                  }
+                  //下一页
+                  document.getElementById("nextPage").onclick = function () {
+                      //获取总页数和当前页
+                      let innerHTML = document.getElementById("currentPage").innerHTML;
+                      let innerHTML2 = document.getElementById("pageSum").innerHTML;
+                      if (Number(innerHTML) > 0 && Number(innerHTML) < Number(innerHTML2)) {
+                          examineScreen(data, Number(innerHTML) + Number(1))
+                      } else if (Number(innerHTML) === Number(innerHTML2) && Number(innerHTML2) !== Number(0)) {
+                          alert("这已经是最后一页了！")
+                      } else if (Number(innerHTML) === Number(0)) {
+                          alert("未查询到任何信息！")
+                      } else {
+                          alert("系统错误，请联系相关人员！")
+                      }
+                  }
+
+                  //输入的页码
+                  document.getElementById("jump").onclick = function () {
+                      //获取输入的页码
+                      let value = document.getElementById("jumpValue").value;
+                      //获取当前页码
+                      let innerHTML = document.getElementById("currentPage").innerHTML;
+                      //获取总页码
+                      let innerHTML1 = document.getElementById("pageSum").innerHTML;
+                      //判断value是否为正整数
+                      var pattern = /^[1-9]\d*$/;
+
+                      let b = pattern.test(value);
+                      if (b) {
+                          //如果是真的，那就符合正整数，然后再比较是否与当前页相同，是否大于总页数
+                          if (Number(value) > Number(innerHTML1)) {
+                              alert("您输入的数据不符合规则！")
+                          } else if (Number(value) === Number(innerHTML)) {
+                              alert("您已经处在当前页面了！")
+                          } else if (Number(innerHTML) === Number(0)) {
+                              alert("未查询到任何信息！")
+                          } else {
+                              examineScreen(data, value);
+                          }
+
+                      } else {
+                          alert("您输入的数据不符合页码规则！")
+                      }
+
+
+                  }
+              }
+
+              //申请人筛选框
+              document.getElementById("applicationUserId").onchange = function () {
+                  let mySelect = document.getElementById("applicationUserId");
+                  let index = mySelect.selectedIndex;
+                  //获取筛选条件
+                  if (mySelect.options[index].value.length > 0) {
+                      screenData.userId = mySelect.options[index].value;
+                  } else {
+                      screenData.userId = "";
+                  }
+
+                  examineScreen(screenData, 1);
+                  examineScreenPage(screenData);
+                  screenDepartment(screenData);
+                  if (Number(mySelect.options[index].value) === Number(0)){
+
+                      screenUser(screenData);
+                  }
+
+
+              }
+      //申请人部门筛选框
+      document.getElementById("applicationDepartment").onchange = function () {
+          let mySelect = document.getElementById("applicationDepartment");
+          let index = mySelect.selectedIndex;
+          if (mySelect.options[index].value.length > 0) {
+              screenData.department = mySelect.options[index].value;
+          } else {
+              screenData.department = "";
+          }
+
+          examineScreen(screenData, 1);
+          examineScreenPage(screenData);
+          screenUser(screenData);
+        if (Number(mySelect.options[index].value) === Number(0)){
+              screenDepartment(screenData);
+          }
+
+
+
+      }
+
+              //筛选状态筛选框
+              document.getElementById("completeId").onchange = function () {
+
+                  let mySelect = document.getElementById("completeId");
+                  let index = mySelect.selectedIndex;
+                  if (mySelect.options[index].value.length > 0) {
+                      screenData.minister = mySelect.options[index].value;
+                  } else {
+                      screenData.minister = "";
+                  }
+
+                  examineScreen(screenData, 1);
+                  examineScreenPage(screenData);
+                  screenUser(screenData);
+                  screenDepartment(screenData);
+
+              }
+
+              //起始日期筛选框
+              document.getElementById("between").onchange = function () {
+                  if (document.getElementById("between").value.length > 0) {
+                      screenData.betweenDate = document.getElementById("between").value;
+                  } else {
+                      screenData.betweenDate = "";
+                  }
+
+                  examineScreen(screenData, 1);
+                  examineScreenPage(screenData);
+                  screenUser(screenData);
+                  screenDepartment(screenData);
+              }
+
+              //截止日期筛选框
+              document.getElementById("and").onchange = function () {
+                  if (document.getElementById("and").value.length > 0) {
+                      screenData.andDate = document.getElementById("and").value + ' 23:59:59';
+                  } else {
+                      screenData.andDate = "";
+                  }
+
+                  examineScreen(screenData, 1);
+                  examineScreenPage(screenData);
+                  screenUser(screenData);
+                  screenDepartment(screenData);
+              }
+
+              //分类筛选框
+              document.getElementById("sortTwo").onchange = function (){
+                  let mySelect = document.getElementById("sortTwo");
+                  let index = mySelect.selectedIndex;
+                  if (mySelect.options[index].value.length > 0) {
+                      screenData.sortTwo = mySelect.options[index].value;
+                  } else {
+                      screenData.sortTwo = "";
+                  }
+
+                  examineScreen(screenData, 1);
+                  examineScreenPage(screenData);
+                  screenUser(screenData);
+                  screenDepartment(screenData);
+              }
+
+      examineScreen(screenData, 1);
+      examineScreenPage(screenData);
+      screenUser(screenData);
+      screenDepartment(screenData);
+
+
+
+
+
+
+  </script>
+
+
+
+</html>

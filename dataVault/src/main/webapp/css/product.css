@@ -166,13 +166,13 @@ ul.l_tree:before {
 }
 
 input{
-	font-family: 微软雅黑, serif !important;
+	font-family: Arial, sans-serif !important;
 }
 textarea{
-	font-family: 微软雅黑, serif !important;
+	font-family: Arial, sans-serif !important;
 }
 pre{
-	font-family: 微软雅黑, serif !important;
+	font-family: Arial, sans-serif !important;
 	cursor: pointer;
 }
 

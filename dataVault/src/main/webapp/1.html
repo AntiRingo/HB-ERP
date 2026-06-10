@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script src="js/axios-0.18.0.js"></script>
+<script>
+    let finLength=0;
+   async function  a(){
+     await   axios({
+            method:"post",
+            url:"finCode/selectCode",
+            data:1
+        }).then(function (resp){
+            let finCode=resp.data;
+            if (finCode.length>0){
+                finLength = finCode[0].length;
+            }
+            else {
+
+            }
+
+        })
+
+        alert(finLength)
+    }
+    a();
+
+</script>
+<script>
+    // axios({
+    //     method:"post",
+    //     url:"attributeValue/select1"
+    // }).then(function (resp){
+    //     let data1=resp.data;
+    //         let list=[];
+    //
+    //     axios({
+    //         method: "post",
+    //         url:"attributeValue/select2"
+    //     }).then(function (resp){
+    //         let data2=resp.data;
+    //         for (let i = 0; i < data1.length; i++) {
+    //             let s=false;
+    //             for (let j = 0; j < data2.length; j++) {
+    //                 if (data1[i].content===data2[j].attValue){
+    //                     s=true;
+    //                     break
+    //                 }
+    //             }
+    //             if (s===false){
+    //                list.push(data1[i])
+    //             }
+    //
+    //         }
+    //         let formdata={
+    //             id:"",
+    //             attNameId:2903,
+    //             attValue:"",
+    //             code:"",
+    //         }
+    //         let list2=[];
+    //         for (let i = 0; i < list.length; i++) {
+    //             formdata={
+    //                 id:"",
+    //                 attNameId:2903,
+    //                 attValue:list[i].content,
+    //                 code:list[i].content
+    //             }
+    //             list2[i]=formdata;
+    //             formdata={
+    //                 id:"",
+    //                 attNameId:2903,
+    //                 attValue:"",
+    //                 code:"",
+    //             }
+    //         }
+    //
+    //         axios({
+    //             method:"post",
+    //             url:"attributeValue/addCodeAuto",
+    //             data:list2
+    //         }).then(function (resp){
+    //             if (resp.data==="success"){
+    //                 alert("成功")
+    //             }
+    //             else {
+    //                 alert("失败")
+    //             }
+    //         })
+    //     })
+    // })
+</script>
+<script>
+//     //单位换算
+//     function power(str){
+//         let number= str.replace(/[fpnum%KMGT]/,'');
+//         let power = str.replace(/([-]?[0-9]+[.][0-9]+)|([-]?[0-9]*)/,'');
+//
+//
+//         if (power.length>0){
+//             let num;
+//             if (power==="f"){
+//                 num=0.000000000000001;
+//             }else if (power==="p"){
+//                 num=0.000000000001;
+//             }else if (power==="n"){
+//                 num=0.000000001;
+//             }else if (power==="u"){
+//                 num=0.000001;
+//             }else if (power==="m"){
+//                 num=0.001;
+//             }else if (power==="%"){
+//                 num=0.01;
+//             }else if (power==="K"){
+//                 num=1000;
+//             }else if (power==="M"){
+//                 num=100000;
+//             }else if (power==="G"){
+//                 num=100000000;
+//             }else if (power==="T"){
+//                 num=100000000000;
+//             }
+//
+//             return Number(num)*Number(number);
+//         }else {
+//             return number
+//         }
+//
+//     }
+//     //判断输入的值是否符合数据库中的范围
+//     function compare (str,value){
+//
+//         //  console.log("范围"+ str)
+//         // console.log("传入的值"+value)
+//         if (value.length>0){
+//             var pattern = /^\[.*\]$/;
+//             var patterns= /^\<.*\]$/;
+//             var pattern1= /^\<.*\>$/;
+//             var patterns1= /^\[.*\>$/;
+//
+//             if (pattern.test(str)===true){
+//                 str=str.split("[").join("");
+//                 str=str.split("]").join("");
+//                 // str=str.replace(/[a-zA-Z]/g, '');
+//                 let strings = str.split("~");
+//
+//                 //判断输入的数值是否符合这个范围
+//                 if (Number(power(value))>=Number(power(strings[0])) && Number(power(value))<=Number(power(strings[1]))){
+//                     return true;
+//                 }else {
+//                     return false;
+//                 }
+//
+//             }
+//             else if (patterns.test(str)===true){
+//
+//                 str=str.split("<").join("");
+//                 str=str.split("]").join("");
+//                 // str=str.replace(/[a-zA-Z]/g, '');
+//                 let strings = str.split("~");
+//
+//                 // console.log("开始"+ strings[0]);
+//                 // console.log("结束"+strings[1])
+//
+//                 //判断输入的数值是否符合这个范围
+//                 if (Number(power(value))>Number(power(strings[0])) && Number(power(value))<=Number(power(strings[1]))){
+//                     return true;
+//                 }else {
+//                     return false;
+//                 }
+//             }
+//             else if (pattern1.test(str)===true){
+//
+//                 str=str.split("<").join("");
+//                 str=str.split(">").join("");
+//                 // str=str.replace(/[a-zA-Z]/g, '');
+//                 let strings = str.split("~");
+//
+//                 // console.log("开始"+ strings[0]);
+//                 // console.log("结束"+strings[1])
+//
+//                 //判断输入的数值是否符合这个范围
+//                 if (Number(power(value))>Number(power(strings[0])) && Number(power(value))<Number(power(strings[1]))){
+//                     return true;
+//                 }else {
+//                     return false;
+//                 }
+//             }
+//             else if (patterns1.test(str)===true){
+//
+//                 str=str.split("[").join("");
+//                 str=str.split(">").join("");
+//                 // str=str.replace(/[a-zA-Z]/g, '');
+//                 let strings = str.split("~");
+//
+//                 // console.log("开始"+ strings[0]);
+//                 // console.log("结束"+strings[1])
+//
+//                 //判断输入的数值是否符合这个范围
+//                 if (Number(power(value))>=Number(power(strings[0])) && Number(power(value))<Number(power(strings[1]))){
+//                     return true;
+//                 }else {
+//                     return false;
+//                 }
+//             }
+//
+//             else if (pattern.test(str)===false && patterns.test(str)===false && pattern1.test(str)===false && patterns1.test(str)===false) {
+//                 alert("数据有问题，不符合格式，请联系相关人员！");
+//
+//             }
+//         }else {
+//             return false;
+//         }
+//
+//
+//     }
+//   //根据物料id生成该物料的物料码
+//
+// axios({
+//     method:"post",
+//     url:"product/selectAllInSort",
+//     data:1041
+// }).then(async function (resp){
+//     let productData=resp.data;
+//     let list=[];
+//     let m=0;
+//     let product={
+//         id:"",
+//         materialNumber:"",
+//     }
+//     for (let k = 0; k < productData.length; k++) {
+//         let str="000000000";
+//       await  axios({
+//             method:"post",
+//             url:"product/jz",
+//             data:productData[k].id
+//         }).then(async function (resp)
+//         {
+//             let jzdatas=resp.data;
+//             for (let i = 0; i < jzdatas.length; i++) {
+//                 if (jzdatas[i].id !==undefined){
+//                     //如果id存在就是在映射中的
+//                     if (jzdatas[i].range===0){
+//                         //不是范围的,直接找属性编码
+//                         let valueData={
+//                             attNameId:jzdatas[i].att_name_id,
+//                             attValue: jzdatas[i].content
+//                         }
+//                         await axios({
+//                             method:"post",
+//                             url:"attributeValue/selectCode",
+//                             data:valueData
+//                         }).then(function (resp){
+//                             code=resp.data[0].code;
+//                             //让code替换位置
+//                             str = str.slice(0, jzdatas[i].begin_location-1) + code + str.slice(jzdatas[i].end_location);
+//                         })
+//                     }
+//                     else if (jzdatas[i].range===1){
+//                         //是范围的，对比后再找属性编码
+//
+//                         //如果是范围，获取所有的范围
+//                         await   axios({
+//                             method:"post",
+//                             url:"attributeValue/selectByAttNameId",
+//                             data:jzdatas[i].att_name_id
+//                         }).then(async function (resp){
+//                             let datas=resp.data;
+//                             let m=0;
+//                             for (let j = 0; j < datas.length; j++) {
+//                                 let b = compare(datas[j].attValue,jzdatas[i].content);
+//
+//                                 if (b){
+//                                     m=j;
+//                                     break
+//                                 }
+//                             }
+//                             let rangeDatas={
+//                                 attNameId:jzdatas[i].att_name_id,
+//                                 attValue:datas[m].attValue
+//                             }
+//                             await  axios({
+//                                 method:"post",
+//                                 url:"attributeValue/selectCode",
+//                                 data:rangeDatas
+//                             }).then(function (resp){
+//                                 if (resp.data.length>0){
+//                                     code=resp.data[0].code;
+//                                     //让code替换位置
+//                                     str = str.slice(0, jzdatas[i].begin_location-1) + code + str.slice(jzdatas[i].end_location);
+//                                 }
+//
+//
+//                             })
+//                         })
+//
+//
+//                     }
+//
+//                 }
+//             }
+//
+//             str= jzdatas[0].material_number.slice(0, 7)+str+jzdatas[0].material_number.slice(16, 18);
+//             if (str!==jzdatas[0].material_number){
+//                 product={
+//                     id:productData[k].id,
+//                     materialNumber:str,
+//                 }
+//                 list[m]=product;
+//                 m++;
+//                 product={
+//                     id:productData[k].id,
+//                     materialNumber:str,
+//                 }
+//             }
+//
+//
+//         })
+//     }
+// console.log(list)
+//     await axios({
+//         method:"post",
+//         url:"product/updateMaterialNumberById",
+//         data:list
+//     }).then(function (resp){
+//         if (resp.data==="success"){
+//             alert("更新成功")
+//         }
+//         else {
+//             alert("更新失败")
+//         }
+//     })
+// })
+
+
+
+
+</script>
+</html>

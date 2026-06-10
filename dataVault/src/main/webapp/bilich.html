@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF比例尺计算工具（毫米单位）</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+      color: white;
+      padding: 25px 30px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .content {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 30px;
+    }
+
+    .control-panel {
+      flex: 0 0 300px;
+      padding: 20px;
+      background: #f8f9ff;
+      border-radius: 10px;
+      margin-right: 20px;
+      height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+
+    .pdf-viewer-container {
+      flex: 1;
+      min-width: 400px;
+      background: #f0f2f5;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      height: calc(100vh - 200px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pdf-viewer-header {
+      padding: 10px 15px;
+      background: #e9ecef;
+      border-bottom: 1px solid #dee2e6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .zoom-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .zoom-btn {
+      padding: 5px 10px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .pdf-viewer {
+      flex: 1;
+      overflow: auto;
+      position: relative;
+    }
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eaeaea;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    button {
+      background: linear-gradient(90deg, #3498db 0%, #1a5f8e 100%);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+    }
+
+    button.secondary {
+      background: linear-gradient(90deg, #6c757d 0%, #495057 100%);
+    }
+
+    button.success {
+      background: linear-gradient(90deg, #28a745 0%, #1e7e34 100%);
+    }
+
+    button.danger {
+      background: linear-gradient(90deg, #dc3545 0%, #bd2130 100%);
+    }
+
+    .result-box {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+
+    .result-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .result-title i {
+      margin-right: 10px;
+      font-size: 1.3rem;
+    }
+
+    .result-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #3498db;
+      text-align: center;
+      padding: 10px;
+      background: #f0f7ff;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+
+    .result-description {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    #pdfCanvas {
+      display: block;
+      margin: 0 auto;
+      cursor: crosshair;
+      border: 1px solid #ddd;
+      background-color: #fff;
+    }
+
+    .coordinate-display {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .origin-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #e74c3c;
+      border: 2px solid white;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 2px #e74c3c;
+      pointer-events: none;
+    }
+
+    .point-marker {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #3498db;
+      border: 2px solid white;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 2px #3498db;
+      pointer-events: none;
+    }
+
+    .point-label {
+      position: absolute;
+      background: rgba(52, 152, 219, 0.8);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      transform: translate(10px, -50%);
+      pointer-events: none;
+    }
+
+    .instructions {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e9f7fe;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    }
+
+    .instructions h3 {
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+
+    .instructions ol {
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin-bottom: 8px;
+    }
+
+    .status-bar {
+      padding: 10px;
+      background: #f8d7da;
+      color: #721c24;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .unit-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .unit-btn {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #f8f9fa;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .unit-btn.active {
+      background: #3498db;
+      color: white;
+      border-color: #3498db;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        flex-direction: column;
+      }
+
+      .control-panel {
+        margin-right: 0;
+        margin-bottom: 20px;
+        height: auto;
+      }
+
+      .pdf-viewer-container {
+        height: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>PDF比例尺计算工具（毫米单位）</h1>
+    <p class="subtitle">设置原点、计算比例尺、显示实际坐标</p>
+  </header>
+
+  <div class="content">
+    <div class="control-panel">
+      <h2>控制面板</h2>
+
+      <div class="input-group">
+        <label for="pdfFile">选择PDF文件</label>
+        <input type="file" id="pdfFile" accept=".pdf">
+      </div>
+
+      <div class="input-group">
+        <label for="pdfPassword">PDF密码 (可选)</label>
+        <input type="password" id="pdfPassword" placeholder="输入PDF密码">
+      </div>
+
+      <button id="loadPdfBtn">加载PDF</button>
+
+      <div class="result-box">
+        <div class="result-title">
+          <i>📍</i> 原点设置
+        </div>
+        <div class="unit-selector">
+          <div class="unit-btn active" data-unit="mm">毫米 (mm)</div>
+          <div class="unit-btn" data-unit="cm">厘米 (cm)</div>
+          <div class="unit-btn" data-unit="m">米 (m)</div>
+        </div>
+        <div class="result-description">
+          在PDF上点击设置原点位置（无需知道实际坐标）
+        </div>
+        <button id="setOriginBtn" class="secondary">设置原点位置</button>
+      </div>
+
+      <div class="result-box">
+        <div class="result-title">
+          <i>📏</i> 比例尺计算
+        </div>
+        <div class="input-group">
+          <label for="realX">实际 X 坐标</label>
+          <input type="number" id="realX" placeholder="输入实际X坐标">
+        </div>
+        <div class="input-group">
+          <label for="realY">实际 Y 坐标</label>
+          <input type="number" id="realY" placeholder="输入实际Y坐标">
+        </div>
+        <button id="addPointBtn" class="success">添加坐标点</button>
+        <button id="calculateScaleBtn">计算比例尺</button>
+        <button id="clearPointsBtn" class="danger">清除所有点</button>
+        <div class="result-description">
+          在PDF上点击添加点，然后输入实际坐标值
+        </div>
+      </div>
+
+      <div class="result-box">
+        <div class="result-title">
+          <i>📐</i> 比例尺结果
+        </div>
+        <div class="result-value" id="scaleResult">尚未计算</div>
+        <div class="result-value" id="ratioResult">--</div>
+        <div class="result-value" id="mmPerPixel">--</div>
+        <div class="result-description">
+          比例尺 = 实际距离 / PDF距离
+        </div>
+        <button id="saveScaleBtn">保存比例尺</button>
+        <button id="loadScaleBtn" class="secondary">加载比例尺</button>
+      </div>
+
+      <div class="instructions">
+        <h3>使用说明</h3>
+        <ol>
+          <li>加载PDF文件（需要密码则输入）</li>
+          <li>在PDF上点击设置原点位置（无需知道实际坐标）</li>
+          <li>在PDF上点击添加点并输入实际坐标</li>
+          <li>点击"计算比例尺"按钮</li>
+          <li>保存比例尺以便下次使用</li>
+        </ol>
+      </div>
+
+      <div class="status-bar" id="statusBar">
+        状态信息将显示在这里
+      </div>
+    </div>
+
+    <div class="pdf-viewer-container">
+      <div class="pdf-viewer-header">
+        <div class="zoom-controls">
+          <button class="zoom-btn" id="zoomInBtn">放大</button>
+          <button class="zoom-btn" id="zoomOutBtn">缩小</button>
+          <button class="zoom-btn" id="resetZoomBtn">重置</button>
+        </div>
+        <div id="pageInfo">第 <span id="currentPage">1</span> 页 / 共 <span id="totalPages">1</span> 页</div>
+      </div>
+      <div class="pdf-viewer" id="pdfViewer">
+        <canvas id="pdfCanvas"></canvas>
+        <div class="coordinate-display">
+          <span id="coordinateInfo">X: 0, Y: 0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // PDF.js工作路径
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+  // DOM元素
+  const pdfFileInput = document.getElementById('pdfFile');
+  const pdfPasswordInput = document.getElementById('pdfPassword');
+  const loadPdfBtn = document.getElementById('loadPdfBtn');
+  const setOriginBtn = document.getElementById('setOriginBtn');
+  const addPointBtn = document.getElementById('addPointBtn');
+  const calculateScaleBtn = document.getElementById('calculateScaleBtn');
+  const clearPointsBtn = document.getElementById('clearPointsBtn');
+  const saveScaleBtn = document.getElementById('saveScaleBtn');
+  const loadScaleBtn = document.getElementById('loadScaleBtn');
+  const realXInput = document.getElementById('realX');
+  const realYInput = document.getElementById('realY');
+  const scaleResult = document.getElementById('scaleResult');
+  const ratioResult = document.getElementById('ratioResult');
+  const mmPerPixel = document.getElementById('mmPerPixel');
+  const coordinateInfo = document.getElementById('coordinateInfo');
+  const statusBar = document.getElementById('statusBar');
+  const pdfCanvas = document.getElementById('pdfCanvas');
+  const pdfViewer = document.getElementById('pdfViewer');
+  const unitButtons = document.querySelectorAll('.unit-btn');
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const resetZoomBtn = document.getElementById('resetZoomBtn');
+  const currentPageEl = document.getElementById('currentPage');
+  const totalPagesEl = document.getElementById('totalPages');
+
+  // 全局变量
+  let pdfDoc = null;
+  let pageNum = 1;
+  let pageRendering = false;
+  let pageNumPending = null;
+  let scale = 1.5;
+  let originPoint = null;
+  let points = [];
+  let currentScaleFactor = 1; // 比例尺因子（米/像素）
+  let canvasContext = null;
+  let currentUnit = 'mm'; // 默认单位为毫米
+  let unitConversion = {
+    'mm': 1,
+    'cm': 10,
+    'm': 1000
+  };
+
+  // 初始化
+  function init() {
+    canvasContext = pdfCanvas.getContext('2d');
+
+    // 事件监听器
+    loadPdfBtn.addEventListener('click', loadPDF);
+    setOriginBtn.addEventListener('click', enableSetOriginMode);
+    addPointBtn.addEventListener('click', enableAddPointMode);
+    calculateScaleBtn.addEventListener('click', calculateScale);
+    clearPointsBtn.addEventListener('click', clearPoints);
+    saveScaleBtn.addEventListener('click', saveScale);
+    loadScaleBtn.addEventListener('click', loadScale);
+    zoomInBtn.addEventListener('click', zoomIn);
+    zoomOutBtn.addEventListener('click', zoomOut);
+    resetZoomBtn.addEventListener('click', resetZoom);
+
+    // 单位选择器
+    unitButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        unitButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentUnit = btn.dataset.unit;
+        updateStatus(`单位已切换为${getUnitName(currentUnit)}`);
+      });
+    });
+
+    // 鼠标移动事件
+    pdfCanvas.addEventListener('mousemove', handleMouseMove);
+
+    // 初始状态
+    updateStatus('请加载PDF文件开始使用');
+  }
+
+  // 获取单位名称
+  function getUnitName(unit) {
+    switch(unit) {
+      case 'mm': return '毫米';
+      case 'cm': return '厘米';
+      case 'm': return '米';
+      default: return '毫米';
+    }
+  }
+
+  // 加载PDF文件
+  function loadPDF() {
+    const file = pdfFileInput.files[0];
+    if (!file) {
+      updateStatus('请选择PDF文件', 'error');
+      return;
+    }
+
+    const password = pdfPasswordInput.value;
+    const fileReader = new FileReader();
+
+    fileReader.onload = function() {
+      const typedarray = new Uint8Array(this.result);
+
+      // 加载PDF文档
+      pdfjsLib.getDocument({
+        data: typedarray,
+        password: password
+      }).promise.then(function(pdf) {
+        pdfDoc = pdf;
+        totalPagesEl.textContent = pdfDoc.numPages;
+        renderPage(pageNum);
+      }).catch(function(error) {
+        if (error.name === 'PasswordException') {
+          updateStatus('需要密码才能打开此PDF', 'error');
+        } else {
+          updateStatus('加载PDF失败: ' + error.message, 'error');
+        }
+      });
+    };
+
+    fileReader.readAsArrayBuffer(file);
+  }
+
+  // 渲染PDF页面
+  function renderPage(num) {
+    pageRendering = true;
+    currentPageEl.textContent = num;
+
+    pdfDoc.getPage(num).then(function(page) {
+      const viewport = page.getViewport({ scale: scale });
+      pdfCanvas.height = viewport.height;
+      pdfCanvas.width = viewport.width;
+
+      const renderContext = {
+        canvasContext: canvasContext,
+        viewport: viewport
+      };
+
+      const renderTask = page.render(renderContext);
+
+      renderTask.promise.then(function() {
+        pageRendering = false;
+        if (pageNumPending !== null) {
+          renderPage(pageNumPending);
+          pageNumPending = null;
+        }
+
+        // 清除之前的标记
+        clearMarkers();
+        updateStatus('PDF加载成功，请设置原点');
+      });
+    });
+  }
+
+  // 放大
+  function zoomIn() {
+    if (scale < 3) {
+      scale += 0.1;
+      queueRenderPage(pageNum);
+    }
+  }
+
+  // 缩小
+  function zoomOut() {
+    if (scale > 0.5) {
+      scale -= 0.1;
+      queueRenderPage(pageNum);
+    }
+  }
+
+  // 重置缩放
+  function resetZoom() {
+    scale = 1.5;
+    queueRenderPage(pageNum);
+  }
+
+  // 排队渲染页面
+  function queueRenderPage(num) {
+    if (pageRendering) {
+      pageNumPending = num;
+    } else {
+      renderPage(num);
+    }
+  }
+
+  // 设置原点模式
+  function enableSetOriginMode() {
+    if (!pdfDoc) {
+      updateStatus('请先加载PDF文件', 'error');
+      return;
+    }
+
+    pdfCanvas.style.cursor = 'crosshair';
+    pdfCanvas.onclick = setOrigin;
+    updateStatus('请在PDF上点击设置原点位置');
+  }
+
+  // 设置原点
+  function setOrigin(event) {
+    const rect = pdfCanvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    originPoint = { x, y };
+
+    // 创建原点标记
+    const marker = document.createElement('div');
+    marker.className = 'origin-marker';
+    marker.style.left = `${x}px`;
+    marker.style.top = `${y}px`;
+    marker.setAttribute('data-type', 'origin');
+    pdfViewer.appendChild(marker);
+
+    pdfCanvas.style.cursor = 'default';
+    pdfCanvas.onclick = null;
+
+    updateStatus('原点已设置，请添加点并输入实际坐标');
+  }
+
+  // 添加点模式
+  function enableAddPointMode() {
+    if (!pdfDoc) {
+      updateStatus('请先加载PDF文件', 'error');
+      return;
+    }
+
+    if (!originPoint) {
+      updateStatus('请先设置原点', 'error');
+      return;
+    }
+
+    pdfCanvas.style.cursor = 'crosshair';
+    pdfCanvas.onclick = addPoint;
+    updateStatus('请在PDF上点击添加点');
+  }
+
+  // 添加点
+  function addPoint(event) {
+    const rect = pdfCanvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // 创建点标记
+    const marker = document.createElement('div');
+    marker.className = 'point-marker';
+    marker.style.left = `${x}px`;
+    marker.style.top = `${y}px`;
+    marker.setAttribute('data-type', 'point');
+    pdfViewer.appendChild(marker);
+
+    // 创建点标签
+    const label = document.createElement('div');
+    label.className = 'point-label';
+    label.style.left = `${x}px`;
+    label.style.top = `${y}px`;
+    label.textContent = `点 ${points.length + 1}`;
+    pdfViewer.appendChild(label);
+
+    points.push({ x, y });
+
+    pdfCanvas.style.cursor = 'default';
+    pdfCanvas.onclick = null;
+
+    updateStatus(`点 ${points.length} 已添加，请输入实际坐标值`);
+  }
+
+  // 计算比例尺
+  function calculateScale() {
+    if (points.length < 1) {
+      updateStatus('请至少添加一个点', 'error');
+      return;
+    }
+
+    if (!realXInput.value || !realYInput.value) {
+      updateStatus('请输入点的实际坐标值', 'error');
+      return;
+    }
+
+    const point = points[points.length - 1];
+    const dx = point.x - originPoint.x;
+    const dy = point.y - originPoint.y;
+    const pdfDistance = Math.sqrt(dx * dx + dy * dy);
+
+    const realX = parseFloat(realXInput.value);
+    const realY = parseFloat(realYInput.value);
+
+    // 实际距离是点相对于原点的距离
+    const realDistance = Math.sqrt(realX * realX + realY * realY);
+
+    if (pdfDistance === 0) {
+      updateStatus('错误：PDF距离为零', 'error');
+      return;
+    }
+
+    // 转换为毫米计算
+    const conversionFactor = unitConversion[currentUnit];
+    const realDistanceMM = realDistance * conversionFactor;
+
+    currentScaleFactor = realDistanceMM / pdfDistance; // 毫米/像素
+    const ratio = Math.round(1 / (currentScaleFactor / 1000)); // 1:XXX 比例尺
+
+    scaleResult.textContent = `${currentScaleFactor.toFixed(6)} 毫米/像素`;
+    ratioResult.textContent = `1:${ratio.toLocaleString()}`;
+    mmPerPixel.textContent = `1像素 = ${currentScaleFactor.toFixed(4)}毫米`;
+
+    updateStatus(`比例尺计算成功: 1像素 = ${currentScaleFactor.toFixed(4)}毫米`);
+  }
+
+  // 清除所有点
+  function clearPoints() {
+    points = [];
+    clearMarkers();
+    updateStatus('所有点已清除');
+  }
+
+  // 清除标记
+  function clearMarkers() {
+    const markers = pdfViewer.querySelectorAll('[data-type]');
+    markers.forEach(marker => marker.remove());
+  }
+
+  // 保存比例尺
+  function saveScale() {
+    if (!currentScaleFactor) {
+      updateStatus('请先计算比例尺', 'error');
+      return;
+    }
+
+    const scaleData = {
+      originPoint,
+      scaleFactor: currentScaleFactor,
+      unit: currentUnit
+    };
+
+    localStorage.setItem('pdfScaleData', JSON.stringify(scaleData));
+    updateStatus('比例尺已保存到本地存储');
+  }
+
+  // 加载比例尺
+  function loadScale() {
+    const scaleData = localStorage.getItem('pdfScaleData');
+    if (!scaleData) {
+      updateStatus('没有保存的比例尺数据', 'error');
+      return;
+    }
+
+    const data = JSON.parse(scaleData);
+    originPoint = data.originPoint;
+    currentScaleFactor = data.scaleFactor;
+    currentUnit = data.unit || 'mm';
+
+    // 更新单位选择
+    unitButtons.forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.unit === currentUnit) {
+        btn.classList.add('active');
+      }
+    });
+
+    // 创建原点标记
+    if (originPoint) {
+      const marker = document.createElement('div');
+      marker.className = 'origin-marker';
+      marker.style.left = `${originPoint.x}px`;
+      marker.style.top = `${originPoint.y}px`;
+      marker.setAttribute('data-type', 'origin');
+      pdfViewer.appendChild(marker);
+    }
+
+    scaleResult.textContent = `${currentScaleFactor.toFixed(6)} 毫米/像素`;
+    const ratio = Math.round(1 / (currentScaleFactor / 1000));
+    ratioResult.textContent = `1:${ratio.toLocaleString()}`;
+    mmPerPixel.textContent = `1像素 = ${currentScaleFactor.toFixed(4)}毫米`;
+
+    updateStatus('比例尺已加载');
+  }
+
+  // 处理鼠标移动
+  function handleMouseMove(event) {
+    if (!originPoint || !currentScaleFactor) return;
+
+    const rect = pdfCanvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // 计算实际坐标（毫米）
+    const dx = x - originPoint.x;
+    const dy = y - originPoint.y;
+
+    const realX = dx * currentScaleFactor;
+    const realY = dy * currentScaleFactor;
+
+    // 根据当前单位转换显示值
+    const conversionFactor = unitConversion[currentUnit];
+    const displayX = realX / conversionFactor;
+    const displayY = realY / conversionFactor;
+
+    coordinateInfo.textContent = `X: ${displayX.toFixed(2)}${currentUnit}, Y: ${displayY.toFixed(2)}${currentUnit}`;
+  }
+
+  // 更新状态信息
+  function updateStatus(message, type = 'info') {
+    statusBar.style.display = 'block';
+    statusBar.textContent = message;
+
+    if (type === 'error') {
+      statusBar.style.background = '#f8d7da';
+      statusBar.style.color = '#721c24';
+    } else {
+      statusBar.style.background = '#d4edda';
+      statusBar.style.color = '#155724';
+    }
+  }
+
+  // 初始化应用
+  init();
+</script>
+</body>
+</html>
