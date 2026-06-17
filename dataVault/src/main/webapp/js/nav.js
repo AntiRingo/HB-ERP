@@ -191,8 +191,28 @@ if (Number(document.documentElement.clientWidth)<=900){
 //     }
 // }
 
+function getNavQueryValue(key){
+    try {
+        return new URLSearchParams(window.location.search).get(key) || "";
+    } catch (e) {
+        return "";
+    }
+}
+
+function applySelectedSortState(name, id, vault){
+    let sortNameEl = document.getElementById("sortName");
+    let sortVaultEl = document.getElementById("sortVault");
+    let allSortEl = document.getElementById("allSort");
+    let displayName = name && name.length > 0 ? name : "全部";
+    let displayId = id && String(id).length > 0 ? String(id) : "0";
+    sortNameEl.textContent = displayName;
+    sortVaultEl.innerHTML = vault || "";
+    allSortEl.value = displayId;
+    allSortEl.title = displayName;
+}
 
 let allSort = document.getElementById("allSort");
+applySelectedSortState(getNavQueryValue("sortName"), getNavQueryValue("sortId"), getNavQueryValue("sortVault"));
 
 allSort.onmouseenter=function (){
     let display = document.getElementById("AllSortDiv").style;
@@ -204,11 +224,14 @@ allSort.onmouseenter=function (){
             url:"sort/selectHaveProduct"
         }).then(function (resp){
             let datas=resp.data;
+            let currentSortId = String(document.getElementById("allSort").value || "0");
             let formdata="";
             for (let i = 0; i < datas.length; i++) {
-                formdata+="<div class=\"sort\" title='双击进入分类，单击确定搜索范围'>"+datas[i].name+"</div>"
+                let activeClass = String(datas[i].id) === currentSortId ? " current-sort" : "";
+                formdata+="<div class=\"sort"+activeClass+"\" title='双击进入分类，单击确定搜索范围'>"+datas[i].name+"</div>"
             }
-            document.getElementById("allSortContent").innerHTML=' <div id="all">全部</div>'
+            let allClass = currentSortId === "0" ? " class=\"current-sort\"" : "";
+            document.getElementById("allSortContent").innerHTML=' <div id="all"'+allClass+'>全部</div>'
             document.getElementById("allSortContent").innerHTML+=formdata;
             let sorts = document.querySelectorAll(".sort");
             // 初始化变量
@@ -220,9 +243,7 @@ allSort.onmouseenter=function (){
 
                     // 设置延时执行单击事件
                     clickTimeout = setTimeout(function() {
-                        document.getElementById("sortName").innerHTML=''+datas[i].name+'';
-                        document.getElementById("sortVault").innerHTML = ''+datas[i].vault+''
-                        document.getElementById("allSort").value=datas[i].id;
+                        applySelectedSortState(datas[i].name, datas[i].id, datas[i].vault);
                         document.getElementById("AllSortDiv").style.opacity="0";
                         display.pointerEvents = "none";
                     }, 250); // 250ms延时以检测可能的双击
@@ -240,8 +261,7 @@ allSort.onmouseenter=function (){
             }
 
             document.getElementById("all").onclick = function (){
-                document.getElementById("sortName").innerHTML='全部<i class="allSortBefore"></i>';
-                document.getElementById("allSort").value=0;
+                applySelectedSortState("全部", 0, "");
                 document.getElementById("AllSortDiv").style.opacity="0";
                 display.pointerEvents = "none";
 

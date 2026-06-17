@@ -74,7 +74,7 @@ h3{
                 <div><img style="min-width: 256px" src="images/logo2.png" alt=""></div>
             </a>
         </div>
-        <div style="width: 100%;height: auto;position: relative">
+        <div style="flex: 1;min-width: 0;height: auto;position: relative">
             <div class="top-searchbar">
                 <button id="allSort" value="0"><span id="sortName">全部</span><span id="sortVault" style="display:none"></span><i class="allSortBefore">﹀</i></button>
                 <label for="searchContent"></label><input id="searchContent" type="search" oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
@@ -370,9 +370,10 @@ h3{
         const encodedValue = encodeURIComponent(value); // 输出 "abc%25",输出对应的编码
         //获取分类筛选条件
         let value1 = document.getElementById("allSort").value;
+        let sortName = encodeURIComponent(document.getElementById("sortName").textContent.trim());
 
         if (value.length>0){
-            location.href="productResult.html?str="+encodedValue+"&sortId="+value1+"&level="+4+"&sortVault="+sortVault+"";
+            location.href="productResult.html?str="+encodedValue+"&sortId="+value1+"&level="+4+"&sortVault="+sortVault+"&sortName="+sortName+"";
         }else {
             alert("请输入查询关键字！")
         }

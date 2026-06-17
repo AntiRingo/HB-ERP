@@ -1,3 +1,15 @@
+.sq,
+html,
+body{
+    font-family: Arial, sans-serif;
+}
+input,
+button,
+textarea,
+select{
+    font-family: inherit;
+}
+
 .searchBefore::before{
     content: "";
     display: block;
@@ -38,6 +50,61 @@ i{
     top: -20px;
     left: 15%;
 
+}
+
+#AllSortDiv #allSortContent{
+    display: block !important;
+    columns: 4;
+    column-gap: 14px;
+    padding: 8px 12px 12px;
+    box-sizing: border-box;
+}
+@media (max-width: 1400px) {
+    #AllSortDiv #allSortContent{
+        columns: 3;
+    }
+}
+@media (max-width: 1100px) {
+    #AllSortDiv #allSortContent{
+        columns: 2;
+    }
+}
+@media (max-width: 720px) {
+    #AllSortDiv #allSortContent{
+        columns: 1;
+    }
+}
+#AllSortDiv #allSortContent #all,
+#AllSortDiv #allSortContent .sort{
+    width: auto;
+    margin: 2px 0;
+    padding: 2px 4px;
+    border-radius: 3px;
+    display: block;
+    break-inside: avoid;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #0070bb;
+    background: transparent;
+    box-shadow: none;
+}
+#AllSortDiv #allSortContent #all{
+    font-weight: 400;
+    color: #0070bb;
+}
+#AllSortDiv #allSortContent .current-sort{
+    color: #111 !important;
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.05);
+}
+#AllSortDiv #allSortContent #all.current-sort{
+    font-weight: 700;
+    background: rgba(0, 0, 0, 0.05);
+}
+#AllSortDiv #allSortContent #all:hover,
+#AllSortDiv #allSortContent .sort:hover{
+    background: rgba(0, 112, 187, 0.08);
+    text-decoration: underline;
 }
 .sort{
     width: fit-content;
@@ -204,18 +271,26 @@ i{
 }
 
 #two a{
-    color: #007bff;
+    color: #0070bb;
     text-decoration: none;
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 3px;
 }
 #two a:hover{
-    color: blue;
+    background: rgba(0, 112, 187, 0.08);
+    text-decoration: underline;
 }
 #threeSort a{
-    color: #007bff;
+    color: #0070bb;
     text-decoration: none;
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 3px;
 }
 #threeSort a:hover{
-    color: blue;
+    background: rgba(0, 112, 187, 0.08);
+    text-decoration: underline;
 }
 
 #two2 a{

@@ -63,18 +63,26 @@
         padding-bottom: 28px;
     }
     #two a{
-        color: #007bff;
+        color: #0070bb;
         text-decoration: none;
+        display: inline-block;
+        padding: 2px 4px;
+        border-radius: 3px;
     }
     #two a:hover{
-        color: blue;
+        background: rgba(0, 112, 187, 0.08);
+        text-decoration: underline;
     }
     #threeSort a{
-        color: #007bff;
+        color: #0070bb;
         text-decoration: none;
+        display: inline-block;
+        padding: 2px 4px;
+        border-radius: 3px;
     }
     #threeSort a:hover{
-        color: blue;
+        background: rgba(0, 112, 187, 0.08);
+        text-decoration: underline;
     }
     .location a{
         color: #007bff;
@@ -124,6 +132,42 @@
     }
     .resultSort a:active{
         color: #007bff;
+    }
+
+    .result-columns{
+        column-count: 4;
+        column-gap: 14px;
+    }
+    @media (max-width: 1400px) {
+        .result-columns{
+            column-count: 3;
+        }
+    }
+    @media (max-width: 1100px) {
+        .result-columns{
+            column-count: 2;
+        }
+    }
+    @media (max-width: 720px) {
+        .result-columns{
+            column-count: 1;
+        }
+    }
+    .result-columns .resultSort{
+        width: auto;
+        margin: 2px 0;
+        padding-left: 0;
+        break-inside: avoid;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    .result-columns .resultSort a{
+        display: inline-block;
+        padding: 1px 3px;
+        border-radius: 3px;
+    }
+    .result-columns .resultSort a:hover{
+        background: rgba(0, 112, 187, 0.08);
     }
     .sticky-table table {
         border-collapse: collapse;
@@ -536,7 +580,7 @@
                 <div><img style="min-width: 256px" src="images/logo2.png" alt=""></div>
             </a>
         </div>
-        <div style="width: 100%;height: auto;position: relative">
+        <div style="flex: 1;min-width: 0;height: auto;position: relative">
             <div class="top-searchbar">
                 <button id="allSort" value="0"><span id="sortName">全部</span><span id="sortVault" style="display:none"></span><i class="allSortBefore">﹀</i></button>
                 <label for="searchContent"></label><input id="searchContent" type="search" oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
@@ -654,9 +698,9 @@
             <span>在结果中搜索:</span>
         </div>
         <div style="width: 100%;height: auto;display: flex">
-            <div style="width:75%;min-width: 400px; margin: 8px auto;height: auto;display: flex;">
-                <label for="searchContent"></label><input id="searchContent1" type="search" style="width: 45%;min-width: 200px; height: 39px;font-size:16px;padding: 0 10px " oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
-                <button id="search1" value="搜索"><i class="searchBefore"></i></button>
+            <div class="top-searchbar top-searchbar--simple">
+                <label for="searchContent1"></label><input id="searchContent1" class="searchbar-input" type="search" oninput="value=value.replace(/\s+/g,'')" placeholder="物料编号/关键字">
+                <button id="search1" class="searchbar-btn" value="搜索"><i class="searchBefore"></i></button>
             </div>
             <div style="width: 25%;height: auto;text-align: center">
                 <button id="back" style="width: 50px;height: 39px;margin: 8px auto;border-radius: 10px">
@@ -673,7 +717,7 @@
     </div>
 
 <!--    查询出来的结果分类-->
-    <div id="resultSort" style="width: 75%;height: auto;display: flex;flex-wrap:wrap;">
+    <div id="resultSort" class="result-columns" style="width: 75%;height: auto;">
 
 
 
@@ -1165,9 +1209,10 @@
         const encodedValue = encodeURIComponent(value); // 输出 "abc%25",输出对应的编码
         //获取分类筛选条件
         let value1 = document.getElementById("allSort").value;
+        let sortName = encodeURIComponent(document.getElementById("sortName").textContent.trim());
 
         if (value.length>0){
-            location.href="productResult.html?str="+encodedValue+"&sortId="+value1+"&level="+4+"";
+            location.href="productResult.html?str="+encodedValue+"&sortId="+value1+"&level="+4+"&sortName="+sortName+"";
         }else {
             alert("请输入查询关键字！")
         }
