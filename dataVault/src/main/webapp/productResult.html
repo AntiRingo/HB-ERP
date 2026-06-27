@@ -433,9 +433,71 @@
         border:white solid 1px;
     }
 
-    .window thead{
+    .application-panel{
+        box-sizing: border-box;
+        --application-panel-width: 99%;
+        --application-panel-title-height: 31px;
+    }
+
+    .application-panel table{
+        width: var(--application-panel-width);
+        margin: auto;
+        border-collapse: collapse;
+        border-spacing: 0;
+        table-layout: fixed;
+        border: 1px solid var(--border);
+    }
+
+    .application-panel-title{
+        position: sticky !important;
+        top: 0 !important;
+        width: var(--application-panel-width) !important;
+        height: var(--application-panel-title-height) !important;
+        line-height: var(--application-panel-title-height) !important;
+        z-index: 30 !important;
+        margin: 0 auto !important;
+        overflow: hidden;
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 1px 0 rgba(15, 74, 168, 0.12);
+    }
+
+    .application-panel thead{
         position: sticky;
-        top: 32px;
+        top: var(--application-panel-title-height);
+        z-index: 20;
+        background-color: #eaf4ff;
+    }
+
+    .application-panel thead th{
+        background-color: #eaf4ff;
+        background-clip: padding-box;
+        box-shadow: inset 0 -1px 0 var(--border);
+        border: 1px solid var(--border);
+        padding: 6px 8px;
+        text-align: center;
+    }
+
+    .application-panel tbody td{
+        border: 1px solid #d9e6f7;
+        padding: 6px 8px;
+        background-color: #ffffff;
+        vertical-align: middle;
+    }
+
+    .application-panel tbody tr:nth-child(even) td{
+        background-color: #f7fbff;
+    }
+
+    .application-panel tbody tr:hover td{
+        background-color: #eef5ff;
+    }
+
+    .application-panel-actions{
+        position: sticky !important;
+        width: var(--application-panel-width);
+        bottom: 0;
+        z-index: 25;
+        box-shadow: 0 -1px 0 rgba(15, 74, 168, 0.12);
     }
 .checkMyApp{
     text-decoration: none;
@@ -447,10 +509,6 @@
 }
 .deleteOne{
     text-decoration: none;
-}
-.window table{
-    width: 99%;
-    margin: auto;
 }
     #myOrderContentTableBody tr{
         cursor: pointer;
@@ -994,9 +1052,9 @@
     <div class="window-content">
 
         <div class="window-content-close">×</div>
-        <div id="addOrder" class="aa" style="width:80% ;height: auto;max-height: 95%; background-color: white;position: absolute;overflow-y: auto;margin: 5px auto auto 10%;">
+        <div id="addOrder" class="aa application-panel" style="width:80% ;height: auto;max-height: 95%; background-color: white;position: absolute;overflow-y: auto;margin: 5px auto auto 10%;">
 
-            <div style="width:99.9%;height: 29px;background-color: #0070bb;margin:1px auto;
+            <div class="application-panel-title" style="width:99.9%;height: 29px;background-color: #0070bb;margin:1px auto;
      line-height: 29px;text-align: center;color: white;font-size: 9pt;position: sticky;top: 1px;z-index: 22222"><b>物品清单</b></div>
             <table border="0" width="100%" >
                 <!--    标题-->
@@ -1019,7 +1077,7 @@
 
             </table>
             <input id="notes" style="width: 96%;height: 30px;border-radius: 5px;border: black solid 1px;margin:5px 1.5%" placeholder="在这里输入备注信息！" maxlength="50">
-            <div style="width: 99%;height: auto;text-align: center;margin: auto;background-color: white;position: sticky;bottom: 0;padding-top: 5px;padding-bottom: 5px">
+            <div class="application-panel-actions" style="width: 99%;height: auto;text-align: center;margin: auto;background-color: white;position: sticky;bottom: 0;padding-top: 5px;padding-bottom: 5px">
 <!--                <button id="get" style="padding: 5px;margin: auto 2%">领料申请</button>-->
 <!--                <button id="return" style="padding: 5px;margin: auto 2%">退料申请</button>-->
 <!--                <button id="buy" style="padding: 5px;margin: auto 2%">采购申请</button>-->
@@ -1062,7 +1120,7 @@
 
         </div>
 
-        <div id="myOrder" class="aa" style="width:80% ;height: auto;max-height: 95%; margin: 5px auto auto 10%;background-color: white;padding-bottom: 5px;display: none;position: absolute;overflow-y: auto">
+        <div id="myOrder" class="aa application-panel" style="width:80% ;height: auto;max-height: 95%; margin: 5px auto auto 10%;background-color: white;padding-bottom: 5px;display: none;position: absolute;overflow-y: auto">
             <div  style="width: fit-content;margin: 10px auto auto auto;text-align: center;flex-wrap: wrap;display: flex">
                 <div style="width: fit-content;height: auto;max-width: 30%;min-width:fit-content; margin: auto 20px"> 开始日期：<input id="between" type="date" value=""><label
                         for="between"> </label></div>
@@ -1071,7 +1129,7 @@
 
             </div>
 
-            <div style="width:99.9%;height: 29px;background-color: #0070bb;margin:1px auto;
+            <div class="application-panel-title" style="width:99.9%;height: 29px;background-color: #0070bb;margin:1px auto;
      line-height: 29px;text-align: center;color: white;font-size: 9pt;position: sticky;top: 1px;z-index: 22222"><b>我的申请</b>
             </div>
             <table border="0" width="100%" >
@@ -1116,10 +1174,10 @@
         </div>
 
 
-        <div id="myOrderContent" class="aa" style="width:80% ;height: auto;max-height: 95%; background-color: white;position: absolute;overflow-y: auto;margin: 5px auto auto 10%;">
+        <div id="myOrderContent" class="aa application-panel" style="width:80% ;height: auto;max-height: 95%; background-color: white;position: absolute;overflow-y: auto;margin: 5px auto auto 10%;">
 
 
-            <div style="width:99.9%;height: 29px;background-color: #0070bb;margin:1px auto;
+            <div class="application-panel-title" style="width:99.9%;height: 29px;background-color: #0070bb;margin:1px auto;
      line-height: 29px;text-align: center;color: white;font-size: 9pt;position: sticky;top: 1px;z-index: 22222"><b>申请单详情<span style="display: none" id="oldOrderNumber"></span></b>
             </div>
             <table border="0"  width="100%" >
@@ -1140,7 +1198,7 @@
 
             </table>
             <label for="checkNotes"></label><input id="checkNotes" style="width: 96%;height: 30px;border-radius: 5px;border: black solid 1px;margin:5px 1.5%" disabled>
-            <div style="width: 99%;height: auto;text-align: center;margin:auto;padding-top: 5px;padding-bottom: 5px;background-color: white;position: sticky;bottom: 0">
+            <div class="application-panel-actions" style="width: 99%;height: auto;text-align: center;margin:auto;padding-top: 5px;padding-bottom: 5px;background-color: white;position: sticky;bottom: 0">
                 <div id="MyRobotBox"  style="display: inline-block;border: black solid 1px;border-radius: 3px;font-size: 13.3333px;font-family: Arial;padding: 5px 5px">  配送<label for="robot"></label><input   type="checkbox" id="myRobot"></div>
 
                 <button id="revoke" style="padding: 5px;margin: auto 2%">撤销申请</button>
