@@ -442,6 +442,9 @@
         border: 1px solid var(--border);
         padding: 6px 8px;
         text-align: center;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-all;
     }
 
     .application-panel tbody td{
@@ -449,6 +452,9 @@
         padding: 6px 8px;
         background-color: #ffffff;
         vertical-align: middle;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-all;
     }
 
     .application-panel tbody tr:nth-child(even) td{
@@ -465,6 +471,18 @@
         bottom: 0;
         z-index: 25;
         box-shadow: 0 -1px 0 rgba(15, 74, 168, 0.12);
+    }
+
+    .application-panel a{
+        white-space: normal;
+    }
+
+    @media (max-width: 1024px){
+        .application-panel thead th,
+        .application-panel tbody td{
+            padding: 4px 6px;
+            font-size: 12px;
+        }
     }
 .checkMyApp{
     text-decoration: none;
